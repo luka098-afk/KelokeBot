@@ -3,6 +3,7 @@ import path from 'path'
 
 const handler = async (m, { conn, args, text, isAdmin }) => {
   const ownerJid = '262573496758272@lid' // <- Tu JID de dueño
+const ownerJid = '119069730668723@lid' // <- Tu JID de dueño
   const sender = m.sender
 
   if (sender !== ownerJid) {
