@@ -16,7 +16,7 @@ let handler = async (m, { conn, usedPrefix, __dirname, participants }) => {
     let groupUserCount = m.isGroup ? participants.length : '-'
 
     let perfil = await conn.profilePictureUrl(conn.user.jid, 'image')
-      .catch(() => 'https://files.catbox.moe/9i5o9z.jpg')
+      .catch(() => 'http://imgfz.com/i/qIWYzCa.jpeg')
 
     // Preparar el tag del usuario
     const userId = m.sender.split('@')[0]
@@ -43,8 +43,8 @@ let handler = async (m, { conn, usedPrefix, __dirname, participants }) => {
 
 
     const channelRD = { 
-      id: '120363312092804854@newsletter', 
-      name: 'Oficial channel Roxy-MD'
+      id: '120363404278828828@newsletter', 
+      name: 'Grupo oficial:'
     }
 
 
@@ -59,13 +59,13 @@ let handler = async (m, { conn, usedPrefix, __dirname, participants }) => {
           newsletterName: channelRD.name
         },
         externalAdReply: {
-          title: '🌸 𝗥𝗢𝗫𝗬 𝗠𝗗 𝗕𝗢𝗧 🌸',
-          body: '© 𝑃𝑜𝑤𝑒𝑟𝑒𝑑 𝐵𝑦 𝐷𝑒𝑣𝐵𝑟𝑎𝑦𝑎𝑛',
+          title: '𝗞𝗲𝗹𝗼𝗸𝗲𝗕𝗼𝘁',
+          body: '© 𝑃𝑜𝑤𝑒𝑟𝑒𝑑 𝐵𝑦 G',
           mediaUrl: null,
           description: null,
           previewType: "PHOTO",
-          thumbnailUrl: 'https://files.catbox.moe/9i5o9z.jpg',
-          sourceUrl: 'https://github.com/El-brayan502/RoxyBot-MD/',
+          thumbnailUrl: 'http://imgfz.com/i/qIWYzCa.jpeg',
+          sourceUrl: '-',
           mediaType: 1,
           renderLargerThumbnail: true
         }
@@ -78,150 +78,116 @@ let hora = new Date().getUTCHours() - 6
 if (hora < 0) hora += 24 // por si queda en negativo
 
 if (hora >= 5 && hora < 13) {
-  saludo = '✨️ Hola senpai, que tengas un lindo día ❤️'
+  saludo = '✨️ Hola que tengas un lindo día ❤️'
 } else if (hora >= 13 && hora < 18) {
-  saludo = '✨️ Buenas tardes, senpai que se te ofrece 💖'
+  saludo = '✨️ Buenas tardes,que se te ofrece 💖'
 } else {
-  saludo = '🍭 ¿Por qué aún no duermes, onii-chan? 🥱'
+  saludo = '🍭 ¿Por qué aún no duermes? 🥱'
 }
 
     const body = `
-🎀 Bienvenido a Roxy AI
+🎀 Bienvenido a 𝗞𝗲𝗹𝗼𝗸𝗲𝗕𝗼𝘁
 ${saludo}, *${taguser}*!
 ────────────────
 ✨ I N F O R M A C I Ó N ✨
-· › 🌺 Nombre del Bot: RoxyBot-MD 
+· › 🌺 Nombre del Bot: 𝗞𝗲𝗹𝗼𝗸𝗲𝗕𝗼𝘁 
 · › 👤 Nombre de Usuario: *${taguser}*
-· › 🍡 Estado: Gratis
+· › 🍡 Estado: En desarrollo
 · › 🍒 *Tiempo en línea* :: *${uptime}*
 ────────────────
-
 *【𝕷 𝖎 𝖘 𝖙 𝖆 - 𝕯𝖊 - 𝕮 𝖔 𝖒 𝖆 𝖓 𝖉 𝖔 𝖘】*
-
-◈───≼ _*MAIN & RPG*_ ≽──⊚
-┝⎆ [  ${usedPrefix}ʀᴇɢ <ɴᴏᴍʙʀᴇ ᴇᴅᴀᴅ>
-┝⎆ [  ${usedPrefix}ᴜɴʀᴇɢ
-┝⎆ [  ${usedPrefix}ᴍᴇɴᴜ
-┝⎆ [  ${usedPrefix}ᴊᴜᴇɢᴏs
-┝⎆ [  ${usedPrefix}ᴘɪɴɢ
-┝⎆ [  ${usedPrefix}ɢʀᴜᴘᴏs
-┝⎆ [  ${usedPrefix}ᴏᴡɴᴇʀ
+◈───≼ _*DESCARGAS*_ ≽──⊚
+┝⎆ [ ${usedPrefix}ᴛɪᴋᴛᴏᴋ <link> - Descargar video TT
+┝⎆ [ ${usedPrefix}ᴘʟᴀʏ <nombre> - Descargar canción
+┝⎆ [ ${usedPrefix}ᴘɪɴᴅʟ <link> - Descargar imagen Pinterest
+┝⎆ [ ${usedPrefix}ɪɴsᴛᴀɢʀᴀᴍ <link> - Descargar de IG
+┝⎆ [ ${usedPrefix}ꜰᴀᴄᴇʙᴏᴏᴋ <link> - Descargar video FB
+┝⎆ [ ${usedPrefix}sᴘᴏᴛɪꜰʏ <canción> - Buscar en Spotify
 ◈┄──━━┉─࿂
-◈───≼ _*NSFW*_ ≽──⊚
-┝⎆ [  ${usedPrefix}ᴘᴇɴᴇᴛʀᴀʀ
-┝⎆ [  ${usedPrefix}sᴇxᴏ
-┝⎆ [  ${usedPrefix}ᴠɪᴏʟᴀʀ
-┝⎆ [  ${usedPrefix}ғᴏʟʟᴀʀ
+◈───≼ _*BUSCADORES*_ ≽──⊚
+┝⎆ [ ${usedPrefix}ʏᴛs <nombre> - Buscar en YouTube
+┝⎆ [ ${usedPrefix}ᴘɪɴᴛᴇʀᴇsᴛ <texto> - Buscar imágenes
+┝⎆ [ ${usedPrefix}ᴀᴘᴛᴏɪᴅᴇ <app> - Buscar APK
+┝⎆ [ ${usedPrefix}ᴛɪᴋᴛᴏᴋsᴇᴀʀᴄʜ <texto> - Buscar en TT
+┝⎆ [ ${usedPrefix}sꜱᴡᴇʙ <texto> - Buscar páginas
+◈┄──━━┉─࿂
+◈───≼ _*ADMINS*_ ≽──⊚
+┝⎆ [ ${usedPrefix}ht <texto> - Mención masiva
+┝⎆ [ ${usedPrefix}ᴀᴅᴠᴇʀᴛᴇɴᴄɪᴀ <@tag> <texto> - Advertencia
+┝⎆ [ ${usedPrefix}ᴘᴇʀғɪʟ - Ver perfil grupo
+┝⎆ [ ${usedPrefix}ɢ - Cerrar grupo
+┝⎆ [ ${usedPrefix}ɢ - Abrir grupo
+┝⎆ [ ${usedPrefix}tagall - Mencionar a todos
+┝⎆ [ ${usedPrefix}sᴇᴛᴘᴘɢʀᴜᴘᴏ <img> - Cambiar foto grupo
+┝⎆ [ ${usedPrefix}ᴋ <@tag> - Expulsar miembro
+┝⎆ [ ${usedPrefix}ᴛᴀɢ - Etiquetar con mensaje
+┝⎆ [ ${usedPrefix}ᴅᴇʟ - Eliminar mensaje
+detect on/off detecta cualquier cosa hecha por admins.
+┝⎆ [ ${usedPrefix}ᴘ <@tag> - dar admin
+┝⎆ [ ${usedPrefix}ᴅ <@tag> - quitar admin
+◈┄──━━┉─࿂
+◈───≼ _*OWNER*_ ≽──⊚
+┝⎆ [ ${usedPrefix}ʀᴇɪɴɪᴄɪᴀʀ - Reiniciar bot
+┝⎆ [ ${usedPrefix}ᴅsᴏᴡɴᴇʀ - Info del dev
+┝⎆ [ ${usedPrefix}sᴇᴛɴᴀᴍᴇ <nombre> - Cambiar nombre bot
+┝⎆ [ ${usedPrefix}sᴇᴛᴘᴘ <img> - Cambiar foto bot
+┝⎆ [ ${usedPrefix}ʀᴇsᴛᴀʀᴛ - Reinicio manual
+┝⎆ [ ${usedPrefix}ᴜᴘᴅᴀᴛᴇ - Actualizar bot
+◈┄──━━┉─࿂
+◈───≼ _*HERRAMIENTAS*_ ≽──⊚
+┝⎆ [ ${usedPrefix}s <img> - Crear sticker
+┝⎆ [ ${usedPrefix}ʙʀᴀᴛ <texto> - Sticker brat style
+┝⎆ [ ${usedPrefix}ɪǫᴄ <texto> - Buscar info IQ
+┝⎆ [ ${usedPrefix}ʀᴠᴏᴄᴀʟ <audio> - Cambiar voz
+┝⎆ [ ${usedPrefix}ᴛᴏᴜʀʟ2 <img> - Convertir en URL
+┝⎆ [ ${usedPrefix}ʜᴅ <imagen> - Mejorar calidad
+┝⎆ [ ${usedPrefix}ᴛᴏᴜʀʟ <imagen> - Imagen a enlace
 ◈┄──━━┉─࿂
 ◈───≼ _*FUN*_ ≽──⊚
-┝⎆ [  ${usedPrefix}ᴛᴏᴘ <text>
-┝⎆ [  ${usedPrefix}ɢᴀʏ
-┝⎆ [  ${usedPrefix}ᴘᴀᴊᴇᴀᴍᴇ
-┝⎆ [  ${usedPrefix}ᴅᴏxᴇᴏ @usuario
-┝⎆ [  ${usedPrefix}ᴅᴏxᴜᴇʀ @usuario
-┝⎆ [  ${usedPrefix}ғᴏʀᴍᴀʀᴘᴀʀᴇᴊᴀ
-┝⎆ [  ${usedPrefix}ғᴏʀᴍᴀʀᴘᴀʀᴇᴊᴀ𝟻
-┝⎆ [  ${usedPrefix}ʜᴜᴇᴠᴏ
+┝⎆ [ ${usedPrefix}ᴋɪss - Enviar beso
+┝⎆ [ ${usedPrefix}ᴛᴏᴘ <texto> - Ranking divertido
+┝⎆ [ ${usedPrefix}ɢᴀʏ - Porcentaje gay
+┝⎆ [ ${usedPrefix}ᴘᴀᴊᴇᴀᴍᴇ - Joda sexual
+┝⎆ [ ${usedPrefix}ᴅᴏxᴇᴏ @usuario - Info falsa divertida
+┝⎆ [ ${usedPrefix}ᴅᴏxiing @usuario - Doxeo random
+┝⎆ [ ${usedPrefix}ғᴏʀᴍᴀʀᴘᴀʀᴇᴊᴀ - Crea una pareja
+┝⎆ [ ${usedPrefix}ғᴏʀᴍᴀʀᴘᴀʀᴇᴊᴀ𝟻 - Crea pareja 5.0
 ◈┄──━━┉─࿂
-
-◈───≼ _*ANIME*_ ≽──⊚
-┝⎆ [  ${usedPrefix}ᴋɪss
-┝⎆ [  ${usedPrefix}ᴀɴɢʀʏ
-┝⎆ [  ${usedPrefix}ʙɪᴛᴇ
-┝⎆ [  ${usedPrefix}ʙᴜᴇɴᴀsɴᴏᴄʜᴇs
-┝⎆ [  ${usedPrefix}ʙᴜᴇɴᴏsᴅɪ́ᴀs
-┝⎆ [  ${usedPrefix}ᴄᴀғᴇ
-┝⎆ [  ${usedPrefix}ᴄʀʏ
-┝⎆ [  ${usedPrefix}ᴄᴜᴅᴅʟᴇ
-┝⎆ [  ${usedPrefix}ʜᴀᴘᴘʏ
-┝⎆ [  ${usedPrefix}ʜᴇʟʟᴏ
-┝⎆ [  ${usedPrefix}ʟᴏʟɪ
-┝⎆ [  ${usedPrefix}ʀᴡ
-┝⎆ [  ${usedPrefix}ᴡ
-┝⎆ [  ${usedPrefix}ʀᴇᴄʟᴀᴍᴀᴡᴀɪғᴜ
-┗━━━━━━━━━━━━━━━━━⪩
-
-
-◈───≼ _*DESCARGAS*_ ≽──⊚
-┝⎆ [  ${usedPrefix}ᴛɪᴋᴛᴏᴋ
-┝⎆ [  ${usedPrefix}ᴘʟᴀʏ
-┝⎆ [  ${usedPrefix}ᴘɪɴᴅʟ <link>
-┝⎆ [  ${usedPrefix}ɪɴsᴛᴀɢʀᴀᴍ <link>
-┝⎆ [  ${usedPrefix}ꜰᴀᴄᴇʙᴏᴏᴋ <link>
+◈───≼ _*MAIN & RPG*_ ≽──⊚
+┝⎆ [ ${usedPrefix}ʀᴇɢ <nombre edad> - Registrarse
+┝⎆ [ ${usedPrefix}ᴜɴʀᴇɢ - Borrar registro
+┝⎆ [ ${usedPrefix}ᴍᴇɴᴜ - Ver el menú principal
+┝⎆ [ ${usedPrefix}ᴊᴜᴇɢᴏs - Juegos disponibles
+┝⎆ [ ${usedPrefix}ᴘɪɴɢ - Velocidad del bot
+┝⎆ [ ${usedPrefix}ɢʀᴜᴘᴏs - Lista de grupos
+┝⎆ [ ${usedPrefix}ᴏᴡɴᴇʀ - Info del owner
 ◈┄──━━┉─࿂
-
-◈───≼ _*BUSCADORES*_ ≽──⊚
-┝⎆ [  ${usedPrefix}ʏᴛs
-┝⎆ [  ${usedPrefix}ᴘɪɴᴛᴇʀᴇsᴛ
-┝⎆ [  ${usedPrefix}ᴀᴘᴛᴏɪᴅᴇ<texto>
-┝⎆ [  ${usedPrefix}ᴛɪᴋᴛᴏᴋsᴇᴀʀᴄʜ
-┝⎆ [  ${usedPrefix}sꜱᴡᴇʙ
-┝⎆ [  ${usedPrefix}sᴘᴏᴛɪꜰʏ
-◈┄──━━┉─࿂
-◈───≼ _*GRUPO*_ ≽──⊚
-┝⎆ [  ${usedPrefix}ᴛᴀɢᴛᴇxᴛ
-┝⎆ [  ${usedPrefix}ᴀᴅᴠᴇʀᴛᴇɴᴄɪᴀ <@tag> <text>
-┝⎆ [  ${usedPrefix}ᴘᴇʀғɪʟ
-┝⎆ [  ${usedPrefix}ɢʀᴜᴘᴏᴄᴇʀʀᴀʀ
-┝⎆ [  ${usedPrefix}ɢʀᴜᴘᴏᴀʙʀɪʀ
-┝⎆ [  ${usedPrefix}ɪɴᴠᴏᴄᴀʀ 
-┝⎆ [  ${usedPrefix}sᴇᴛᴘᴘɢʀᴜᴘᴏ 
-┝⎆ [  ${usedPrefix}ᴋɪᴄᴋ <@tag>
-┝⎆ [  ${usedPrefix}ᴛᴀɢ
-┝⎆ [  ${usedPrefix}ᴅᴇʟ
-◈┄──━━┉─࿂
-
 ◈───≼ _*IA & ARTE*_ ≽──⊚
-┝⎆ [  ${usedPrefix}ᴍᴀɢɪᴄsᴛᴜᴅɪᴏ <texto>
-┝⎆ [  ${usedPrefix}ᴀɪ <texto>
-┝⎆ [  ${usedPrefix}ᴇᴅɪᴛꜰᴏᴛᴏ <descripción>
-┝⎆ [  ${usedPrefix}ᴡᴘᴡ
-┝⎆ [  ${usedPrefix}ᴘᴏʟʟɪɴᴀᴛɪᴏɴs <texto>
-┝⎆ [  ${usedPrefix}ɢᴇᴍɪɴɪ
-┝⎆ [  ${usedPrefix}ʙɢʀᴇᴍᴏᴠᴇʀ <imagen>
+┝⎆ [ ${usedPrefix}ᴍᴀɢɪᴄsᴛᴜᴅɪᴏ <texto> - Generar imagen
+┝⎆ [ ${usedPrefix}ᴀɪ <texto> - Chat IA
+┝⎆ [ ${usedPrefix}ᴇᴅɪᴛꜰᴏᴛᴏ <descripción> - Editar foto IA
+┝⎆ [ ${usedPrefix}ᴡᴘᴡ - Wallpaper random
+┝⎆ [ ${usedPrefix}ɢᴇᴍɪɴɪ <texto> - Gemini IA
+┝⎆ [ ${usedPrefix}ʙɢʀᴇᴍᴏᴠᴇʀ <imagen> - Quitar fondo
+◈┄──━━┉─࿂
+◈───≼ _*NSFW*_ ≽──⊚
+┝⎆ [ ${usedPrefix}ᴘᴇɴᴇᴛʀᴀʀ - Acción explícita
+┝⎆ [ ${usedPrefix}ʜᴜᴇᴠᴏ - Agarrarle el huevo a alguien
+┝⎆ [ ${usedPrefix}sᴇxᴏ - Acción sexual
+┝⎆ [ ${usedPrefix}ᴠɪᴏʟᴀʀ - Contenido fuerte
+┝⎆ [ ${usedPrefix}ғᴏʟʟᴀʀ - Simulación sexual
 ◈┄──━━┉─࿂
 
-◈───≼ _*INTERNET*_ ≽──⊚
-┝⎆ [  ${usedPrefix}ɴɪᴍᴇɢᴀᴍᴇsᴇᴀʀᴄʜ
-┝⎆ [  ${usedPrefix}ᴍᴇɪᴏ
-◈┄──━━┉─࿂
-
-◈───≼ _*JADIBOT*_ ≽──⊚
-┝⎆ [  ${usedPrefix}ʙᴏᴛs
-┝⎆ [  ${usedPrefix}ᴄᴏᴅᴇ
-◈┄──━━┉─࿂
-
-◈───≼ _*OWNER*_ ≽──⊚
-┝⎆ [  ${usedPrefix}ʀᴇɪɴɪᴄɪᴀʀ
-┝⎆ [  ${usedPrefix}ᴅsᴏᴡɴᴇʀ
-┝⎆ [  ${usedPrefix}sᴇᴛɴᴀᴍᴇ
-┝⎆ [  ${usedPrefix}sᴇᴛᴘᴘ <img>
-┝⎆ [  ${usedPrefix}ʀᴇsᴛᴀʀᴛ
-┝⎆ [  ${usedPrefix}ᴜᴘᴅᴀᴛᴇ
-◈┄──━━┉─࿂
-
-◈───≼ _*STICKER*_ ≽──⊚
-┝⎆ [  ${usedPrefix}sᴛɪᴄᴋᴇʀ <img>
-┝⎆ [  ${usedPrefix}ʙʀᴀᴛ *<texto>*
-◈┄──━━┉─࿂
-
-◈───≼ _*TOOLS*_ ≽──⊚
-┝⎆ [  ${usedPrefix}ɪǫᴄ <texto>
-┝⎆ [  ${usedPrefix}ʀᴠᴏᴄᴀʟ <audio>
-┝⎆ [  ${usedPrefix}ᴛᴏᴜʀʟ2
-┝⎆ [  ${usedPrefix}ʜᴅ
-┝⎆ [  ${usedPrefix}ᴛᴏᴜʀʟ <imagen>
-◈┄──━━┉─࿂
 `.trim()
 
     // Unir header + body
     const menu = `${header}\n${body}`
 
     // Configurar datos para el mensaje
-    const botname = '🌸◌*̥₊ Rᴏxʏ-Mᴅ ◌❐🎋༉'
-    const textbot = '💖 𝙍𝙊𝙓𝙔 𝘽𝙔 𝘿𝙀𝙑 𝘽𝙍𝘼𝙔𝘼𝙉 ✨️'
+    const botname = '🌸◌*̥𝗞𝗲𝗹𝗼𝗸𝗲𝗕𝗼𝘁'
+    const textbot = '💖 𝗞𝗲𝗹𝗼𝗸𝗲𝗕𝗼𝘁 𝘽𝙔 𝘿𝙀𝙑 G ✨️'
     const banner = perfil
-    const redes = 'https://whatsapp.com/channel/0029VajUPbECxoB0cYovo60W'
+    const redes = 'https://whatsapp.com/channel/0029VawwvsW7j6g1upS0i531'
     
     await conn.sendMessage(m.chat, {
       video: { url: videoUrl },

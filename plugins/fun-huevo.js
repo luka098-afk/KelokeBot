@@ -1,29 +1,38 @@
-//Codígo creado por Destroy wa.me/584120346669
+// Código creado por Destroy wa.me/584120346669
+
+const emoji = '⚠️'; // Define el emoji que quieres usar en mensajes
 
 const handler = async (m, { conn, usedPrefix, command, text }) => {
   let who;
 
   if (m.isGroup) {
-    who = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : text ? text.replace(/[^0-9]/g, '') + '@s.whatsapp.net' : false;
+    who = m.mentionedJid && m.mentionedJid[0]
+      ? m.mentionedJid[0]
+      : m.quoted
+      ? m.quoted.sender
+      : text
+      ? text.replace(/[^0-9]/g, '') + '@s.whatsapp.net'
+      : false;
   } else {
     who = text ? text.replace(/[^0-9]/g, '') + '@s.whatsapp.net' : m.chat;
   }
 
-  if (!who) return m.reply(`${emoji} Por favor, menciona aun usuario.`);
+  if (!who) return m.reply(`${emoji} Por favor, menciona a un usuario.`);
 
   let pp = './src/catalogo.jpg';
   try {
     pp = await conn.getProfilePicture(who);
   } catch (e) {
+    // Si no hay foto, se usa imagen por defecto
   } finally {
-    let pp = await conn.profilePictureUrl(who, 'image').catch(_ => './src/catalogo.jpg');
-    let username = conn.getName(who);
+    pp = await conn.profilePictureUrl(who, 'image').catch(_ => './src/catalogo.jpg');
+    let username = await conn.getName(who);
     let str = `@${m.sender.split('@')[0]} le está agarrando el huevo a @${who.split('@')[0]}.`;
     let mentionedJid = [who, m.sender];
 
     const abrazo = await conn.reply(m.chat, str, m, { mentions: mentionedJid });
-    
-    conn.sendMessage(m.chat, { react: { text: '🍆', key: abrazo.key } });
+
+    await conn.sendMessage(m.chat, { react: { text: '🍆', key: abrazo.key } });
   }
 };
 

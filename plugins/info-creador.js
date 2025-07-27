@@ -14,27 +14,21 @@ let handler = async (m, { conn }) => {
 
   const owners = [
     {
-      name: 'DevBrayan',
-      desc: 'Creador Principal de NagiBotV3',
-      image: 'https://files.cloudkuimages.guru/images/fJk8xWXl.jpg',
+      name: 'German',
+      desc: 'Creador Principal de Kelokebot',
+      image: 'http://imgfz.com/i/QOMybA0.jpeg',
       buttons: [
-        { name: 'WhatsApp', url: 'https://wa.me/50231458537' },
-        { name: 'Instagram', url: 'https://www.instagram.com/elbrayan502ff' },
-        { name: 'Facebook', url: 'https://www.facebook.com/profile.php?id=61556686993783' },
-        { name: 'Telegram', url: 'https://t.me/DevBrayan' },
-        { name: 'TikTok', url: 'https://www.tiktok.com/@fantom_uwu_330' },
-        { name: 'PayPal', url: 'https://paypal.me/BrayanMoscoso' }
+        { name: 'WhatsApp', url: 'https://wa.me/59896026646' },
+        { name: 'Instagram', url: 'https://www.instagram.com/germanalvarez2007' },
       ]
     },
     {
-      name: 'DavBrayan2',
-      desc: 'Co-Creador de Roxy-MD',
-      image: 'https://files.cloudkuimages.guru/images/MLrB6aiO.jpg',
+      name: 'Felipe',
+      desc: 'Co-Creador de Kelokebot',
+      image: 'http://imgfz.com/i/QOMybA0.jpeg',
       buttons: [
-        { name: 'WhatsApp', url: 'https://wa.me/573001533523' },
-        { name: 'Instagram', url: 'https://www.instagram.com/elbrayan502ff' },
-        { name: 'TikTok', url: 'https://www.tiktok.com/@fantom_uwu_330' },
-        { name: 'PayPal', url: 'https://paypal.me/davidryze' }
+        { name: 'WhatsApp', url: 'https://wa.me/59898719147' },
+        { name: 'Instagram', url: 'https://www.instagram.com/feli_dipe' },
       ]
     }
   ]
@@ -78,7 +72,7 @@ let handler = async (m, { conn }) => {
         },
         interactiveMessage: proto.Message.InteractiveMessage.fromObject({
           body: proto.Message.InteractiveMessage.Body.create({
-            text: '✨️ Creadores de Roxy-MD & NagiBot-MD ✨️'
+            text: '✨️ Creadores de KelokeBot ✨️'
           }),
           footer: proto.Message.InteractiveMessage.Footer.create({
             text: 'Conoce a los desarrolladores del bot'

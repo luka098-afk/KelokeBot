@@ -2,7 +2,7 @@ import axios from 'axios'
 
 const handler = async (m, { conn, text, command }) => {
   if (!text) return conn.sendMessage(m.chat, {
-    text: `📌 ¿Dónde está el enlace? ¡Sensei despistado!\n\nEjemplo:\n.${command} https://id.pinterest.com/pin/16044142417873989/`
+    text: `📌 ¿Dónde está el enlace?\n\nEjemplo:\n.${command} https://id.pinterest.com/pin/16044142417873989/`
   }, { quoted: m })
 
   // Reacción inicial

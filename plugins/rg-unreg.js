@@ -18,7 +18,7 @@ let handler = async (m, { conn }) => {
   user.money = 0
 
   // Imagen de perfil
-  let pp = 'https://files.catbox.moe/3ee3ib.jpg'
+  let pp = '-' imagen
   try {
     pp = await conn.profilePictureUrl(m.sender, 'image')
   } catch (e) {}

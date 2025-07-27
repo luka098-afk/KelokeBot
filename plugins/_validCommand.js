@@ -3,9 +3,8 @@ export async function before(m, { conn }) {
     if (!m.text || !global.prefix || !global.prefix.test(m.text)) return;
 
     const Buffer = global.Buffer || ((...args) => new Uint8Array(...args));
-    
-    const channelRD = global.channelRD || { id: '120363312092804854@newsletter', name: 'Oficial channel roxy' };
-    const metanombre = global.metanombre || 'DevBrayan';
+    const channelRD = global.channelRD || { id: '0029VawwvsW7j6g1upS0i531@newsletter', name: 'Oficial channel' };
+    const metanombre = global.metanombre || 'DevByG';
 
     if (!Array.prototype.getRandom) {
       Array.prototype.getRandom = function () {
@@ -38,7 +37,7 @@ export async function before(m, { conn }) {
       },
       message: {
         contactMessage: {
-          displayName: 'DevBrayan',
+          displayName: 'DevByG',
           vcard: `BEGIN:VCARD\nVERSION:3.0\nFN:Meta AI\nORG:Meta AI\nTEL;type=CELL;type=VOICE;waid=50231458537:+502 3145 8537\nEND:VCARD`,
           jpegThumbnail: Buffer.from([]),
           contextInfo: {
@@ -59,13 +58,13 @@ export async function before(m, { conn }) {
           newsletterName: channelRD.name
         },
         externalAdReply: {
-          title: 'DevBrayan',
-          body: '🌸◌*̥₊ Rᴏxʏ-Mᴅ ◌❐🎋༉',
+          title: 'DevByG',
+          body: '🌸◌*̥₊ KelokeBot ◌❐🎋༉',
           mediaUrl: null,
           description: null,
           previewType: "PHOTO",
-          thumbnailUrl: 'https://files.cloudkuimages.guru/images/HUmjMRt8.jpg',
-          sourceUrl: 'https://github.com/El-brayan502/RoxyBot-MD/',
+          thumbnailUrl: 'http://imgfz.com/i/ysZD3vi.jpeg',
+          sourceUrl: '-',
           mediaType: 1,
           renderLargerThumbnail: true
         }
@@ -74,71 +73,62 @@ export async function before(m, { conn }) {
 
     const usedPrefix = global.prefix.exec(m.text)[0];
     const command = m.text.slice(usedPrefix.length).trim().split(' ')[0].toLowerCase();
-
     if (!command) return;
 
-    const validCommand = (command, plugins) => {
-      if (!plugins) return false;
-      return Object.values(plugins).some(plugin =>
-        plugin && plugin.command && (Array.isArray(plugin.command) ? plugin.command : [plugin.command]).includes(command)
-      );
+    const isValidCommand = (cmd) => {
+      return Object.values(global.plugins).some(plugin => {
+        if (!plugin.command) return false;
+        if (typeof plugin.command === 'function') return plugin.command(cmd);
+        if (plugin.command instanceof RegExp) return plugin.command.test(cmd);
+        if (Array.isArray(plugin.command)) return plugin.command.map(c => c.toLowerCase()).includes(cmd);
+        return plugin.command.toLowerCase() === cmd;
+      });
     };
 
     if (command === "bot") return;
 
-    if (validCommand(command, global.plugins)) {
+    if (isValidCommand(command)) {
       const chat = global.db.data.chats[m.chat];
       const user = global.db.data.users[m.sender];
 
-      if (chat && chat.isBanned) {
-        const adReplyMsgBanned = {
-          text: `《✦》El bot *Ryze Bot* está desactivado en este grupo.\n\n> ✦ Un *administrador* puede activarlo con el comando:\n> » *${usedPrefix}bot on*`,
+      if (chat?.isBanned) {
+        const msg = {
+          text: `《✦》El bot *KelokeBot* está desactivado en este grupo.\n\n> ✦ Un *administrador* puede activarlo con:\n» *${usedPrefix}bot on*`,
           contextInfo: {
             mentionedJid: [m.sender],
             externalAdReply: {
-              title: 'DevBrayan',
-              body: '🌸◌*̥₊ Rᴏxʏ-Mᴅ ◌❐🎋༉',
-              thumbnailUrl: 'https://files.cloudkuimages.guru/images/HUmjMRt8.jpg',
-              sourceUrl: 'https://github.com/El-brayan502/RoxyBot-MD/',
+              title: 'DevByG',
+              body: '🌸◌*̥₊ kelokebot ◌❐🎋༉',
+              thumbnailUrl: 'http://imgfz.com/i/ysZD3vi.jpeg',
+              sourceUrl: '-',
               mediaType: 1,
               renderLargerThumbnail: true
             }
           }
         };
-
-        try {
-          await conn.sendMessage(m.chat, adReplyMsgBanned, { quoted: global.fakeMetaMsg });
-        } catch (e) {
-          console.error("Error al enviar mensaje con formato:", e);
-          await m.reply(`《✦》El bot *RoxyBot-MD* está desactivado en este grupo.\n\n> ✦ Un *administrador* puede activarlo con el comando:\n> » *${usedPrefix}bot on*`);
-        }
+        await conn.sendMessage(m.chat, msg, { quoted: global.fakeMetaMsg });
         return;
       }
 
       if (user) user.commands = (user.commands || 0) + 1;
+
     } else {
       const comando = m.text.trim().split(' ')[0];
-      const adReplyMsgInvalidCommand = {
+      const msg = {
         text: `《✦》El comando *${comando}* no existe.\nPara ver la lista de comandos usa:\n» *${usedPrefix}help*`,
         contextInfo: {
           mentionedJid: [m.sender],
           externalAdReply: {
-            title: 'DevBrayan',
-            body: '🌸◌*̥₊ Rᴏxʏ-Mᴅ ◌❐🎋༉',
-            thumbnailUrl: 'https://files.cloudkuimages.guru/images/HUmjMRt8.jpg',
-            sourceUrl: 'https://github.com/El-brayan502/RoxyBot-MD/',
+            title: 'DevByG',
+            body: '🌸◌*̥₊ kelokebot ◌❐🎋༉',
+            thumbnailUrl: 'http://imgfz.com/i/ysZD3vi.jpeg',
+            sourceUrl: '-',
             mediaType: 1,
             renderLargerThumbnail: true
           }
         }
       };
-
-      try {
-        await conn.sendMessage(m.chat, adReplyMsgInvalidCommand, { quoted: global.fakeMetaMsg });
-      } catch (e) {
-        console.error("Error al enviar mensaje con formato:", e);
-        await m.reply(`《✦》El comando *${comando}* no existe.\nPara ver la lista de comandos usa:\n» *${usedPrefix}help*`);
-      }
+      await conn.sendMessage(m.chat, msg, { quoted: global.fakeMetaMsg });
     }
   } catch (error) {
     console.error(`Error en _validCommand.js: ${error}`);

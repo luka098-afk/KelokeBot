@@ -4,6 +4,13 @@ import axios from "axios"
 const youtubeRegexID = /(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([a-zA-Z0-9_-]{11})/
 
 const handler = async (m, { conn, text, usedPrefix, command }) => {
+const fake = {
+  quoted: m,
+  contextInfo: {
+    isForwarded: true,
+    forwardingScore: 999
+  }
+}
   try {
     if (!text.trim()) {
       return conn.reply(m.chat, `*✨️ QUE MÚSICA QUIERES DESCARGAR*.`, m, fake)

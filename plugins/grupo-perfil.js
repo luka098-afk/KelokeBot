@@ -13,7 +13,7 @@ let handler = async (m, { conn }) => {
   try {
     profilePicUrl = await conn.profilePictureUrl(user, 'image')
   } catch (e) {
-    profilePicUrl = 'https://files.cloudkuimages.guru/images/7kAcwery.jpg' // Imagen por defecto
+    profilePicUrl = 'http://imgfz.com/i/JkN0gqv.jpeg' // Imagen por defecto
   }
 
   const { imageMessage } = await generateWAMessageContent({
@@ -25,7 +25,7 @@ let handler = async (m, { conn }) => {
       text: `👤 *Perfil de Usuario*\n\n📛 Nombre: ${username}\n📱 Número: wa.me/${number}\n📝 Registro: ${isRegistered}`
     }),
     footer: proto.Message.InteractiveMessage.Footer.fromObject({
-      text: 'Bot: Roxy-MD'
+      text: 'Bot: kelokebot'
     }),
     header: proto.Message.InteractiveMessage.Header.fromObject({
       hasMediaAttachment: true,
@@ -37,21 +37,21 @@ let handler = async (m, { conn }) => {
           name: 'cta_url',
           buttonParamsJson: JSON.stringify({
             display_text: '📢 Canal de WhatsApp',
-            url: 'https://whatsapp.com/channel/0029VajUPbECxoB0cYovo60W'
+            url: 'https://whatsapp.com/channel/0029VawwvsW7j6g1upS0i531'
           })
         },
         {
           name: 'cta_url',
           buttonParamsJson: JSON.stringify({
             display_text: '📦 Repositorio del Bot',
-            url: 'https://github.com/El-brayan502/RoxyBot-MD'
+            url: ''
           })
         },
         {
           name: 'cta_url',
           buttonParamsJson: JSON.stringify({
             display_text: '🎵 TikTok del Creador',
-            url: 'https://www.tiktok.com/@fantom_uwu_330?_t=ZM-8yBpnlcBH7e&_r=1'
+            url: 'https://www.tiktok.com/@elgerman0?_t=ZM-8yMelASBfdw&_r=1'
           })
         }
       ]
@@ -70,7 +70,7 @@ let handler = async (m, { conn }) => {
             text: '✨ Información de perfil'
           }),
           footer: proto.Message.InteractiveMessage.Footer.create({
-            text: 'Sistema de Perfiles • Roxy-MD'
+            text: 'Sistema de Perfiles • kelokebot'
           }),
           carouselMessage: proto.Message.InteractiveMessage.CarouselMessage.fromObject({
             cards: [card]

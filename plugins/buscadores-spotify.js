@@ -1,48 +1,48 @@
 import fetch from 'node-fetch';
 
 const handler = async (m, { args, conn, command, prefix }) => {
-  // Verifica si se proporcionó el nombre de la canción
   if (!args[0]) {
-    return m.reply(`📌 Ejemplo de uso:\n${(prefix || '.') + command} nina feast`);
+    return m.reply(`📌 Ejemplo de uso:\n${(prefix || '.') + command} bad bunny - titi me pregunto`);
   }
 
-  // Reacción de espera
   await conn.sendMessage(m.chat, {
     react: {
-      text: '⏱',
+      text: '🎧',
       key: m.key,
     },
   });
 
-  // Codifica la búsqueda para la URL
   const query = encodeURIComponent(args.join(' '));
-  const url = `https://zenz.biz.id/search/spotify?query=${query}`;
+  const url = `https://itunes.apple.com/search?term=${query}&media=music`;
 
   try {
-    // Llama a la API de Zenz
     const res = await fetch(url);
     const json = await res.json();
 
-    // Verifica si hay resultados
-    if (!json.status || !json.result || json.result.length === 0) {
+    if (!json.results || json.results.length === 0) {
       return m.reply('❌ No encontré la canción que estás buscando.');
     }
 
-    const data = json.result[0];
+    const data = json.results[0];
+    const caption = `🎵 *Título:* ${data.trackName}
+🎤 *Artista:* ${data.artistName}
+💿 *Álbum:* ${data.collectionName}
+🌍 *Género:* ${data.primaryGenreName}
+🔗 *Enlace:* ${data.trackViewUrl}`;
 
-    // Arma el mensaje con los datos de la canción
-    const caption = `🎵 *Título:* ${data.title}
-🎤 *Artista:* ${data.artist}
-💿 *Álbum:* ${data.album}
-🔗 *Enlace:* ${data.url}`;
-
-    // Muestra la portada del álbum y la información
+    // Enviar carátula + info
     await conn.sendMessage(m.chat, {
-      image: { url: data.cover },
-      caption
+      image: { url: data.artworkUrl100.replace('100x100bb', '500x500bb') },
+      caption,
     }, { quoted: m });
 
-    // Reacción de éxito
+    // Enviar el preview de audio
+    await conn.sendMessage(m.chat, {
+      audio: { url: data.previewUrl },
+      mimetype: 'audio/mpeg',
+      ptt: false,
+    }, { quoted: m });
+
     await conn.sendMessage(m.chat, {
       react: {
         text: '✅',
@@ -56,9 +56,8 @@ const handler = async (m, { args, conn, command, prefix }) => {
   }
 };
 
-// Información de ayuda del comando
-handler.help = ['sspotify <nombre de la canción>'];
+handler.help = ['spotify <nombre de la canción>'];
 handler.tags = ['busqueda'];
-handler.command = ['spotify', 'sspotify', 'spotiti']
+handler.command = ['spotify', 'sspotify', 'spotiti'];
 
 export default handler;

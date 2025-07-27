@@ -1,0 +1,82 @@
+// aceptar.js
+import fs from 'fs'
+import path from 'path'
+
+const handler = async (m, { conn, text }) => {
+  try {
+    if (!text) return m.reply('⚠️ Debes mencionar a la persona que te declaró su amor. Ejemplo: .aceptar @59896026646')
+
+    // Datos del remitente (quien acepta)
+    const senderRaw = m.sender.split('@')[0]
+    const sender = `${senderRaw}@s.whatsapp.net`
+
+    let target, targetRaw
+
+    // Extraer de mención o texto
+    if (m.mentionedJid && m.mentionedJid.length > 0) {
+      target = m.mentionedJid[0]
+      targetRaw = target.split('@')[0]
+    } else {
+      const matches = text.match(/@(\d{5,15})/)
+      if (!matches) return m.reply('⚠️ Formato inválido. Usa: .aceptar @número o menciona al pretendiente.')
+
+      targetRaw = matches[1]
+      target = `${targetRaw}@s.whatsapp.net`
+    }
+
+    // Leer solicitudes
+    const solicitudesPath = path.join('./database', 'solicitudes.json')
+    let solicitudes = {}
+    try {
+      solicitudes = JSON.parse(fs.readFileSync(solicitudesPath))
+    } catch (e) {
+      solicitudes = {}
+    }
+
+    const solicitudesDelAceptante = solicitudes[senderRaw] || []
+
+    // Buscar si existe solicitud de esa persona
+    const existe = solicitudesDelAceptante.find(s => s.jid === target)
+    if (!existe) return m.reply('❌ No tienes una solicitud de esa persona.')
+
+    // Eliminar solicitud aceptada
+    solicitudes[senderRaw] = solicitudesDelAceptante.filter(s => s.jid !== target)
+    fs.writeFileSync(solicitudesPath, JSON.stringify(solicitudes, null, 2))
+
+    // Guardar en parejas.json
+    const parejasPath = path.join('./database', 'parejas.json')
+    let parejas = {}
+    try {
+      parejas = JSON.parse(fs.readFileSync(parejasPath))
+    } catch (e) {
+      parejas = {}
+    }
+
+    // Asignar la pareja
+    parejas[senderRaw] = targetRaw
+    parejas[targetRaw] = senderRaw
+
+    fs.writeFileSync(parejasPath, JSON.stringify(parejas, null, 2))
+
+    const mensaje = `💘 ¡Amor confirmado! 💘
+
+@${senderRaw} ha aceptado el amor de @${targetRaw}.
+
+¡Felicidades a esta nueva pareja! 🎉💑`
+
+    await conn.sendMessage(m.chat, {
+      text: mensaje,
+      mentions: [sender, target]
+    })
+
+  } catch (error) {
+    console.error('Error en .aceptar:', error)
+    m.reply('❌ Ocurrió un error al aceptar la pareja.')
+  }
+}
+
+handler.help = ['aceptar @número']
+handler.tags = ['pareja']
+handler.command = /^aceptar$/i
+
+export default handler

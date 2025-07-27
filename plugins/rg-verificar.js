@@ -1,6 +1,13 @@
 import moment from 'moment-timezone'
 
 const handler = async (m, { text, command, conn }) => {
+const fake = {
+  quoted: m,
+  contextInfo: {
+    isForwarded: true,
+    forwardingScore: 999
+  }
+}
   const user = m.sender
   const args = text.split(' ')
   const nombre = args[0]

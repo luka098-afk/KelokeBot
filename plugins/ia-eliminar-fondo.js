@@ -10,7 +10,7 @@ let yeon = async (m, { conn, usedPrefix, command }) => {
             react: { text: "❌", key: m.key }
         });
         return conn.sendMessage(m.chat, {
-            text: `🖼️ *Senpai*, responde a una imagen con el comando *${usedPrefix + command}* para eliminar el fondo.`
+            text: `🖼️ *responde a una imagen con el comando* *${usedPrefix + command}* para eliminar el fondo.`
         });
     }
 
@@ -43,7 +43,7 @@ let yeon = async (m, { conn, usedPrefix, command }) => {
 
         await conn.sendMessage(m.chat, {
             image: res.data,
-            caption: `✨ *¡Fondo eliminado con éxito, Senpai!*  
+            caption: `✨ *¡Fondo eliminado con éxito!*  
 📌 *Formato:* PNG  
 🔗 *Modelo:* v1`
         });
@@ -58,7 +58,7 @@ let yeon = async (m, { conn, usedPrefix, command }) => {
             react: { text: "❌", key: m.key }
         });
         await conn.sendMessage(m.chat, {
-            text: `⚠️ *Ups, ocurrió un error, Senpai!*  
+            text: `⚠️ *Ups, ocurrió un error!*  
 Esta función está teniendo problemas, intenta de nuevo más tarde 😅`
         });
     }

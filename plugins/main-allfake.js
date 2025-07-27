@@ -29,20 +29,20 @@ console.log(`Error : ${e}`)
 }}
 
 // IᖴᑎᖴOᖇᗰᗩᑕIOᑎ ᗪᗴ ᒪᗩ ᗷOT
-global.creador = 'Wa.me/573001533523'
+global.creador = 'Wa.me/59896026646'
 global.ofcbot = `Wa.me/${conn.user.jid.split('@')[0]}?text=✨️hl`
-global.asistencia = 'Wa.me/50231458537'
-global.namechannel = '🌸◌*̥₊ Rᴏxʏ-Mᴅ ◌❐🎋༉'
-global.namechannel2 = '🌸◌*̥₊ Rᴏxʏ-Mᴅ ◌❐🎋༉'
-global.namegrupo = '𝐑𝐎𝐗𝐘 𝐆𝐑𝐔𝐏𝐎'
-global.namecomu = '𝐓𝐇𝐄 𝐑𝐎𝐗𝐘 𝐂𝐎𝐌𝐔𝐍𝐈𝐓𝐘'
+global.asistencia = 'Wa.me/59896026646'
+global.namechannel = '🌸◌*̥₊ xURUx ◌❐🎋༉'
+global.namechannel2 = '🌸◌*̥₊ xURUx ◌❐🎋༉'
+global.namegrupo = 'xURUx 𝐆𝐑𝐔𝐏𝐎'
+global.namecomu = 'xURUx 𝐂𝐎𝐌𝐔𝐍𝐈𝐓𝐘'
 global.listo = '𝑨𝑸𝑼𝑰 𝑻𝑰𝑬𝑵𝑬 𝑮𝑹𝑨𝑪𝑰𝑨𝑺 𝑿 𝑬𝑺𝑷𝑬𝑹𝑨𝑹 ˃ 𖥦 ˂'
 global.fotoperfil = await conn.profilePictureUrl(m.sender, 'image').catch(_ => catalogo,)
 
 // ᑕᗩᑎᗩᒪ ᗪᗴ ᒪᗩ ᗷOT
-global.idchannel = '120363312092804854@newsletter'
-global.canalIdM = ["120363312092804854@newsletter", "120363312092804854@newsletter"]
-global.canalNombreM = ["🌸◌*̥₊ Rᴏxʏ-Mᴅ ◌❐🎋༉", "𝗧𝗢𝗖𝗔 𝗔𝗤𝗨𝗜 ✨️"]
+global.idchannel = '120363404278828828@newsletter'
+global.canalIdM = ["120363404278828828@newsletter"
+global.canalNombreM = ["🌸◌*̥₊ xURUx◌❐🎋༉", "𝗧𝗢𝗖𝗔 𝗔𝗤𝗨𝗜 ✨️"]
 global.channelRD = await getRandomChannel()
 
 
@@ -82,10 +82,10 @@ global.user2 = m.pushName || 'Anónimo';
 global.verifyaleatorio = ['registrar', 'reg', 'verificar', 'verify', 'register'].getRandom();
 
 // ᗴᑎᒪᗩᑕᗴՏ ᘜᒪOᗷᗩᒪ
-var canal = 'https://whatsapp.com/channel/0029VajUPbECxoB0cYovo60W'  
-let canal2 = 'https://whatsapp.com/channel/0029VajUPbECxoB0cYovo60W'
-var git = 'https://github.com/El-brayan502'
-var github = 'https://github.com/El-brayan502/RoxyBot-MD' 
+var canal = 'https://whatsapp.com/channel/0029VawwvsW7j6g1upS0i531'
+let canal2 = 'https://whatsapp.com/channel/0029VawwvsW7j6g1upS0i531'
+var git = '-'
+var github = '-'
 
 global.redes = [canal, canal2, git, github].getRandom()
 
@@ -112,9 +112,17 @@ global.readMore = more.repeat(850)
 //Fakes
 let pp = null; try { pp = await conn.profilePictureUrl('50231458537@s.whatsapp.net', 'image') } catch (e) { pp = null } global.fkontak = { key: {participant: `0@s.whatsapp.net`, ...(m.chat ? { remoteJid: `120363402481697721@g.us` } : {}) }, message: { 'contactMessage': { 'displayName': `DevBrayan owner ✨`, 'vcard': `BEGIN:VCARD\nVERSION:3.0\nN:XL;DevBrayan owner✨,;;;\nFN:DevBrayan creador\nitem1.TEL;waid=50231458537:50231458537\nitem1.X-ABLabel:Ponsel\nEND:VCARD`, 'jpegThumbnail': pp ? await (await fetch(pp)).buffer() : null, thumbnail: null, sendEphemeral: true }}}
 
-global.fake = { contextInfo: { isForwarded: true, forwardedNewsletterMessageInfo: { newsletterJid: channelRD.id, newsletterName: channelRD.name, serverMessageId: -1 }
-}}, { quoted: m }
-
+global.fake = {
+  quoted: m,
+  contextInfo: {
+    isForwarded: true,
+    forwardedNewsletterMessageInfo: {
+      newsletterJid: channelRD.id,
+      newsletterName: channelRD.name,
+      serverMessageId: -1
+    }
+  }
+}
 
 
 

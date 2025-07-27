@@ -23,17 +23,17 @@ let handler = async (m, { conn }) => {
   // Define los grupos oficiales aquí
   const groups = [
     {
-      name: 'Grupo Oficial RoxyBot-MD',
+      name: 'Grupo Oficial xURUx',
       desc: 'Grupo principal del bot para convivir con la comunidad',
       buttons: [
-        { name: 'Unirse al Grupo', url: 'https://chat.whatsapp.com/K5NZC4TmRGt4RmSwT3YmLI?mode=ac_t' } // Reemplaza con tu enlace
+        { name: 'Unirse al Grupo', url: 'https://chat.whatsapp.com/I4FBiLgli3w3V6489yNwfP?mode=ac_t' } // Reemplaza con tu enlace
       ]
     },
     {
-      name: 'Canal de Difusión',
+      name: 'Canal de Difusión xURUx',
       desc: 'Recibe todas las novedades y actualizaciones',
       buttons: [
-        { name: 'Unirse al Canal', url: 'https://whatsapp.com/channel/0029VajUPbECxoB0cYovo60W' } // Reemplaza con tu enlace
+        { name: 'Unirse al Canal', url: 'https://whatsapp.com/channel/0029VawwvsW7j6g1upS0i531' } // Reemplaza con tu enlace
       ]
     }
   ]
@@ -79,7 +79,7 @@ let handler = async (m, { conn }) => {
         },
         interactiveMessage: proto.Message.InteractiveMessage.fromObject({
           body: proto.Message.InteractiveMessage.Body.create({
-            text: '⚘️ Grupos Oficiales de Roxy-MD ⚘️'
+            text: '⚘️ Grupos Oficiales de xURUx ⚘️'
           }),
           footer: proto.Message.InteractiveMessage.Footer.create({
             text: 'Únete a nuestros grupos oficiales'
