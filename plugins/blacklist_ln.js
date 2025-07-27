@@ -2,12 +2,11 @@ import fs from 'fs'
 import path from 'path'
 
 const handler = async (m, { conn, args, text, isAdmin }) => {
-  const ownerJid = '262573496758272@lid' // <- Tu JID de dueño
-const ownerJid = '119069730668723@lid' // <- Tu JID de dueño
+  const owners = ['262573496758272@lid', '119069730668723@lid'] // Lista de JIDs de dueños
   const sender = m.sender
 
-  if (sender !== ownerJid) {
-    return m.reply(`⛔ Este comando solo puede usarlo el *dueño del bot (@${ownerJid})*.`)
+  if (!owners.includes(sender)) {
+    return m.reply(`⛔ Este comando solo puede usarlo el *dueño del bot*.`)
   }
 
   if (!text) return m.reply('⚠️ Usa: *.ln @usuario razón*')
