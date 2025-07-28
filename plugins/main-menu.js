@@ -42,7 +42,7 @@ let handler = async (m, { conn, usedPrefix, __dirname, participants }) => {
     const isPremium = user.premium || false;
 
     const channelRD = {
-      id: '120363404278828828@newsletter',
+      id: '120363386229166956@newsletter',
       name: 'Grupo oficial:'
     }
 
