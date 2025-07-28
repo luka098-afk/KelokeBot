@@ -8,6 +8,20 @@ let handler = async (m, { conn, usedPrefix, __dirname, participants }) => {
   try {
     await m.react('🩸')
 
+    // Verificar que global.db exista antes de usarlo
+    if (!global.db || !global.db.data || !global.db.data.users) {
+      throw new Error('Database not initialized')
+    }
+
+    // Inicializar usuario si no existe
+    if (!global.db.data.users[m.sender]) {
+      global.db.data.users[m.sender] = {
+        exp: 0,
+        bank: 0,
+        registered: false
+      }
+    }
+
     let { exp, bank, registered } = global.db.data.users[m.sender]
     let name = await conn.getName(m.sender)
     let _uptime = process.uptime() * 1000
@@ -25,9 +39,9 @@ let handler = async (m, { conn, usedPrefix, __dirname, participants }) => {
     let pais = phone.getRegionCode() || 'Desconocido 🌐'
 
     const vids = [
-      '',
-      '',
-      ''
+      'https://telegra.ph/file/ejemplo1.mp4', // Agregar URLs reales
+      'https://telegra.ph/file/ejemplo2.mp4',
+      'https://telegra.ph/file/ejemplo3.mp4'
     ]
     let videoUrl = vids[Math.floor(Math.random() * vids.length)]
 
@@ -46,45 +60,47 @@ let handler = async (m, { conn, usedPrefix, __dirname, participants }) => {
       name: 'Grupo oficial:'
     }
 
-// Objeto meta corregido
-const meta = {
-  contextInfo: {
-    mentionedJid: [m.sender],
-    isForwarded: true,
-    externalAdReply: {
-      title: '𝗞𝗲𝗹𝗼𝗸𝗲𝗕𝗼𝘁',
-      body: '© 𝑃𝑜𝑤𝑒𝑟𝑒𝑑 𝐵𝑦 G',
-      mediaUrl: null,
-      description: null,
-      previewType: "PHOTO",
-      thumbnailUrl: 'http://imgfz.com/i/Ut7YNKE.jpeg',
-      sourceUrl: '', // tu número de contacto o canal
-      mediaType: 1,
-      renderLargerThumbnail: true
+    // Objeto meta corregido
+    const meta = {
+      contextInfo: {
+        mentionedJid: [m.sender],
+        isForwarded: true,
+        externalAdReply: {
+          title: '𝗞𝗲𝗹𝗼𝗸𝗲𝗕𝗼𝘁',
+          body: '© 𝑃𝑜𝑤𝑒𝑟𝑒𝑑 𝐵𝑦 G',
+          mediaUrl: null,
+          description: null,
+          previewType: "PHOTO",
+          thumbnailUrl: 'http://imgfz.com/i/Ut7YNKE.jpeg',
+          sourceUrl: '', // tu número de contacto o canal
+          mediaType: 1,
+          renderLargerThumbnail: true
+        }
+      }
     }
-  }
-}
 
-// Calcular saludo según hora
-let saludo
-let hora = new Date().getUTCHours() - 6
-if (hora < 0) hora += 24
+    // Calcular saludo según hora (ajustado para Uruguay UTC-3)
+    let saludo
+    let hora = new Date().getUTCHours() - 3 // Zona horaria de Uruguay
+    if (hora < 0) hora += 24
+    if (hora >= 24) hora -= 24
 
-if (hora >= 5 && hora < 13) {
-  saludo = 'Hola que tengas un lindo día'
-} else if (hora >= 13 && hora < 18) {
-  saludo = 'Buenas tardes, ¿qué se te ofrece?'
-} else {
-  saludo = '🍭 ¿Por qué aún no duermes? 🥱'
-}
+    if (hora >= 5 && hora < 13) {
+      saludo = 'Hola que tengas un lindo día'
+    } else if (hora >= 13 && hora < 18) {
+      saludo = 'Buenas tardes, ¿qué se te ofrece?'
+    } else {
+      saludo = '🍭 ¿Por qué aún no duermes? 🥱'
+    }
 
-// Fecha formateada
-const date = new Date().toLocaleDateString('es-ES', {
-  weekday: 'long',
-  year: 'numeric',
-  month: 'long',
-  day: 'numeric'
-})
+    // Fecha formateada para Uruguay
+    const date = new Date().toLocaleDateString('es-UY', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      timeZone: 'America/Montevideo'
+    })
 
     const body = `
 Bienvenido a 𝗞𝗲𝗹𝗼𝗸𝗲𝗕𝗼𝘁
@@ -108,14 +124,14 @@ ${saludo}, *${taguser}*!
 ◈┄──━━┉─࿂
 
 ◈───≼ 🕸️ _*BUSCADORES*_ 🕸️ ≽──⊚
-🕷️┝⎆ [ ${usedPrefix}yts <nombre> - Buscar en YouTube           
+🕷️┝⎆ [ ${usedPrefix}yts <nombre> - Buscar en YouTube
 🕷️┝⎆ [ ${usedPrefix}pinterest <texto> - Buscar imágenes
 🕷️┝⎆ [ ${usedPrefix}aptoide <app> - Buscar APK
 🕸️┝⎆ [ ${usedPrefix}tiktoksearch <texto> - Buscar en TT
 🕷️┝⎆ [ ${usedPrefix}ssweb <texto> - Buscar páginas
 ◈┄──━━┉─࿂
 
-◈───≼ ⚰️ _*ADMINS*_ ⚰️ ≽──⊚                                     
+◈───≼ ⚰️ _*ADMINS*_ ⚰️ ≽──⊚
 🩸┝⎆ [ ${usedPrefix}ht <texto> - Mención masiva
 🩸┝⎆ [ ${usedPrefix}advertencia <@tag> <texto> - Advertencia
 🧟┝⎆ [ ${usedPrefix}perfil - Ver perfil grupo
@@ -124,7 +140,7 @@ ${saludo}, *${taguser}*!
 🕷️┝⎆ [ ${usedPrefix}tagall - Mencionar a todos
 🕷️┝⎆ [ ${usedPrefix}setppgrupo <img> - Cambiar foto grupo
 🩸┝⎆ [ ${usedPrefix}k <@tag> - Expulsar miembro
-🕷️┝⎆ [ ${usedPrefix}tag <mensaje> - Etiquetar con mensaje      
+🕷️┝⎆ [ ${usedPrefix}tag <mensaje> - Etiquetar con mensaje
 🩸┝⎆ [ ${usedPrefix}del - Eliminar mensaje
 🩸┝⎆ [ ${usedPrefix}p <@tag> - Dar admin
 🩸┝⎆ [ ${usedPrefix}d <@tag> - Quitar admin
@@ -201,16 +217,17 @@ ${saludo}, *${taguser}*!
       caption: body,
       gifPlayback: true,
       mentions: [m.sender],
-      ...metaMsg
+      ...meta
     })
 
   } catch (e) {
     console.error(e)
+    // Si hay error, enviar menú sin video
     await conn.sendMessage(m.chat, {
-      text: `✘ Error al enviar el menú: ${e.message}`,
+      text: body || `✘ Error al enviar el menú: ${e.message}`,
       mentions: [m.sender]
     }, {
-      quoted: metaMsg
+      quoted: m
     })
   }
 }
