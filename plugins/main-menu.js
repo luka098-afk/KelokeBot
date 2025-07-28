@@ -46,41 +46,45 @@ let handler = async (m, { conn, usedPrefix, __dirname, participants }) => {
       name: 'Grupo oficial:'
     }
 
-// Objeto metaMsg corregido
-    const metaMsg = {
-      contextInfo: {
-        mentionedJid: [m.sender],
-        isForwarded: true,
-        externalAdReply: {
-          title: '𝗞𝗲𝗹𝗼𝗸𝗲𝗕𝗼𝘁',
-          body: '© 𝑃𝑜𝑤𝑒𝑟𝑒𝑑 𝐵𝑦 G',
-          mediaUrl: null,
-          description: null,
-          previewType: "PHOTO",
-          thumbnailUrl: 'http://imgfz.com/i/Ut7YNKE.jpeg',
-          sourceUrl: '', // tu número de contacto o canal
-          mediaType: 1,
-          renderLargerThumbnail: true
-        }
-      }
+// Objeto meta corregido
+const meta = {
+  contextInfo: {
+    mentionedJid: [m.sender],
+    isForwarded: true,
+    externalAdReply: {
+      title: '𝗞𝗲𝗹𝗼𝗸𝗲𝗕𝗼𝘁',
+      body: '© 𝑃𝑜𝑤𝑒𝑟𝑒𝑑 𝐵𝑦 G',
+      mediaUrl: null,
+      description: null,
+      previewType: "PHOTO",
+      thumbnailUrl: 'http://imgfz.com/i/Ut7YNKE.jpeg',
+      sourceUrl: '', // tu número de contacto o canal
+      mediaType: 1,
+      renderLargerThumbnail: true
     }
+  }
+}
 
-    let saludo
-    let hora = new Date().getUTCHours() - 6
-    if (hora < 0) hora += 24
+// Calcular saludo según hora
+let saludo
+let hora = new Date().getUTCHours() - 6
+if (hora < 0) hora += 24
 
-    if (hora >= 5 && hora < 13) {
-      saludo = 'Hola que tengas un lindo día'
-    } else if (hora >= 13 && hora < 18) {
-      saludo = 'Buenas tardes,que se te ofrece '
-    } else {
-      saludo = '🍭 ¿Por qué aún no duermes? 🥱'
-    }
+if (hora >= 5 && hora < 13) {
+  saludo = 'Hola que tengas un lindo día'
+} else if (hora >= 13 && hora < 18) {
+  saludo = 'Buenas tardes, ¿qué se te ofrece?'
+} else {
+  saludo = '🍭 ¿Por qué aún no duermes? 🥱'
+}
 
-    // Definir la fecha para evitar error
-    const date = new Date().toLocaleDateString('es-ES', {
-      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-    })
+// Fecha formateada
+const date = new Date().toLocaleDateString('es-ES', {
+  weekday: 'long',
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric'
+})
 
     const body = `
 Bienvenido a 𝗞𝗲𝗹𝗼𝗸𝗲𝗕𝗼𝘁
