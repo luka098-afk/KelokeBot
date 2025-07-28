@@ -1,6 +1,6 @@
-let handler = async (m, { conn, text }) => {
+let handler = async (m, { conn, text, command }) => {
   if (!text) {
-    return m.reply('*📝 Escribe un texto para chatear con KelokeBot!*\n*Ejemplo:* .keloke Hola, ¿cómo estás?');
+    return m.reply(`*📝 Escribe un texto para chatear con KelokeBot!*\n*Ejemplo:* .${command} Hola, ¿cómo estás?`);
   }
 
   try {
@@ -22,9 +22,14 @@ let handler = async (m, { conn, text }) => {
   }
 };
 
-handler.help = ['keloke'];
-handler.command = ['keloke', 'kelokeai', 'iakeloke'];
+// Todos los comandos posibles con combinaciones de letras (bot, Bot, BOT, etc.)
+const botVariants = [
+  'bot', 'Bot', 'BOT', 'bOt', 'boT', 'BoT', 'bOT', 'BoT', 'bOt', 'BOt'
+];
+
+handler.help = ['bot'];
 handler.tags = ['ai'];
+handler.command = [...botVariants, 'keloke', 'kelokeai', 'iakeloke'];
 handler.limit = true;
 handler.register = true;
 
