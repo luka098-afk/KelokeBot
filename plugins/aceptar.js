@@ -1,13 +1,13 @@
 import fs from 'fs'
 
 const handler = async (m, { conn, args }) => {
+  const fileSolicitudes = './database/solicitudes.json'
   const fileParejas = './database/parejas.json'
-  const fileEx = './database/exparejas.json'
 
-  if (!fs.existsSync(fileParejas)) return m.reply('❌ No hay solicitudes registradas.')
+  if (!fs.existsSync(fileSolicitudes)) return m.reply('❌ No hay solicitudes registradas.')
 
-  let parejas = JSON.parse(fs.readFileSync(fileParejas))
-  const yoJid = m.sender // ej: 119069730668723@s.whatsapp.net
+  let solicitudes = JSON.parse(fs.readFileSync(fileSolicitudes))
+  const yoJid = m.sender
   const yoNum = yoJid.split('@')[0]
 
   if (!args[0]) return m.reply('❌ Debes mencionar a la persona cuya solicitud quieres aceptar.\n\nEjemplo:\n*.aceptar @123456789*')
@@ -15,50 +15,57 @@ const handler = async (m, { conn, args }) => {
   const otroNum = args[0].replace(/[^0-9]/g, '')
   const otroJid = `${otroNum}@s.whatsapp.net`
 
-  // Buscar si YO tengo una solicitud del número mencionado
-  const solicitudes = parejas[yoNum]
+  // Verifica si tienes una solicitud de esa persona
+  const misSolicitudes = solicitudes[yoNum]
 
-  if (!solicitudes || !Array.isArray(solicitudes)) {
+  if (!misSolicitudes || !Array.isArray(misSolicitudes)) {
     return m.reply('❌ No tienes ninguna solicitud pendiente.')
   }
 
-  const solicitud = solicitudes.find(s => s.jid === otroJid)
+  const solicitud = misSolicitudes.find(s => s.jid === otroJid)
 
   if (!solicitud) {
     return m.reply('❌ No tienes una solicitud de esa persona.')
   }
 
   // ✅ Eliminar la solicitud aceptada
-  parejas[yoNum] = solicitudes.filter(s => s.jid !== otroJid)
-  if (parejas[yoNum].length === 0) delete parejas[yoNum]
+  solicitudes[yoNum] = misSolicitudes.filter(s => s.jid !== otroJid)
+  if (solicitudes[yoNum].length === 0) delete solicitudes[yoNum]
+  fs.writeFileSync(fileSolicitudes, JSON.stringify(solicitudes, null, 2))
+
+  // ✅ Guardar la nueva pareja en parejas.json
+  if (!fs.existsSync(fileParejas)) fs.writeFileSync(fileParejas, JSON.stringify({}, null, 2))
+  const parejas = JSON.parse(fs.readFileSync(fileParejas))
+
+  const fecha = new Date().toISOString()
+
+  parejas[yoNum] = {
+    pareja: otroJid,
+    desde: fecha
+  }
+
+  parejas[otroNum] = {
+    pareja: yoJid,
+    desde: fecha
+  }
+
   fs.writeFileSync(fileParejas, JSON.stringify(parejas, null, 2))
 
-  // ✅ Guardar en exparejas.json
-  if (!fs.existsSync(fileEx)) fs.writeFileSync(fileEx, JSON.stringify({}, null, 2))
-  const exParejas = JSON.parse(fs.readFileSync(fileEx))
+  // ✅ Mensaje romántico y bonito
+  const mensaje = `💘 *¡Felicidades!* 💘
+@${otroNum}, tu solicitud fue aceptada por @${yoNum}.
+🌹 ¡Ahora son oficialmente pareja! 🌹
 
-  if (!exParejas[yoNum]) exParejas[yoNum] = []
-  exParejas[yoNum].push({
-    jid: otroJid,
-    nombre: solicitud.targetNombre || 'SinNombre',
-    targetNombre: solicitud.nombre || 'SinNombre',
-    fecha: new Date().toISOString()
-  })
+📖 *Poema para ustedes* 📖
+_"Dos caminos que el destino unió,_  
+_en un lazo de amor eterno y puro._  
+_Cada latido ahora es compartido,_  
+_en un viaje de sueños futuros."_ 💞
 
-  if (!exParejas[otroNum]) exParejas[otroNum] = []
-  exParejas[otroNum].push({
-    jid: yoJid,
-    nombre: solicitud.nombre || 'SinNombre',
-    targetNombre: solicitud.targetNombre || 'SinNombre',
-    fecha: new Date().toISOString()
-  })
+🎉 ¡Disfruten esta nueva etapa juntos! 🎉`
 
-  fs.writeFileSync(fileEx, JSON.stringify(exParejas, null, 2))
-
-  // ✅ Mensaje con menciones a ambos
-  const texto = `💍 ¡@${yoNum} y @${otroNum} ahora son pareja! 💖\n\n¡Felicidades! 🎉`
   await conn.sendMessage(m.chat, {
-    text: texto,
+    text: mensaje,
     mentions: [yoJid, otroJid]
   })
 }
