@@ -30,7 +30,7 @@ let handler = async (m, { conn, usedPrefix, __dirname, participants }) => {
     let groupUserCount = m.isGroup ? participants.length : ''
 
     let perfil = await conn.profilePictureUrl(conn.user.jid, 'image')
-      .catch(() => 'http://imgfz.com/i/Ut7YNKE.jpeg')
+      .catch(() => '') // AQUÍ: Pone tu URL de imagen por defecto
 
     // Preparar el tag del usuario
     const userId = m.sender.split('@')[0]
@@ -39,9 +39,9 @@ let handler = async (m, { conn, usedPrefix, __dirname, participants }) => {
     let pais = phone.getRegionCode() || 'Desconocido 🌐'
 
     const vids = [
-      'https://telegra.ph/file/ejemplo1.mp4', // Agregar URLs reales
-      'https://telegra.ph/file/ejemplo2.mp4',
-      'https://telegra.ph/file/ejemplo3.mp4'
+      '', // AQUÍ: Pone tus URLs de videos MP4
+      '', // AQUÍ: Pone tus URLs de videos MP4
+      ''  // AQUÍ: Pone tus URLs de videos MP4
     ]
     let videoUrl = vids[Math.floor(Math.random() * vids.length)]
 
@@ -71,8 +71,8 @@ let handler = async (m, { conn, usedPrefix, __dirname, participants }) => {
           mediaUrl: null,
           description: null,
           previewType: "PHOTO",
-          thumbnailUrl: 'http://imgfz.com/i/Ut7YNKE.jpeg',
-          sourceUrl: '', // tu número de contacto o canal
+          thumbnailUrl: '', // AQUÍ: Pone tu URL de imagen para el thumbnail
+          sourceUrl: '', // AQUÍ: Pone tu número de contacto o canal
           mediaType: 1,
           renderLargerThumbnail: true
         }
@@ -211,20 +211,36 @@ ${saludo}, *${taguser}*!
     // Unir header + body
     const menu = `${header}\n${body}`
 
-    // Enviar el menú con video y menciones
-    await conn.sendMessage(m.chat, {
-      video: { url: videoUrl },
-      caption: body,
-      gifPlayback: true,
-      mentions: [m.sender],
-      ...meta
-    })
+    // Enviar el menú con video (si hay URL) o solo texto
+    if (videoUrl && videoUrl.trim() !== '') {
+      await conn.sendMessage(m.chat, {
+        video: { url: videoUrl },
+        caption: body,
+        gifPlayback: true,
+        mentions: [m.sender],
+        ...meta
+      })
+    } else {
+      await conn.sendMessage(m.chat, {
+        text: body,
+        mentions: [m.sender],
+        ...meta
+      })
+    }
 
   } catch (e) {
     console.error(e)
-    // Si hay error, enviar menú sin video
+    
+    // Crear un body básico en caso de error
+    const errorBody = `
+Bienvenido a 𝗞𝗲𝗹𝗼𝗸𝗲𝗕𝗼𝘁
+¡Hola! Hubo un error al cargar el menú completo.
+Usa ${usedPrefix}help para ver los comandos disponibles.
+    `.trim()
+    
+    // Si hay error, enviar menú básico
     await conn.sendMessage(m.chat, {
-      text: body || `✘ Error al enviar el menú: ${e.message}`,
+      text: errorBody,
       mentions: [m.sender]
     }, {
       quoted: m
