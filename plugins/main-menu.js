@@ -6,14 +6,14 @@ import PhoneNumber from 'awesome-phonenumber'
 
 let handler = async (m, { conn, usedPrefix, __dirname, participants }) => {
   try {
-    await m.react('✨️')
+    await m.react('🩸')
 
     let { exp, bank, registered } = global.db.data.users[m.sender]
     let name = await conn.getName(m.sender)
     let _uptime = process.uptime() * 1000
     let uptime = clockString(_uptime)
     let totalreg = Object.keys(global.db.data.users).length
-    let groupUserCount = m.isGroup ? participants.length : '-'
+    let groupUserCount = m.isGroup ? participants.length : '120363386229166956@newsletter'
 
     let perfil = await conn.profilePictureUrl(conn.user.jid, 'image')
       .catch(() => 'http://imgfz.com/i/4FxeQNH.gif')
@@ -25,9 +25,9 @@ let handler = async (m, { conn, usedPrefix, __dirname, participants }) => {
     let pais = phone.getRegionCode() || 'Desconocido 🌐'
 
     const vids = [
-      'https://s8.ezgif.com/tmp/ezgif-83c9712edcb0df.mp4',
-      'https://s8.ezgif.com/tmp/ezgif-83c9712edcb0df.mp4',
-      'https://s8.ezgif.com/tmp/ezgif-83c9712edcb0df.mp4'
+      '',
+      '',
+      ''
     ]
     let videoUrl = vids[Math.floor(Math.random() * vids.length)]
 
@@ -75,7 +75,7 @@ let handler = async (m, { conn, usedPrefix, __dirname, participants }) => {
     if (hora < 0) hora += 24
 
     if (hora >= 5 && hora < 13) {
-      saludo = '✨️ Hola que tengas un lindo día ❤️'
+      saludo = 'Hola que tengas un lindo día'
     } else if (hora >= 13 && hora < 18) {
       saludo = 'Buenas tardes,que se te ofrece '
     } else {
