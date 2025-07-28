@@ -46,16 +46,11 @@ let handler = async (m, { conn, usedPrefix, __dirname, participants }) => {
       name: 'Grupo oficial:'
     }
 
+// Objeto metaMsg corregido
     const metaMsg = {
-      quoted: global.fakeMetaMsg,
       contextInfo: {
         mentionedJid: [m.sender],
         isForwarded: true,
-        forwardedNewsletterMessageInfo: {
-          newsletterJid: channelRD.id,
-          serverMessageId: 100,
-          newsletterName: channelRD.name
-        },
         externalAdReply: {
           title: '𝗞𝗲𝗹𝗼𝗸𝗲𝗕𝗼𝘁',
           body: '© 𝑃𝑜𝑤𝑒𝑟𝑒𝑑 𝐵𝑦 G',
@@ -63,7 +58,7 @@ let handler = async (m, { conn, usedPrefix, __dirname, participants }) => {
           description: null,
           previewType: "PHOTO",
           thumbnailUrl: 'http://imgfz.com/i/Ut7YNKE.jpeg',
-          sourceUrl: 'https://whatsapp.com/channel/0029VawwvsW7j6g1upS0i531',
+          sourceUrl: 'https://whatsapp.com/channel/0029VawwvsW7j6g1upS0i531', // tu número de contacto o canal
           mediaType: 1,
           renderLargerThumbnail: true
         }
