@@ -42,30 +42,16 @@ const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 async function showBanner() {
     const title = `
-░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-░░░░░░░░░░▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄░░░░░░░░░
-░░░░░░░░▄▀░░░░░░░░░░░░▄░░░░░░░▀▄░░░░░░░
-░░░░░░░░█░░▄░░░░▄░░░░░░░░░░░░░░█░░░░░░░
-░░░░░░░░█░░░░░░░░░░░░▄█▄▄░░▄░░░█░▄▄▄░░░
-░▄▄▄▄▄░░█░░░░░░▀░░░░▀█░░▀▄░░░░░█▀▀░██░░
-░██▄▀██▄█░░░▄░░░░░░░██░░░░▀▀▀▀▀░░░░██░░
-░░▀██▄▀██░░░░░░░░▀░██▀░░░░░░░░░░░░░▀██░
-░░░░▀████░▀░░░░▄░░░██░░░▄█░░░░▄░▄█░░██░
-░░░░░░░▀█░░░░▄░░░░░██░░░░▄░░░▄░░▄░░░██░
-░░░░░░░▄█▄░░░░░░░░░░░▀▄░░▀▀▀▀▀▀▀▀░░▄▀░░
-░░░░░░█▀▀█████████▀▀▀▀████████████▀░░░░
-░░░░░░████▀░░███▀░░░░░░▀███░░▀██▀░░░░░░
-░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 
     `.split('\n').map(line => chalk.hex('#ff00cc').bold(line)).join('\n')
 
-    const subtitle = chalk.hex('#00eaff').bold('✦ ROXYBOT-MD ✦').padStart(40)
-    const poweredMsg = chalk.hex('#00eaff').italic('powered by Brayan')
-    const aiMsg = chalk.hex('#ffb300').bold('🤖 RoxyAi - Tu compañera virtual')
+    const subtitle = chalk.hex('#00eaff').bold('✦ KELOKEBOT ✦').padStart(40)
+    const poweredMsg = chalk.hex('#00eaff').italic('powered by German')
+    const aiMsg = chalk.hex('#ffb300').bold('🤖 KelokeBot - Tu compañero virtual')
     const tips = [
         chalk.hex('#ffb300')('💡 Tip: Usa /help para ver los comandos disponibles.'),
         chalk.hex('#00eaff')('� Síguenos en GitHub para actualizaciones.'),
-        chalk.hex('#ff00cc')('✨ Disfruta de la experiencia premium de RoxyAi.')
+        chalk.hex('#ff00cc')('✨ Disfruta de la experiencia premium de Keloke.')
     ]
     const loadingFrames = [
         chalk.magentaBright('⠋ Cargando módulos...'),
@@ -105,7 +91,7 @@ async function showBanner() {
         letterSpacing: 1,
         lineHeight: 1
     })
-    say('powered by Brayan', {
+    say('powered by German', {
         font: 'console',
         align: 'center',
         colors: ['blue'],
@@ -124,8 +110,8 @@ async function showBanner() {
     console.log(
         chalk.bold.cyanBright(
             boxen(
-                chalk.bold('¡Bienvenido a RoxyAi!\n') +
-                chalk.hex('#00eaff')('La bot está arrancando, por favor espere...') +
+                chalk.bold('¡Bienvenido a Keloke!\n') +
+                chalk.hex('#00eaff')('El bot está arrancando, por favor espere...') +
                 '\n' +
                 tips.join('\n'),
                 {
@@ -348,7 +334,7 @@ if (opcion == '1' || methodCodeQR) {
 console.log(chalk.bold.yellow(`\n❐ ESCANEA EL CÓDIGO QR EXPIRA EN 45 SEGUNDOS`))}
 }
 if (connection == 'open') {
-console.log(chalk.bold.green('\n✨️ RoxyMD ya esta conectada ✨️'))
+console.log(chalk.bold.green('\n✨️ Keloke ya esta conectado ✨️'))
 }
 let reason = new Boom(lastDisconnect?.error)?.output?.statusCode
 if (connection === 'close') {

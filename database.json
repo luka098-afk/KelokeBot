@@ -109,7 +109,7 @@
       "warn": 0
     },
     "59896367249@s.whatsapp.net": {
-      "exp": 4953,
+      "exp": 5343,
       "joincount": 1,
       "diamond": 3,
       "lastadventure": 0,
@@ -497,7 +497,7 @@
       "warn": 0
     },
     "61710677373172@lid": {
-      "exp": 442,
+      "exp": 456,
       "joincount": 1,
       "diamond": 3,
       "lastadventure": 0,
@@ -535,7 +535,7 @@
       "commands": 13
     },
     "262573496758272@lid": {
-      "exp": 13786,
+      "exp": 14419,
       "joincount": 1,
       "diamond": 3,
       "lastadventure": 0,
@@ -566,8 +566,8 @@
       "role": "Nuv",
       "premium": false,
       "premiumTime": 0,
-      "commands": 352,
-      "spam": 1753636803250,
+      "commands": 368,
+      "spam": 1753658822169,
       "coin": null,
       "crime": 0,
       "warn": 0,
@@ -648,7 +648,7 @@
       "warn": 0
     },
     "59891694645@s.whatsapp.net": {
-      "exp": 547,
+      "exp": 573,
       "joincount": 1,
       "diamond": 3,
       "lastadventure": 0,
@@ -684,7 +684,7 @@
       "warn": 0
     },
     "119069730668723@lid": {
-      "exp": 4030,
+      "exp": 4224,
       "joincount": 1,
       "diamond": 3,
       "lastadventure": 0,
@@ -718,8 +718,8 @@
       "coin": null,
       "crime": 0,
       "warn": 0,
-      "commands": 38,
-      "spam": 1753636605561,
+      "commands": 39,
+      "spam": 1753646449667,
       "banRazon": ""
     },
     "198633832116276@lid": {
@@ -759,7 +759,7 @@
       "warn": 0
     },
     "179160551047249@lid": {
-      "exp": 192,
+      "exp": 211,
       "joincount": 1,
       "diamond": 3,
       "lastadventure": 0,
@@ -1116,7 +1116,7 @@
       "warn": 0
     },
     "202172734152801@lid": {
-      "exp": 325,
+      "exp": 416,
       "joincount": 1,
       "diamond": 3,
       "lastadventure": 0,
@@ -1243,6 +1243,42 @@
       "description": "",
       "packstickers": null,
       "name": "Ruben",
+      "age": -1,
+      "regTime": -1,
+      "afk": -1,
+      "afkReason": "",
+      "banned": false,
+      "useDocument": false,
+      "bank": 0,
+      "role": "Nuv",
+      "premium": false,
+      "premiumTime": 0,
+      "coin": null,
+      "crime": 0,
+      "warn": 0
+    },
+    "265622252478588@lid": {
+      "exp": 115,
+      "joincount": 1,
+      "diamond": 3,
+      "lastadventure": 0,
+      "health": 100,
+      "lastclaim": 0,
+      "lastcofre": 0,
+      "lastdiamantes": 0,
+      "lastcode": 0,
+      "lastduel": 0,
+      "lastpago": 0,
+      "lastmining": 0,
+      "lastcodereg": 0,
+      "muto": false,
+      "registered": false,
+      "genre": "",
+      "birth": "",
+      "marry": "",
+      "description": "",
+      "packstickers": null,
+      "name": "Ger",
       "age": -1,
       "regTime": -1,
       "afk": -1,
@@ -1443,10 +1479,10 @@
       "lastSuccess": 1753574083945
     },
     "main-menu.js": {
-      "total": 38,
-      "success": 38,
-      "last": 1753636807141,
-      "lastSuccess": 1753636807141
+      "total": 43,
+      "success": 42,
+      "last": 1753658825692,
+      "lastSuccess": 1753658825692
     },
     "fun-paja.js": {
       "total": 3,
@@ -1467,10 +1503,10 @@
       "lastSuccess": 1753583104049
     },
     "downloader-play.js": {
-      "total": 17,
-      "success": 17,
-      "last": 1753581556038,
-      "lastSuccess": 1753581556038
+      "total": 20,
+      "success": 20,
+      "last": 1753658179169,
+      "lastSuccess": 1753658179169
     },
     "info-creador.js": {
       "total": 7,
@@ -1749,10 +1785,10 @@
       "lastSuccess": 1753581695416
     },
     "admins_cerrarabrir.js": {
-      "total": 5,
-      "success": 5,
-      "last": 1753556209459,
-      "lastSuccess": 1753556209459
+      "total": 10,
+      "success": 10,
+      "last": 1753646204752,
+      "lastSuccess": 1753646204752
     },
     "admins_todos.js": {
       "total": 3,
@@ -1845,10 +1881,10 @@
       "lastSuccess": 1753633856701
     },
     "blacklist_ln.js": {
-      "total": 10,
-      "success": 9,
-      "last": 1753636036831,
-      "lastSuccess": 1753636036831
+      "total": 13,
+      "success": 12,
+      "last": 1753646494105,
+      "lastSuccess": 1753646494105
     },
     "blacklist_verln.js": {
       "total": 9,
@@ -1857,10 +1893,10 @@
       "lastSuccess": 1753636028504
     },
     "blacklist_unln.js": {
-      "total": 5,
-      "success": 5,
-      "last": 1753636033131,
-      "lastSuccess": 1753636033131
+      "total": 6,
+      "success": 6,
+      "last": 1753646508253,
+      "lastSuccess": 1753646508253
     },
     "owner_k7.js": {
       "total": 6,

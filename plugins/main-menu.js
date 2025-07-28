@@ -16,7 +16,7 @@ let handler = async (m, { conn, usedPrefix, __dirname, participants }) => {
     let groupUserCount = m.isGroup ? participants.length : '-'
 
     let perfil = await conn.profilePictureUrl(conn.user.jid, 'image')
-      .catch(() => 'http://imgfz.com/i/qIWYzCa.jpeg')
+      .catch(() => 'http://imgfz.com/i/4FxeQNH.gif')
 
     // Preparar el tag del usuario
     const userId = m.sender.split('@')[0]
@@ -25,9 +25,9 @@ let handler = async (m, { conn, usedPrefix, __dirname, participants }) => {
     let pais = phone.getRegionCode() || 'Desconocido 🌐'
 
     const vids = [
-      'https://files.cloudkuimages.guru/videos/RhnYWAae.mp4',
-      'https://files.cloudkuimages.guru/videos/RhnYWAae.mp4',
-      'https://files.cloudkuimages.guru/videos/RhnYWAae.mp4'
+      'https://s8.ezgif.com/tmp/ezgif-83c9712edcb0df.mp4',
+      'https://s8.ezgif.com/tmp/ezgif-83c9712edcb0df.mp4',
+      'https://s8.ezgif.com/tmp/ezgif-83c9712edcb0df.mp4'
     ]
     let videoUrl = vids[Math.floor(Math.random() * vids.length)]
 
@@ -41,12 +41,10 @@ let handler = async (m, { conn, usedPrefix, __dirname, participants }) => {
     const country = user.country || '';
     const isPremium = user.premium || false;
 
-
-    const channelRD = { 
-      id: '120363404278828828@newsletter', 
+    const channelRD = {
+      id: '120363404278828828@newsletter',
       name: 'Grupo oficial:'
     }
-
 
     const metaMsg = {
       quoted: global.fakeMetaMsg,
@@ -64,7 +62,7 @@ let handler = async (m, { conn, usedPrefix, __dirname, participants }) => {
           mediaUrl: null,
           description: null,
           previewType: "PHOTO",
-          thumbnailUrl: 'http://imgfz.com/i/qIWYzCa.jpeg',
+          thumbnailUrl: 'http://imgfz.com/i/4FxeQNH.gif',
           sourceUrl: '-',
           mediaType: 1,
           renderLargerThumbnail: true
@@ -72,145 +70,155 @@ let handler = async (m, { conn, usedPrefix, __dirname, participants }) => {
       }
     }
 
-let saludo
-let hora = new Date().getUTCHours() - 6 
+    let saludo
+    let hora = new Date().getUTCHours() - 6
+    if (hora < 0) hora += 24
 
-if (hora < 0) hora += 24 // por si queda en negativo
+    if (hora >= 5 && hora < 13) {
+      saludo = '✨️ Hola que tengas un lindo día ❤️'
+    } else if (hora >= 13 && hora < 18) {
+      saludo = 'Buenas tardes,que se te ofrece '
+    } else {
+      saludo = '🍭 ¿Por qué aún no duermes? 🥱'
+    }
 
-if (hora >= 5 && hora < 13) {
-  saludo = '✨️ Hola que tengas un lindo día ❤️'
-} else if (hora >= 13 && hora < 18) {
-  saludo = '✨️ Buenas tardes,que se te ofrece 💖'
-} else {
-  saludo = '🍭 ¿Por qué aún no duermes? 🥱'
-}
+    // Definir la fecha para evitar error
+    const date = new Date().toLocaleDateString('es-ES', {
+      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+    })
 
     const body = `
-🎀 Bienvenido a 𝗞𝗲𝗹𝗼𝗸𝗲𝗕𝗼𝘁
+Bienvenido a 𝗞𝗲𝗹𝗼𝗸𝗲𝗕𝗼𝘁
 ${saludo}, *${taguser}*!
-────────────────
-✨ I N F O R M A C I Ó N ✨
-· › 🌺 Nombre del Bot: 𝗞𝗲𝗹𝗼𝗸𝗲𝗕𝗼𝘁 
-· › 👤 Nombre de Usuario: *${taguser}*
-· › 🍡 Estado: En desarrollo
-· › 🍒 *Tiempo en línea* :: *${uptime}*
-────────────────
+╔═══════ ⛓️ 𝐊𝐞𝐥𝐨𝐤𝐞𝐁𝐨𝐭 ⛓️ ═══════╗
+┃    𝙷𝚘𝚕𝚊, 𝚜𝚘𝚢 𝚝𝚞 𝚊𝚜𝚒𝚜𝚝𝚎𝚗𝚝𝚎 𝚣𝚘𝚖𝚋𝚒𝚎 🧟‍♂️    ┃
+┃        Usuario: *${taguser}*         ┃
+┃         Fecha: *${date}*          ┃
+┃        Uptime: *${uptime}*         ┃
+┃  Estado: en desarrollo oscuro... 🩸  ┃
+╚═══════════════════════════════════╝
 *【𝕷 𝖎 𝖘 𝖙 𝖆 - 𝕯𝖊 - 𝕮 𝖔 𝖒 𝖆 𝖓 𝖉 𝖔 𝖘】*
-◈───≼ _*DESCARGAS*_ ≽──⊚
-┝⎆ [ ${usedPrefix}ᴛɪᴋᴛᴏᴋ <link> - Descargar video TT
-┝⎆ [ ${usedPrefix}ᴘʟᴀʏ <nombre> - Descargar canción
-┝⎆ [ ${usedPrefix}ᴘɪɴᴅʟ <link> - Descargar imagen Pinterest
-┝⎆ [ ${usedPrefix}ɪɴsᴛᴀɢʀᴀᴍ <link> - Descargar de IG
-┝⎆ [ ${usedPrefix}ꜰᴀᴄᴇʙᴏᴏᴋ <link> - Descargar video FB
-┝⎆ [ ${usedPrefix}sᴘᴏᴛɪꜰʏ <canción> - Buscar en Spotify
-◈┄──━━┉─࿂
-◈───≼ _*BUSCADORES*_ ≽──⊚
-┝⎆ [ ${usedPrefix}ʏᴛs <nombre> - Buscar en YouTube
-┝⎆ [ ${usedPrefix}ᴘɪɴᴛᴇʀᴇsᴛ <texto> - Buscar imágenes
-┝⎆ [ ${usedPrefix}ᴀᴘᴛᴏɪᴅᴇ <app> - Buscar APK
-┝⎆ [ ${usedPrefix}ᴛɪᴋᴛᴏᴋsᴇᴀʀᴄʜ <texto> - Buscar en TT
-┝⎆ [ ${usedPrefix}sꜱᴡᴇʙ <texto> - Buscar páginas
-◈┄──━━┉─࿂
-◈───≼ _*ADMINS*_ ≽──⊚
-┝⎆ [ ${usedPrefix}ht <texto> - Mención masiva
-┝⎆ [ ${usedPrefix}ᴀᴅᴠᴇʀᴛᴇɴᴄɪᴀ <@tag> <texto> - Advertencia
-┝⎆ [ ${usedPrefix}ᴘᴇʀғɪʟ - Ver perfil grupo
-┝⎆ [ ${usedPrefix}ɢ - Cerrar grupo
-┝⎆ [ ${usedPrefix}ɢ - Abrir grupo
-┝⎆ [ ${usedPrefix}tagall - Mencionar a todos
-┝⎆ [ ${usedPrefix}sᴇᴛᴘᴘɢʀᴜᴘᴏ <img> - Cambiar foto grupo
-┝⎆ [ ${usedPrefix}ᴋ <@tag> - Expulsar miembro
-┝⎆ [ ${usedPrefix}ᴛᴀɢ - Etiquetar con mensaje
-┝⎆ [ ${usedPrefix}ᴅᴇʟ - Eliminar mensaje
-detect on/off detecta cualquier cosa hecha por admins.
-┝⎆ [ ${usedPrefix}ᴘ <@tag> - dar admin
-┝⎆ [ ${usedPrefix}ᴅ <@tag> - quitar admin
-◈┄──━━┉─࿂
-◈───≼ _*OWNER*_ ≽──⊚
-┝⎆ [ ${usedPrefix}ʀᴇɪɴɪᴄɪᴀʀ - Reiniciar bot
-┝⎆ [ ${usedPrefix}ᴅsᴏᴡɴᴇʀ - Info del dev
-┝⎆ [ ${usedPrefix}sᴇᴛɴᴀᴍᴇ <nombre> - Cambiar nombre bot
-┝⎆ [ ${usedPrefix}sᴇᴛᴘᴘ <img> - Cambiar foto bot
-┝⎆ [ ${usedPrefix}ʀᴇsᴛᴀʀᴛ - Reinicio manual
-┝⎆ [ ${usedPrefix}ᴜᴘᴅᴀᴛᴇ - Actualizar bot
-◈┄──━━┉─࿂
-◈───≼ _*HERRAMIENTAS*_ ≽──⊚
-┝⎆ [ ${usedPrefix}s <img> - Crear sticker
-┝⎆ [ ${usedPrefix}ʙʀᴀᴛ <texto> - Sticker brat style
-┝⎆ [ ${usedPrefix}ɪǫᴄ <texto> - Buscar info IQ
-┝⎆ [ ${usedPrefix}ʀᴠᴏᴄᴀʟ <audio> - Cambiar voz
-┝⎆ [ ${usedPrefix}ᴛᴏᴜʀʟ2 <img> - Convertir en URL
-┝⎆ [ ${usedPrefix}ʜᴅ <imagen> - Mejorar calidad
-┝⎆ [ ${usedPrefix}ᴛᴏᴜʀʟ <imagen> - Imagen a enlace
-◈┄──━━┉─࿂
-◈───≼ _*FUN*_ ≽──⊚
-┝⎆ [ ${usedPrefix}ᴋɪss - Enviar beso
-┝⎆ [ ${usedPrefix}ᴛᴏᴘ <texto> - Ranking divertido
-┝⎆ [ ${usedPrefix}ɢᴀʏ - Porcentaje gay
-┝⎆ [ ${usedPrefix}ᴘᴀᴊᴇᴀᴍᴇ - Joda sexual
-┝⎆ [ ${usedPrefix}ᴅᴏxᴇᴏ @usuario - Info falsa divertida
-┝⎆ [ ${usedPrefix}ᴅᴏxiing @usuario - Doxeo random
-┝⎆ [ ${usedPrefix}ғᴏʀᴍᴀʀᴘᴀʀᴇᴊᴀ - Crea una pareja
-┝⎆ [ ${usedPrefix}ғᴏʀᴍᴀʀᴘᴀʀᴇᴊᴀ𝟻 - Crea pareja 5.0
-◈┄──━━┉─࿂
-◈───≼ _*MAIN & RPG*_ ≽──⊚
-┝⎆ [ ${usedPrefix}ʀᴇɢ <nombre edad> - Registrarse
-┝⎆ [ ${usedPrefix}ᴜɴʀᴇɢ - Borrar registro
-┝⎆ [ ${usedPrefix}ᴍᴇɴᴜ - Ver el menú principal
-┝⎆ [ ${usedPrefix}ᴊᴜᴇɢᴏs - Juegos disponibles
-┝⎆ [ ${usedPrefix}ᴘɪɴɢ - Velocidad del bot
-┝⎆ [ ${usedPrefix}ɢʀᴜᴘᴏs - Lista de grupos
-┝⎆ [ ${usedPrefix}ᴏᴡɴᴇʀ - Info del owner
-◈┄──━━┉─࿂
-◈───≼ _*IA & ARTE*_ ≽──⊚
-┝⎆ [ ${usedPrefix}ᴍᴀɢɪᴄsᴛᴜᴅɪᴏ <texto> - Generar imagen
-┝⎆ [ ${usedPrefix}ᴀɪ <texto> - Chat IA
-┝⎆ [ ${usedPrefix}ᴇᴅɪᴛꜰᴏᴛᴏ <descripción> - Editar foto IA
-┝⎆ [ ${usedPrefix}ᴡᴘᴡ - Wallpaper random
-┝⎆ [ ${usedPrefix}ɢᴇᴍɪɴɪ <texto> - Gemini IA
-┝⎆ [ ${usedPrefix}ʙɢʀᴇᴍᴏᴠᴇʀ <imagen> - Quitar fondo
-◈┄──━━┉─࿂
-◈───≼ _*NSFW*_ ≽──⊚
-┝⎆ [ ${usedPrefix}ᴘᴇɴᴇᴛʀᴀʀ - Acción explícita
-┝⎆ [ ${usedPrefix}ʜᴜᴇᴠᴏ - Agarrarle el huevo a alguien
-┝⎆ [ ${usedPrefix}sᴇxᴏ - Acción sexual
-┝⎆ [ ${usedPrefix}ᴠɪᴏʟᴀʀ - Contenido fuerte
-┝⎆ [ ${usedPrefix}ғᴏʟʟᴀʀ - Simulación sexual
+
+◈───≼ 🧟‍♀️ _*DESCARGAS*_ 🧟‍♀️ ≽──⊚
+🕷️┝⎆ [ ${usedPrefix}tiktok <link> - Descargar video TT
+🕷️┝⎆ [ ${usedPrefix}play <nombre> - Descargar canción
+🕸️┝⎆ [ ${usedPrefix}pindl <link> - Descargar imagen Pinterest
+🕷️┝⎆ [ ${usedPrefix}instagram <link> - Descargar de IG
+🕷️┝⎆ [ ${usedPrefix}facebook <link> - Descargar video FB
+🕷️┝⎆ [ ${usedPrefix}spotify <canción> - Buscar en Spotify
 ◈┄──━━┉─࿂
 
+◈───≼ 🕸️ _*BUSCADORES*_ 🕸️ ≽──⊚
+🕷️┝⎆ [ ${usedPrefix}yts <nombre> - Buscar en YouTube           
+🕷️┝⎆ [ ${usedPrefix}pinterest <texto> - Buscar imágenes
+🕷️┝⎆ [ ${usedPrefix}aptoide <app> - Buscar APK
+🕸️┝⎆ [ ${usedPrefix}tiktoksearch <texto> - Buscar en TT
+🕷️┝⎆ [ ${usedPrefix}ssweb <texto> - Buscar páginas
+◈┄──━━┉─࿂
+
+◈───≼ ⚰️ _*ADMINS*_ ⚰️ ≽──⊚                                     
+🩸┝⎆ [ ${usedPrefix}ht <texto> - Mención masiva
+🩸┝⎆ [ ${usedPrefix}advertencia <@tag> <texto> - Advertencia
+🧟┝⎆ [ ${usedPrefix}perfil - Ver perfil grupo
+🕸️┝⎆ [ ${usedPrefix}g - Cerrar grupo
+🕸️┝⎆ [ ${usedPrefix}g - Abrir grupo
+🕷️┝⎆ [ ${usedPrefix}tagall - Mencionar a todos
+🕷️┝⎆ [ ${usedPrefix}setppgrupo <img> - Cambiar foto grupo
+🩸┝⎆ [ ${usedPrefix}k <@tag> - Expulsar miembro
+🕷️┝⎆ [ ${usedPrefix}tag <mensaje> - Etiquetar con mensaje      
+🩸┝⎆ [ ${usedPrefix}del - Eliminar mensaje
+🩸┝⎆ [ ${usedPrefix}p <@tag> - Dar admin
+🩸┝⎆ [ ${usedPrefix}d <@tag> - Quitar admin
+🧟‍♂️┝⎆ [ ${usedPrefix}autoadmin - El bot te da admin
+☠️┝⎆ [ ${usedPrefix}banuser @tag - Banea al etiquetado
+✨┝⎆ [ ${usedPrefix}unbanuser @tag - Desbanea al etiquetado
+👁️‍🗨️┝⎆ [ ${usedPrefix}detect on/off - Detecta acciones hechas por admins
+◈┄──━━┉─࿂
+
+◈───≼ 🧟‍♂️ _*OWNER*_ 🧟‍♂️ ≽──⊚
+🕷️┝⎆ [ ${usedPrefix}reiniciar - Reiniciar bot
+🕷️┝⎆ [ ${usedPrefix}dsowner - Info del dev
+🕸️┝⎆ [ ${usedPrefix}setname <nombre> - Cambiar nombre bot
+🕸️┝⎆ [ ${usedPrefix}setpp <img> - Cambiar foto bot
+🕷️┝⎆ [ ${usedPrefix}restart - Reinicio manual
+🕷️┝⎆ [ ${usedPrefix}update - Actualizar bot
+◈┄──━━┉─࿂
+
+◈───≼ 🕸️ _*HERRAMIENTAS*_ 🕸️ ≽──⊚
+🩸┝⎆ [ ${usedPrefix}s <img> - Crear sticker
+🩸┝⎆ [ ${usedPrefix}brat <texto> - Sticker brat style
+🕷️┝⎆ [ ${usedPrefix}iqc <texto> - Buscar info IQ
+🕷️┝⎆ [ ${usedPrefix}rvocal <audio> - Cambiar voz
+🕷️┝⎆ [ ${usedPrefix}tourl2 <img> - Convertir en URL
+🕷️┝⎆ [ ${usedPrefix}hd <imagen> - Mejorar calidad
+🕷️┝⎆ [ ${usedPrefix}tourl <imagen> - Imagen a enlace
+◈┄──━━┉─࿂
+
+◈───≼ 🧟 _*FUN*_ 🧟 ≽──⊚
+🕷️┝⎆ [ ${usedPrefix}kiss - Enviar beso
+🕷️┝⎆ [ ${usedPrefix}top <texto> - Ranking divertido
+🕸️┝⎆ [ ${usedPrefix}gay - Porcentaje gay
+🕷️┝⎆ [ ${usedPrefix}pajeame - Joda sexual
+🕷️┝⎆ [ ${usedPrefix}doxeo @usuario - Info falsa divertida
+🕷️┝⎆ [ ${usedPrefix}doxiing @usuario - Doxeo random
+🕸️┝⎆ [ ${usedPrefix}formarpareja - Crea una pareja
+🕸️┝⎆ [ ${usedPrefix}formarpareja5 - Crea pareja 5.0
+◈┄──━━┉─࿂
+
+◈───≼ 🕷️ _*MAIN & RPG*_ 🕷️ ≽──⊚
+🩸┝⎆ [ ${usedPrefix}reg <nombre edad> - Registrarse
+🩸┝⎆ [ ${usedPrefix}unreg - Borrar registro
+🧟┝⎆ [ ${usedPrefix}menu - Ver el menú principal
+🕷️┝⎆ [ ${usedPrefix}juegos - Juegos disponibles
+🕸️┝⎆ [ ${usedPrefix}ping - Velocidad del bot
+🕷️┝⎆ [ ${usedPrefix}grupos - Lista de grupos
+🕷️┝⎆ [ ${usedPrefix}owner - Info del owner
+◈┄──━━┉─࿂
+
+◈───≼ 🧟‍♂️ _*IA & ARTE*_ 🧟‍♂️ ≽──⊚
+🕸️┝⎆ [ ${usedPrefix}magicstudio <texto> - Generar imagen
+🕷️┝⎆ [ ${usedPrefix}ai <texto> - Chat IA
+🕷️┝⎆ [ ${usedPrefix}editfoto <descripción> - Editar foto IA
+🕷️┝⎆ [ ${usedPrefix}wpw - Wallpaper random
+🕷️┝⎆ [ ${usedPrefix}gemini <texto> - Gemini IA
+🕷️┝⎆ [ ${usedPrefix}bgremover <imagen> - Quitar fondo
+◈┄──━━┉─࿂
+
+◈───≼ ☠️ _*NSFW*_ ☠️ ≽──⊚
+🩸┝⎆ [ ${usedPrefix}penetrar - Acción explícita
+🕸️┝⎆ [ ${usedPrefix}huevo - Agarrarle el huevo a alguien
+🕷️┝⎆ [ ${usedPrefix}sexo - Acción sexual
+🕷️┝⎆ [ ${usedPrefix}violar - Contenido fuerte
+🕷️┝⎆ [ ${usedPrefix}follar - Simulación sexual
+◈┄──━━┉─࿂
 `.trim()
 
     // Unir header + body
     const menu = `${header}\n${body}`
 
-    // Configurar datos para el mensaje
-    const botname = '🌸◌*̥𝗞𝗲𝗹𝗼𝗸𝗲𝗕𝗼𝘁'
-    const textbot = '💖 𝗞𝗲𝗹𝗼𝗸𝗲𝗕𝗼𝘁 𝘽𝙔 𝘿𝙀𝙑 G ✨️'
-    const banner = perfil
-    const redes = 'https://whatsapp.com/channel/0029VawwvsW7j6g1upS0i531'
-    
+    // Enviar el menú con video y menciones
     await conn.sendMessage(m.chat, {
       video: { url: videoUrl },
       caption: body,
       gifPlayback: true,
-      mentions: [m.sender],  // Agregamos el array de menciones
+      mentions: [m.sender],
       ...metaMsg
     })
 
   } catch (e) {
     console.error(e)
-    await conn.sendMessage(m.chat, { 
+    await conn.sendMessage(m.chat, {
       text: `✘ Error al enviar el menú: ${e.message}`,
-      mentions: [m.sender]  // También incluimos menciones en el mensaje de error
-    }, { 
-      quoted: metaMsg 
+      mentions: [m.sender]
+    }, {
+      quoted: metaMsg
     })
   }
 }
 
 handler.help = ['menu']
 handler.tags = ['main']
-handler.command = ['menu','help','menú','allmenu','menucompleto']
+handler.command = ['menu', 'help', 'menú', 'allmenu', 'menucompleto']
 handler.register = true
 export default handler
 
