@@ -1,45 +1,29 @@
-import { execSync } from 'child_process';
+import { exec } from 'child_process';
 
-let handler = async (m, { conn, args }) => { 
-    try { 
-        await conn.reply(m.chat, '✨️ Actualizando el bot, por favor espere...', m, fake)
+let handler = async (m, { conn }) => {
+  m.reply(`🏔️ 𝑨𝒍𝒕𝒖𝒂𝒍𝒊𝒛𝒂𝒏𝒅𝒐 𝒆𝒍 𝒃𝒐𝒕...`);
 
-        const output = execSync('git pull' + (args.length ? ' ' + args.join(' ') : '')).toString();
-        let response = output.includes('Already up to date') 
-            ? '✨️ El bot ya está actualizado.' 
-            : `✨️ Se han aplicado actualizaciones:\n\n${output}`;
+  exec('git pull', (err, stdout, stderr) => {
+    if (err) {
+      conn.reply(m.chat, `${msm} Error: No se pudo realizar la actualización.\nRazón: ${err.message}`, m);
+      return;
+    }
 
-        await conn.reply(m.chat, response, m, fake);
+    if (stderr) {
+      console.warn('Advertencia durante la actualización:', stderr);
+    }
 
-    } catch (error) { 
-        try { 
-            const status = execSync('git status --porcelain').toString().trim(); 
-            if (status) { 
-                const conflictedFiles = status.split('\n').filter(line => 
-                    !line.includes('roxySession/') && 
-                    !line.includes('.cache/') && 
-                    !line.includes('tmp/')
-                ); 
-
-                if (conflictedFiles.length > 0) { 
-                    const conflictMsg = `⚠️ Conflictos detectados en los siguientes archivos:\n\n` +
-                        conflictedFiles.map(f => '• ' + f.slice(3)).join('\n') +
-                        `\n\n🔹 Para solucionar esto, reinstala el bot o actualiza manualmente.`;
-
-                    return await conn.reply(m.chat, conflictMsg, m, fake); 
-                } 
-            } 
-        } catch (statusError) { 
-            console.error(statusError); 
-        }
-
-        await conn.reply(m.chat, `❌ Error al actualizar: ${error.message || 'Error desconocido.'}`, m, fake);
-    } 
+    if (stdout.includes('Already up to date.')) {
+      conn.reply(m.chat, `*🔥 El bot ya está actualizado.*`, m, rcanal);
+    } else {
+      conn.reply(m.chat, `*🌴 Actualización realizada con éxito. 👑*\n\n${stdout}`, m, rcanal);
+    }
+  });
 };
 
-handler.help = ['update', 'actualizar'];
-handler.command = ['update', 'actualizar']
+handler.help = ['update'];
 handler.tags = ['owner'];
+handler.command = ['update', 'fix'];
 handler.rowner = true;
 
 export default handler;

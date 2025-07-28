@@ -16,7 +16,7 @@ let handler = async (m, { conn, usedPrefix, __dirname, participants }) => {
     let groupUserCount = m.isGroup ? participants.length : ''
 
     let perfil = await conn.profilePictureUrl(conn.user.jid, 'image')
-      .catch(() => 'http://imgfz.com/i/4FxeQNH.gif')
+      .catch(() => 'http://imgfz.com/i/Ut7YNKE.jpeg')
 
     // Preparar el tag del usuario
     const userId = m.sender.split('@')[0]
@@ -58,7 +58,7 @@ let handler = async (m, { conn, usedPrefix, __dirname, participants }) => {
           description: null,
           previewType: "PHOTO",
           thumbnailUrl: 'http://imgfz.com/i/Ut7YNKE.jpeg',
-          sourceUrl: 'https://whatsapp.com/channel/0029VawwvsW7j6g1upS0i531', // tu número de contacto o canal
+          sourceUrl: '', // tu número de contacto o canal
           mediaType: 1,
           renderLargerThumbnail: true
         }
