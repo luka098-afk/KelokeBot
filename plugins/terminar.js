@@ -26,39 +26,39 @@ const handler = async (m, { conn, plugins }) => {
       exparejas = {}
     }
 
-    // Obtener el sender limpio y normalizado
+    // Obtener el sender usando la misma lógica que .pareja
     const senderRaw = m.sender.split('@')[0]
-    const sender = `${senderRaw}@s.whatsapp.net`
-    const senderName = conn.getName(sender) || senderRaw
+    const senderJID = `${senderRaw}@s.whatsapp.net`
+    const senderName = conn.getName(senderJID) || senderRaw
 
-    // Verificar si tiene pareja actual
-    const parejaData = parejas[senderRaw]
+    // Verificar si tiene pareja actual usando JID completo como clave
+    const parejaData = parejas[senderJID]
     if (!parejaData || !parejaData.pareja) {
       return m.reply('❌ No tienes pareja actualmente para terminar una relación.')
     }
 
-    const parejaRaw = parejaData.pareja.split('@')[0]
-    const pareja = `${parejaRaw}@s.whatsapp.net`
-    const parejaName = conn.getName(pareja) || parejaRaw
+    const parejaJID = parejaData.pareja
+    const parejaRaw = parejaJID.split('@')[0]
+    const parejaName = conn.getName(parejaJID) || parejaRaw
 
-    // Guardar la relación terminada en exparejas con nombres
-    exparejas[senderRaw] = {
-      ex: parejaData.pareja,
+    // Guardar la relación terminada en exparejas usando JIDs completos como clave
+    exparejas[senderJID] = {
+      ex: parejaJID,
       exNombre: parejaName,
       miNombre: senderName,
       fecha: new Date().toISOString()
     }
     
-    exparejas[parejaRaw] = {
-      ex: sender,
+    exparejas[parejaJID] = {
+      ex: senderJID,
       exNombre: senderName,
       miNombre: parejaName,
       fecha: new Date().toISOString()
     }
 
-    // Eliminar la pareja actual
-    delete parejas[senderRaw]
-    delete parejas[parejaRaw]
+    // Eliminar la pareja actual usando JIDs completos
+    delete parejas[senderJID]
+    delete parejas[parejaJID]
 
     // Guardar cambios
     fs.writeFileSync(parejasPath, JSON.stringify(parejas, null, 2))
@@ -105,13 +105,17 @@ ahora cada uno sigue su latido."
 
     const poemaAleatorio = poemas[Math.floor(Math.random() * poemas.length)]
 
-    // Limpiar y normalizar JIDs para las menciones
-    const senderClean = sender.includes('@') ? sender : `${sender}@s.whatsapp.net`
-    const parejaClean = pareja.includes('@') ? pareja : `${pareja}@s.whatsapp.net`
+    // Limpiar JIDs para las menciones (igual que en .pareja)
+    const senderClean = senderJID.includes('@') ? senderJID : `${senderJID}@s.whatsapp.net`
+    const parejaClean = parejaJID.includes('@') ? parejaJID : `${parejaJID}@s.whatsapp.net`
+
+    // Extraer números limpios para el texto (igual que en .pareja)
+    const senderNum = senderClean.split('@')[0]
+    const parejaNum = parejaClean.split('@')[0]
 
     const mensaje = `${poemaAleatorio}
 
-💔 @${senderRaw} y @${parejaRaw} han terminado su relación 💔
+💔 @${senderNum} y @${parejaNum} han terminado su relación 💔
 
 *Los recuerdos quedan, pero cada uno toma su propio sendero...*
 
