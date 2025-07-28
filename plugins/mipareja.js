@@ -1,69 +1,59 @@
-// mipareja.js
 import fs from 'fs'
 import path from 'path'
 
-const handler = async (m, { conn, text }) => {
+const handler = async (m, { conn }) => {
   try {
     const userRaw = m.sender.split('@')[0]
     const user = `${userRaw}@s.whatsapp.net`
 
     // Leer base de datos de parejas
     const parejasPath = path.join('./database', 'parejas.json')
-    let parejas = {}
-    try {
-      parejas = JSON.parse(fs.readFileSync(parejasPath))
-    } catch (e) {
-      return m.reply('❌ No tienes pareja actualmente.')
-    }
+    if (!fs.existsSync(parejasPath)) return m.reply('❌ No tienes pareja actualmente.')
 
-    // Verificar si tiene pareja
-    if (!parejas[userRaw]) {
-      return m.reply('❌ No tienes pareja actualmente.')
-    }
+    const parejas = JSON.parse(fs.readFileSync(parejasPath))
 
-    const pareja = parejas[userRaw]
-    const parejaJid = pareja.jid
-    const parejaNombre = pareja.pareja
-    const fechaInicio = new Date(pareja.fechaInicio)
-    const casados = pareja.casados || false
-    const parejasAnteriores = pareja.parejasAnteriores || 0
+    if (!parejas[userRaw]) return m.reply('❌ No tienes pareja actualmente.')
+
+    const parejaObj = parejas[userRaw]
+    const parejaJid = parejaObj.pareja
+    const fechaInicio = new Date(parejaObj.desde)
+    const casados = parejaObj.casados || false
+    const parejasAnteriores = parejaObj.parejasAnteriores || 0
 
     // Calcular tiempo de relación
     const ahora = new Date()
     const diferencia = ahora - fechaInicio
-    
+
     const dias = Math.floor(diferencia / (1000 * 60 * 60 * 24))
     const horas = Math.floor((diferencia % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
     const minutos = Math.floor((diferencia % (1000 * 60 * 60)) / (1000 * 60))
 
-    // Limpiar y normalizar JIDs para menciones
-    const userClean = user.includes('@') ? user : `${user}@s.whatsapp.net`
+    // Limpiar JIDs para menciones
     const parejaClean = parejaJid.includes('@') ? parejaJid : `${parejaJid}@s.whatsapp.net`
-    
+    const userClean = user.includes('@') ? user : `${user}@s.whatsapp.net`
     const userNum = userClean.split('@')[0]
     const parejaNum = parejaClean.split('@')[0]
 
-    const mensaje = `@${userNum} 𝙴𝚂𝚃𝙰́𝚂 𝙴𝙽 𝚄𝙽𝙰 𝚁𝙴𝙻𝙰𝙲𝙸𝙾́𝙽 𝙲𝙾𝙽 @${parejaNum} 😋
+    // Mensaje con arte y estilo nuevo
+    const mensaje = `💫 *Vínculo de Estrellas* 💫
 
-───▄█▀█▄──▄███▄───
-──▐█░██████████▌──
-───██▒█████████───
-────▀████████▀────
-───────▀██▀───────
-❣️‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎😍 ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎‎ ❣️
+@${userNum} está en una conexión cósmica con @${parejaNum} ✨
 
-*⏳Tiempo de pareja:*
+🌌 𓂃𓈒𓏸 𝒜𝓂𝑜𝓇 𝑒𝓃 𝓁𝒾𝓃𝑒𝒶... 💞
+───☆────☆────☆───
+          💫   💞   💫
+       *Un amor fuera de este mundo*
+
+*⏳ Tiempo juntos:*
 ${dias} días, ${horas} horas, ${minutos} minutos
 
-*💍Casados:* ${casados ? '✅' : '❌'}
+*🔗 Unidos en matrimonio:* ${casados ? '💍 Sí' : '❌ No'}
 
-*💕Parejas anteriores:* ${parejasAnteriores}`
-
-    const mentionsArray = [userClean, parejaClean]
+*🕰️ Amores pasados:* ${parejasAnteriores}`
 
     await conn.sendMessage(m.chat, {
       text: mensaje,
-      mentions: mentionsArray
+      mentions: [userClean, parejaClean]
     })
 
   } catch (error) {
