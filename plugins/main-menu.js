@@ -13,7 +13,7 @@ let handler = async (m, { conn, usedPrefix, __dirname, participants }) => {
     let _uptime = process.uptime() * 1000
     let uptime = clockString(_uptime)
     let totalreg = Object.keys(global.db.data.users).length
-    let groupUserCount = m.isGroup ? participants.length : '120363386229166956@newsletter'
+    let groupUserCount = m.isGroup ? participants.length : ''
 
     let perfil = await conn.profilePictureUrl(conn.user.jid, 'image')
       .catch(() => 'http://imgfz.com/i/4FxeQNH.gif')
@@ -62,7 +62,7 @@ let handler = async (m, { conn, usedPrefix, __dirname, participants }) => {
           mediaUrl: null,
           description: null,
           previewType: "PHOTO",
-          thumbnailUrl: 'http://imgfz.com/i/4FxeQNH.gif',
+          thumbnailUrl: 'http://imgfz.com/i/Ut7YNKE.jpeg',
           sourceUrl: '120363386229166956@newsletter',
           mediaType: 1,
           renderLargerThumbnail: true
