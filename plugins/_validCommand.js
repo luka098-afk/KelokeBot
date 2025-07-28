@@ -59,7 +59,7 @@ export async function before(m, { conn }) {
         },
         externalAdReply: {
           title: 'DevByG',
-          body: '🌸◌*̥₊ KelokeBot ◌❐🎋༉',
+          body: 'KelokeBot',
           mediaUrl: null,
           description: null,
           previewType: "PHOTO",
@@ -98,7 +98,7 @@ export async function before(m, { conn }) {
             mentionedJid: [m.sender],
             externalAdReply: {
               title: 'DevByG',
-              body: '🌸◌*̥₊ kelokebot ◌❐🎋༉',
+              body: 'kelokebot',
               thumbnailUrl: 'http://imgfz.com/i/ysZD3vi.jpeg',
               sourceUrl: '-',
               mediaType: 1,
@@ -120,7 +120,7 @@ export async function before(m, { conn }) {
           mentionedJid: [m.sender],
           externalAdReply: {
             title: 'DevByG',
-            body: '🌸◌*̥₊ kelokebot ◌❐🎋༉',
+            body: 'kelokebot',
             thumbnailUrl: 'http://imgfz.com/i/ysZD3vi.jpeg',
             sourceUrl: '-',
             mediaType: 1,

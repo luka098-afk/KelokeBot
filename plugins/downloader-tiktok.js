@@ -65,7 +65,7 @@ let yeon = async (m, { conn, text, usedPrefix, command }) => {
   if (!text) {
     await conn.sendMessage(m.chat, { react: { text: "❌", key: m.key } })
     return conn.sendMessage(m.chat, {
-      text: `😕 *Senpai*, ¿dónde está el enlace de TikTok?  
+      text: `😕¿dónde está el enlace de TikTok?
 Ejemplo: *${usedPrefix + command}* https://vt.tiktok.com/abcd/`
     })
   }
