@@ -63,7 +63,7 @@ let handler = async (m, { conn, usedPrefix, __dirname, participants }) => {
           description: null,
           previewType: "PHOTO",
           thumbnailUrl: 'http://imgfz.com/i/4FxeQNH.gif',
-          sourceUrl: '-',
+          sourceUrl: '120363386229166956@newsletter',
           mediaType: 1,
           renderLargerThumbnail: true
         }
