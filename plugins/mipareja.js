@@ -4,7 +4,7 @@ import path from 'path'
 const handler = async (m, { conn }) => {
   try {
     const userRaw = m.sender.split('@')[0]
-    const userJid = `${userRaw}@s.whatsapp.net`
+    const userJid = m.sender.includes('@') ? m.sender : `${m.sender}@s.whatsapp.net`
 
     const parejasPath = path.join('./database', 'parejas.json')
     if (!fs.existsSync(parejasPath)) return m.reply('❌ No tienes pareja actualmente.')
@@ -26,6 +26,10 @@ const handler = async (m, { conn }) => {
     const horas = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
     const minutos = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
 
+    // Limpiar y normalizar JIDs usando la lógica de pareja.js
+    const userClean = userJid.includes('@') ? userJid : `${userJid}@s.whatsapp.net`
+    const parejaClean = parejaJid.includes('@') ? parejaJid : `${parejaJid}@s.whatsapp.net`
+
     const mensaje = `💌 *Declaración Oficial del Amor* 💌
 
 @${userRaw} está en pareja con @${parejaRaw} ✨
@@ -44,9 +48,12 @@ ${dias} días, ${horas} horas, ${minutos} minutos
 
 *💔 Amores pasados:* ${parejasAnteriores}`
 
+    // Asegurar que usamos los JIDs correctos para las menciones
+    const mentionsArray = [userClean, parejaClean]
+
     await conn.sendMessage(m.chat, {
       text: mensaje,
-      mentions: [userJid, parejaJid]
+      mentions: mentionsArray
     })
 
   } catch (error) {
