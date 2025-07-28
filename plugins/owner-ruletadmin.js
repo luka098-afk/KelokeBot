@@ -1,20 +1,23 @@
-const ownerNumbers = ['59896026646', '59898719147'] // Dueños sin '+'
+// Lista de números dueños sin el símbolo "+"
+const ownerNumbers = ['59896026646', '59898719147']
 
 let handler = async (m, { conn, participants, isBotAdmin }) => {
   if (!m.isGroup) return m.reply('❌ Este comando solo se puede usar en grupos.')
 
+  // Obtener el número sin "@s.whatsapp.net"
   const senderID = m.sender.split('@')[0]
 
-  // Solo dueños
+  // Verificar si el que envía es dueño
   if (!ownerNumbers.includes(senderID)) {
     return m.reply('⛔ Este comando solo puede usarlo un *dueño del bot*.')
   }
 
+  // Verificar que el bot sea admin
   if (!isBotAdmin) {
-    return m.reply('❌ No puedo degradar a nadie porque *no soy administrador*.')
+    return m.reply('❌ No puedo ejecutar este comando porque no soy administrador.')
   }
 
-  // Filtrar admins (excepto el bot y los dueños)
+  // Filtrar admins que no sean bot ni dueños
   let admins = participants.filter(p =>
     p.admin &&
     !ownerNumbers.includes(p.id.split('@')[0]) &&
@@ -22,25 +25,25 @@ let handler = async (m, { conn, participants, isBotAdmin }) => {
   )
 
   if (admins.length === 0) {
-    return m.reply('😅 No hay administradores elegibles para ser degradados.')
+    return m.reply('😅 No hay administradores elegibles para degradar.')
   }
 
-  // Elegir uno al azar
+  // Elegir admin al azar para degradar
   let degradado = admins[Math.floor(Math.random() * admins.length)]
 
   // Mensaje previo
   await conn.sendMessage(m.chat, {
-    text: `🎲 *RULETADMIN - VERSIÓN INACTIVO* 🎲\n\nAnalizando actividad de los administradores...`,
+    text: `🎲 *RULETADMIN - INACTIVIDAD* 🎲\nAnalizando actividad de los administradores...`,
   })
 
-  await new Promise(res => setTimeout(res, 2000))
+  await new Promise(r => setTimeout(r, 2000))
 
   await conn.sendMessage(m.chat, {
-    text: `🛑 @${degradado.id.split('@')[0]} ha sido marcado como *inactivo*.\n😔 Pierde sus privilegios de administrador.`,
+    text: `🛑 @${degradado.id.split('@')[0]} ha sido marcado como *inactivo* y perderá sus privilegios de administrador.`,
     mentions: [degradado.id]
   })
 
-  // Ejecutar la degradación
+  // Quitar admin
   await conn.groupParticipantsUpdate(m.chat, [degradado.id], 'demote')
 }
 
