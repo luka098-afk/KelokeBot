@@ -1,73 +1,56 @@
-// welcome-handler.js
+import { welcome } from '../lib/database.js'
 
-export async function handler(m, { conn, text, usedPrefix }) {
-  if (!m.isGroup) return m.reply('Este comando solo funciona en grupos.');
+let handler = async (m, { conn, args, isAdmin, usedPrefix, command }) => {
 
-  const chat = global.db.data.chats[m.chat];
-  if (!chat) return m.reply('Error: Chat no encontrado en la base de datos.');
+// Verificar que sea administrador
+if (!isAdmin) return m.reply(`🎃 *Solo los administradores pueden usar este comando.*`)
 
-  const arg = (text || '').toLowerCase();
+let isEnable = /true|enable|(turn)?on|1/i.test(command)
+let chat = global.db.data.chats[m.chat]
+let user = global.db.data.users[m.sender]
+let bot = global.db.data.settings[conn.user.jid] || {}
 
-  if (arg === 'on') {
-    chat.welcome = true;
-    await conn.sendMessage(m.chat, {
-      text: `✅ Bienvenida activada para este grupo.`,
-    });
-  } else if (arg === 'off') {
-    chat.welcome = false;
-    await conn.sendMessage(m.chat, {
-      text: `❌ Bienvenida desactivada para este grupo.`,
-    });
-  } else {
-    await conn.sendMessage(m.chat, {
-      text: `Usa el comando así:\n${usedPrefix}welcome on\n${usedPrefix}welcome off`,
-    });
-  }
+if (args[0] === 'on' || args[0] === 'enable' || args[0] === '1') {
+    if (chat.welcome) return m.reply(`🎃 *El welcome ya está activado en este grupo.*`)
+    chat.welcome = true
+    m.reply(`╭━〔 🎃 𝗪𝗲𝗹𝗰𝗼𝗺𝗲 𝗔𝗰𝘁𝗶𝘃𝗮𝗱𝗼! 👻 〕━⬣
+┃
+┃ 🦇 ¡Welcome activado correctamente!
+┃ 🕷️ Ahora daré la bienvenida a 
+┃    nuevos miembros y despediré
+┃    a los que se van.
+┃
+╰━━━━━━━━━━━━━━━━━━⬣`)
 
-  // Guardar la base de datos si no está automático:
-  if (global.db?.write) await global.db.write();
+} else if (args[0] === 'off' || args[0] === 'disable' || args[0] === '0') {
+    if (!chat.welcome) return m.reply(`🎃 *El welcome ya está desactivado en este grupo.*`)
+    chat.welcome = false
+    m.reply(`╭━〔 🎃 𝗪𝗲𝗹𝗰𝗼𝗺𝗲 𝗗𝗲𝘀𝗮𝗰𝘁𝗶𝘃𝗮𝗱𝗼 👻 〕━⬣
+┃
+┃ 💀 Welcome desactivado correctamente.
+┃ 🕸️ Ya no daré mensajes de
+┃    bienvenida ni despedida.
+┃
+╰━━━━━━━━━━━━━━━━━━⬣`)
+
+} else {
+    m.reply(`╭━〔 🎃 𝗖𝗼𝗺𝗮𝗻𝗱𝗼 𝗪𝗲𝗹𝗰𝗼𝗺𝗲 👻 〕━⬣
+┃
+┃ 🦇 *Uso:* ${usedPrefix + command} on/off
+┃ 🕷️ *Ejemplo:* ${usedPrefix + command} on
+┃ 
+┃ 📋 *Estado actual:* ${chat.welcome ? '✅ Activado' : '❌ Desactivado'}
+┃
+╰━━━━━━━━━━━━━━━━━━⬣`)
 }
 
-handler.command = ['welcome'];
-handler.group = true;
-
-export default handler;
-
-
-// before.js
-
-export async function before(m, { conn }) {
-  if (!m.isGroup || !m.messageStubType || !m.messageStubParameters) return;
-
-  if (!global.db.data.chats[m.chat].welcome) return;
-
-  const groupMetadata = await conn.groupMetadata(m.chat);
-  const participants = m.messageStubParameters || [];
-  const date = new Date();
-  const fecha = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
-
-  for (const user of participants) {
-    let name = await conn.getName(user);
-    const taguser = '@' + user.split('@')[0];
-    const gifUrl = 'https://files.catbox.moe/3nhupk.gif'; // tu GIF                                                         
-    if (m.messageStubType === 27 || m.messageStubType === 31) {
-      // Bienvenida
-      await conn.sendMessage(m.chat, {
-        video: { url: gifUrl },
-        gifPlayback: true,
-        caption: `🎉 ¡Hola ${taguser}! Bienvenido al grupo *${groupMetadata.subject}*.\n\nEsperamos que disfrutes y aportes mucho.\n\n🗓️ Fecha: ${fecha}`,
-        mentions: [user]
-      });
-    }
-
-    if (m.messageStubType === 28 || m.messageStubType === 32) {
-      // Despedida
-      await conn.sendMessage(m.chat, {
-        video: { url: gifUrl },
-        gifPlayback: true,
-        caption: `😢 ${taguser} ha salido del grupo *${groupMetadata.subject}*.\n\n¡Te deseamos lo mejor!`,
-        mentions: [user]
-      });
-    }
-  }
 }
+
+handler.help = ['welcome'].map(v => v + ' <on/off>')
+handler.tags = ['group']
+handler.command = ['welcome', 'bienvenida']
+handler.group = true
+handler.admin = true
+handler.botAdmin = true
+
+export default handler
