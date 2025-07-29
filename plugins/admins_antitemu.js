@@ -13,14 +13,28 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
   }
 }
 
-handler.customPrefix = /https?:\/\/(www\.)?(share\.)?temu\.com\/\S+/i
-handler.before = async function (m, { conn }) {
-  if (!m.isGroup) return
+handler.command = /^antitemu$/i
+handler.group = true
+handler.admin = true
+handler.botAdmin = true
+
+export default handler
+
+// 💀 Filtro que detecta Temu, sin errores
+export async function before(m, { conn, isBotAdmin }) {
+  if (!m.isGroup || !isBotAdmin || m.fromMe || !m.text) return
+
   const chat = global.db.data.chats[m.chat]
   if (!chat?.antitemu) return
 
+  const temuRegex = /https?:\/\/(www\.)?(share\.)?temu\.com\/\S+/i
+  if (!temuRegex.test(m.text)) return
+
   try {
+    // Borra el mensaje original con link
     await conn.sendMessage(m.chat, { delete: m.key })
+
+    // Responde al usuario con mención
     await conn.reply(
       m.chat,
       `@${m.sender.split('@')[0]} no mandes links de Temu.\nNo seas gil ni te la creas.`,
@@ -31,11 +45,3 @@ handler.before = async function (m, { conn }) {
     console.error('[❌ ANTITEMU ERROR]', e)
   }
 }
-
-// Solo se ejecuta el filtro si no es comando (importante para evitar conflictos)
-handler.command = /^antitemu$/i
-handler.group = true
-handler.admin = true
-handler.botAdmin = true
-
-export default handler
