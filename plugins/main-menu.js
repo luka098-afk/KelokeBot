@@ -120,7 +120,7 @@ ${saludo}, *${taguser}*!
 🕸️┝⎆ [ ${usedPrefix}pindl <link> - Descargar imagen Pinterest
 🕷️┝⎆ [ ${usedPrefix}instagram <link> - Descargar de IG
 🕷️┝⎆ [ ${usedPrefix}facebook <link> - Descargar video FB
-🕷️┝⎆ [ ${usedPrefix}spotify <canción> - Buscar en Spotify
+🕷️┝⎆ [ ${usedPrefix}spotify <canción> - Descargar en Spotify
 ◈┄──━━┉─࿂
 
 ◈───≼ 🕸️ _*BUSCADORES*_ 🕸️ ≽──⊚
@@ -149,6 +149,7 @@ ${saludo}, *${taguser}*!
 ✨┝⎆ [ ${usedPrefix}unbanuser @tag - Desbanea al etiquetado
 👁️‍🗨️┝⎆ [ ${usedPrefix}detect on/off - Detecta acciones hechas por admins
 🕸️┝⎆ [ ${usedPrefix}ruletaban @tag ] - 𝕽𝖚𝖑𝖊𝖙𝖆 𝕬𝖑𝖊𝖆𝖙𝖔𝖗𝖎𝖆 ☠️
+🩸┝⎆ [ ${usedPrefix}link - Obtiene el link del grupo
 ◈┄──━━┉─࿂
 
 ◈───≼ 🧟‍♂️ _*OWNER*_ 🧟‍♂️ ≽──⊚
@@ -180,6 +181,7 @@ ${saludo}, *${taguser}*!
 🕸️┝⎆ [ ${usedPrefix}formarpareja - Crea una pareja
 🕸️┝⎆ [ ${usedPrefix}formarpareja5 - Crea pareja 5.0
 🎃┝⎆ [ ${usedPrefix}sortear - Sorteo al azar entre mortales
+🩸┝⎆ [ ${usedPrefix}sorpresa - ¿quieres saber el secreto?☠️
 ◈┄──━━┉─࿂
 
 ◈───≼ 🕷️ _*MAIN & RPG*_ 🕷️ ≽──⊚
@@ -194,7 +196,7 @@ ${saludo}, *${taguser}*!
 
 ◈───≼ 🧟‍♂️ _*IA & ARTE*_ 🧟‍♂️ ≽──⊚
 🕸️┝⎆ [ ${usedPrefix}magicstudio <texto> - Generar imagen
-🕷️┝⎆ [ ${usedPrefix}ai <texto> - Chat IA
+🕷️┝⎆ [ ${usedPrefix}bot <texto> - Chat IA
 🕷️┝⎆ [ ${usedPrefix}editfoto <descripción> - Editar foto IA
 🕷️┝⎆ [ ${usedPrefix}wpw - Wallpaper random
 🕷️┝⎆ [ ${usedPrefix}gemini <texto> - Gemini IA
