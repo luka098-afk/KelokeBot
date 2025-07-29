@@ -13,7 +13,7 @@ let fake = {
     isForwarded: true,
     forwardedNewsletterMessageInfo: {
       newsletterJid: '120363386229166956@newsletter',
-      newsletterName: '🎃 holaaaaa 🎃',
+      newsletterName: '🎃holaaaaaa🎃',
       serverMessageId: 143
     }
   }
@@ -22,7 +22,7 @@ let fake = {
 // Definir variables globales si no existen
 let redes = global.redes || ''
 let icons = global.icons || null
-let packname = global.packname || '🎃 Halloween Stickers'
+let packname = global.packname || '🎃Keloke Stickers'
 let rcanal = global.rcanal || fake
 
 let stiker = false
@@ -31,28 +31,46 @@ let q = m.quoted ? m.quoted : m
 let mime = (q.msg || q).mimetype || q.mediaType || ''
 if (/webp|image|video/g.test(mime)) {
 if (/video/g.test(mime)) if ((q.msg || q).seconds > 8) return m.reply(`🎃 *¡El video no puede durar mas de 8 segundos!*`)
-let img = await q.download?.()
 
-if (!img) return conn.reply(m.chat, `🎃 𝙋𝙤𝙧 𝙁𝙖𝙫𝙤𝙧, 𝙚𝙣𝙫𝙞𝙖 𝙪𝙣𝙖 𝙞𝙢𝙖𝙜𝙚𝙣 𝙤 𝙫𝙞𝙙𝙚𝙤 𝙥𝙖𝙧𝙖 𝙝𝙖𝙘𝙚𝙧 𝙪𝙣 𝙨𝙩𝙞𝙘𝙠𝙚𝙧 🦇`, m, fake)
+// Verificar si el archivo existe antes de procesarlo
+let img
+try {
+  img = await q.download?.()
+} catch (downloadError) {
+  console.error('Download error:', downloadError)
+  return m.reply('🎃 Error al descargar el archivo. Intenta de nuevo.')
+}
 
-let out
+if (!img || !Buffer.isBuffer(img)) return conn.reply(m.chat, `🎃 𝙋𝙤𝙧 𝙁𝙖𝙫𝙤𝙧, 𝙚𝙣𝙫𝙞𝙖 𝙪𝙣𝙖 𝙞𝙢𝙖𝙜𝙚𝙣 𝙤 𝙫𝙞𝙙𝙚𝙤 𝙫á𝙡𝙞𝙙𝙤 𝙥𝙖𝙧𝙖 𝙝𝙖𝙘𝙚𝙧 𝙪𝙣 𝙨𝙩𝙞𝙘𝙠𝙚𝙧 🦇`, m, rcanal)
+
+// Intentar crear el sticker directamente primero
 try {
 stiker = await sticker(img, false, global.packsticker || packname, global.packsticker2 || '🎃 Halloween Bot')
 } catch (e) {
-console.error(e)
-} finally {
-if (!stiker) {
+console.error('Direct sticker creation failed:', e)
+// Si falla, intentar métodos alternativos
+let out
 try {
-if (/webp/g.test(mime)) out = await webp2png(img)
-else if (/image/g.test(mime)) out = await uploadImage(img)
-else if (/video/g.test(mime)) out = await uploadFile(img)
-if (typeof out !== 'string') out = await uploadImage(img)
-stiker = await sticker(false, out, global.packsticker || packname, global.author || '🎃 Halloween Bot')
-} catch (err) {
-console.error('Error processing media:', err)
-return m.reply('🎃 Error al procesar el archivo. Intenta con otro formato.')
+if (/webp/g.test(mime)) {
+  out = await webp2png(img)
+} else if (/image/g.test(mime)) {
+  out = await uploadImage(img)
+} else if (/video/g.test(mime)) {
+  out = await uploadFile(img)
 }
-}}
+
+if (out && typeof out === 'string') {
+  stiker = await sticker(false, out, global.packsticker || packname, global.author || '🎃 Halloween Bot')
+} else {
+  // Último intento con uploadImage
+  out = await uploadImage(img)
+  stiker = await sticker(false, out, global.packsticker || packname, global.author || '🎃 Halloween Bot')
+}
+} catch (err) {
+console.error('Alternative processing failed:', err)
+return m.reply('🎃 Error al procesar el archivo. El formato podría no ser compatible.')
+}
+}
 } else if (args[0]) {
 if (isUrl(args[0])) {
 try {
@@ -74,7 +92,7 @@ if (stiker) conn.sendFile(m.chat, stiker, 'sticker.webp', '',m, true, {
     externalAdReply: { 
       showAdAttribution: false, 
       title: packname, 
-      body: `🎃 Keloke👻`, 
+      body: `🎃 Keloke 👻`, 
       mediaType: 2, 
       sourceUrl: redes, 
       thumbnail: icons
