@@ -1,40 +1,46 @@
-let temuRegex = /(?:https?:\/\/)?(?:www\.)?(temu\.com|temu\.to|share\.temu\.com)\/\S+/i
+let handler = async (m, { conn, args, usedPrefix, command }) => {
+  let chat = global.db.data.chats[m.chat]
+  if (!chat) global.db.data.chats[m.chat] = {}
 
-export async function before(m, { conn, isAdmin, isBotAdmin, isOwner }) {
-  if (!m.isGroup) return
-  if (!isBotAdmin) return
-  if (isAdmin || isOwner) return
-
-  let chat = global.db.data.chats[m.chat] || {}
-  if (!chat.antitemu) return
-
-  if (temuRegex.test(m.text)) {
-    try {
-      await conn.sendMessage(m.chat, { delete: m.key }) // Elimina solo el mensaje
-      await conn.sendMessage(m.chat, {
-        text: '🚫 No creas en bobadas, los enlaces de Temu están prohibidos.'
-      })
-    } catch (e) {
-      console.error('❌ Error en AntiTemu:', e)
-    }
+  if (args[0] === 'on') {
+    global.db.data.chats[m.chat].antitemu = true
+    m.reply('🛡️ Antitemu activado en este grupo.')
+  } else if (args[0] === 'off') {
+    global.db.data.chats[m.chat].antitemu = false
+    m.reply('❌ Antitemu desactivado en este grupo.')
+  } else {
+    m.reply(`📛 Usa correctamente:\n🩸┝⎆ [ ${usedPrefix}${command} on\n🩸┝⎆ [ ${usedPrefix}${command} off`)
   }
 }
 
-let handler = async (m, { conn, command, isAdmin }) => {
-  if (!m.isGroup) return m.reply('❌ Este comando solo se puede usar en grupos.')
-  if (!isAdmin) return m.reply('⛔ Solo los administradores pueden usar este comando.')
-
-  global.db.data.chats[m.chat] = global.db.data.chats[m.chat] || {}
-
-  const activar = !/off/i.test(command)
-  global.db.data.chats[m.chat].antitemu = activar
-
-  m.reply(`✅ AntiTemu ${activar ? 'activado' : 'desactivado'} correctamente.`)
-}
-
-handler.command = /^antitemu(off)?$/i
+handler.command = /^antitemu$/i
 handler.group = true
 handler.admin = true
 handler.botAdmin = true
 
 export default handler
+
+// Filtro automático incluido en el mismo archivo
+export async function before(m, { conn }) {
+  if (!m.isGroup) return
+  let chat = global.db.data.chats[m.chat]
+  if (!chat?.antitemu) return
+
+  const temuRegex = /https?:\/\/(www\.)?(share\.)?temu\.com\/\S+/i
+  if (temuRegex.test(m.text)) {
+    try {
+      // Eliminar mensaje
+      await conn.sendMessage(m.chat, { delete: m.key })
+
+      // Responder al usuario que lo mandó
+      await conn.reply(
+        m.chat,
+        `@${m.sender.split('@')[0]} no mandes links de Temu.\nNo seas gil ni te la creas.`,
+        m,
+        { mentions: [m.sender] }
+      )
+    } catch (e) {
+      console.error('❌ Error en filtro Temu:', e)
+    }
+  }
+}

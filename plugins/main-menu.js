@@ -66,8 +66,8 @@ let handler = async (m, { conn, usedPrefix, __dirname, participants }) => {
         mentionedJid: [m.sender],
         isForwarded: true,
         externalAdReply: {
-          title: '-',
-          body: '-',
+          title: '',
+          body: '',
           mediaUrl: null,
           description: null,
           previewType: "PHOTO",
