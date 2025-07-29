@@ -2,7 +2,7 @@ import axios from 'axios'
 const { generateWAMessageContent, generateWAMessageFromContent, proto } = (await import('@whiskeysockets/baileys')).default
 
 let handler = async (m, { conn }) => {
-  const proses = '🌸 Obteniendo información de los creadores...'
+  const proses = 'Obteniendo información de los creadores...'
   await conn.sendMessage(m.chat, { text: proses }, { quoted: m })
 
   async function createImage(url) {
@@ -25,7 +25,7 @@ let handler = async (m, { conn }) => {
     {
       name: 'Felipe',
       desc: 'Co-Creador de Kelokebot',
-      image: 'http://imgfz.com/i/QOMybA0.jpeg',
+      image: 'http://imgfz.com/i/ZDkghQw.jpeg',
       buttons: [
         { name: 'WhatsApp', url: 'https://wa.me/59898719147' },
         { name: 'Instagram', url: 'https://www.instagram.com/feli_dipe' },
@@ -51,7 +51,7 @@ let handler = async (m, { conn }) => {
         text: `✨️ *${owner.name}*\n${owner.desc}`
       }),
       footer: proto.Message.InteractiveMessage.Footer.fromObject({
-        text: '> Conoce más sobre nuestros creadores siguiendo sus redes sociales. Haz clic en cualquier botón para acceder a sus perfiles y descubrir su trabajo. Si te gustaría apoyarlos, también puedes realizar una donación a través de nuestro PayPal.'
+        text: '> Conoce más sobre nuestros creadores siguiendo sus redes sociales. Haz clic en cualquier botón para acceder a sus perfiles y descubrir su trabajo.'
       }),
       header: proto.Message.InteractiveMessage.Header.fromObject({
         hasMediaAttachment: true,
