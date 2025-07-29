@@ -1,4 +1,4 @@
-let temuRegex = /(?:https?:\/\/)?(?:www\.)?(temu\.com|temu\.to)\/\S+/i
+let temuRegex = /(?:https?:\/\/)?(?:www\.)?(temu\.com|temu\.to|share\.temu\.com)\/\S+/i
 
 export async function before(m, { conn, isAdmin, isBotAdmin, isOwner }) {
   if (!m.isGroup) return
@@ -11,7 +11,9 @@ export async function before(m, { conn, isAdmin, isBotAdmin, isOwner }) {
   if (temuRegex.test(m.text)) {
     try {
       await conn.sendMessage(m.chat, { delete: m.key }) // Elimina solo el mensaje
-      await conn.sendMessage(m.chat, { text: '🚫 No creas en bobadas, los enlaces de Temu están prohibidos.' })
+      await conn.sendMessage(m.chat, {
+        text: '🚫 No creas en bobadas, los enlaces de Temu están prohibidos.'
+      })
     } catch (e) {
       console.error('❌ Error en AntiTemu:', e)
     }

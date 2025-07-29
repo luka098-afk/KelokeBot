@@ -66,8 +66,8 @@ let handler = async (m, { conn, usedPrefix, __dirname, participants }) => {
         mentionedJid: [m.sender],
         isForwarded: true,
         externalAdReply: {
-          title: '𝗞𝗲𝗹𝗼𝗸𝗲𝗕𝗼𝘁',
-          body: '© 𝑃𝑜𝑤𝑒𝑟𝑒𝑑 𝐵𝑦 G',
+          title: '-',
+          body: '-',
           mediaUrl: null,
           description: null,
           previewType: "PHOTO",
