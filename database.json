@@ -1305,8 +1305,6 @@
       "expired": 0,
     },
     "59896367249@s.whatsapp.net": {
-      "isBanned": false,
-      "sAutoresponder": "",
       "welcome": false,
       "autoresponder": false,
       "delete": false,
@@ -1318,8 +1316,6 @@
       "antiBot2": false,
       "modoadmin": false,
       "antiLink": true,
-      "antifake": false,
-      "antiarabes": false,
       "reaction": false,
       "nsfw": false,
       "expired": 0,
