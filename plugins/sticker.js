@@ -5,15 +5,29 @@ import { sticker } from '../lib/sticker.js'
 
 let handler = async (m, { conn, args, usedPrefix, command }) => {
 
+// Definir el objeto fake para evitar el error
+let fake = {
+  contextInfo: {
+    mentionedJid: [m.sender],
+    forwardingScore: 999,
+    isForwarded: true,
+    forwardedNewsletterMessageInfo: {
+      newsletterJid: '120363386229166956@newsletter',
+      newsletterName: '🎃 Keloke Bot 🎃',
+      serverMessageId: 143
+    }
+  }
+}
+
 let stiker = false
 try {
 let q = m.quoted ? m.quoted : m
 let mime = (q.msg || q).mimetype || q.mediaType || ''
 if (/webp|image|video/g.test(mime)) {
-if (/video/g.test(mime)) if ((q.msg || q).seconds > 8) return m.reply(`🥷 *¡El video no puede durar mas de 8 segundos!*`)
+if (/video/g.test(mime)) if ((q.msg || q).seconds > 8) return m.reply(`🎃 *¡El video no puede durar mas de 8 segundos!*`)
 let img = await q.download?.()
 
-if (!img) return conn.reply(m.chat, `🥥 𝙋𝙤𝙧 𝙁𝙖𝙫𝙤𝙧, 𝙚𝙣𝙫𝙞𝙖 𝙪𝙣𝙖 𝙞𝙢𝙖𝙜𝙚𝙣 𝙤 𝙫𝙞𝙙𝙚𝙤 𝙥𝙖𝙧𝙖 𝙝𝙖𝙘𝙚𝙧 𝙪𝙣 𝙨𝙩𝙞𝙘𝙠𝙚𝙧.`, m, rcanal)
+if (!img) return conn.reply(m.chat, `🎃 𝙋𝙤𝙧 𝙁𝙖𝙫𝙤𝙧, 𝙚𝙣𝙫𝙞𝙖 𝙪𝙣𝙖 𝙞𝙢𝙖𝙜𝙚𝙣 𝙤 𝙫𝙞𝙙𝙚𝙤 𝙥𝙖𝙧𝙖 𝙝𝙖𝙘𝙚𝙧 𝙪𝙣 𝙨𝙩𝙞𝙘𝙠𝙚𝙧 🦇`, m, fake)
 
 let out
 try {
@@ -31,19 +45,32 @@ stiker = await sticker(false, out, global.packsticker, global.author)
 } else if (args[0]) {
 if (isUrl(args[0])) stiker = await sticker(false, args[0], global.packsticker, global.packsticker2)
 
-else return m.reply(`⚠️El url es incorrecto`)
+else return m.reply(`⚠️ El url es incorrecto`)
 
 }
 } catch (e) {
 console.error(e)
 if (!stiker) stiker = e
 } finally {
-if (stiker) conn.sendFile(m.chat, stiker, 'sticker.webp', '',m, true, { contextInfo: { 'forwardingScore': 200, 'isForwarded': false, externalAdReply:{ showAdAttribution: false, title: packname, body: `𝑺𝒖𝒌𝒖𝒏𝒂 𝒎𝒅 • 𝘽𝙮 𝙩𝙝𝙚𝘽𝙡𝙖𝙘𝙠`, mediaType: 2, sourceUrl: redes, thumbnail: icons}}}, { quoted: m })
+if (stiker) conn.sendFile(m.chat, stiker, 'sticker.webp', '',m, true, { 
+  contextInfo: { 
+    'forwardingScore': 200, 
+    'isForwarded': false, 
+    externalAdReply: { 
+      showAdAttribution: false, 
+      title: packname, 
+      body: `🎃 Keloke 👻`, 
+      mediaType: 2, 
+      sourceUrl: redes, 
+      thumbnail: icons
+    }
+  }
+}, { quoted: m })
 
-else return conn.reply(m.chat, `╭━〔 🥥 𝗦𝘁𝗶𝗰𝗸𝗲𝗿 𝗧𝗶𝗺𝗲! 〕━⬣
+else return conn.reply(m.chat, `╭━〔 🎃 𝗦𝗽𝗼𝗼𝗸𝘆 𝗦𝘁𝗶𝗰𝗸𝗲𝗿 𝗧𝗶𝗺𝗲! 👻 〕━⬣
 ┃
-┃ 🖼️ 🔖 𝑯𝒐𝒍𝒂, 𝒏𝒆𝒄𝒆𝒔𝒊𝒕𝒐𝒔 𝒖𝒏𝒂 𝒊𝒎𝒂𝒈𝒆𝒏 𝒐 𝒗𝒊𝒅𝒆𝒐 
-┃ 🌳 𝒑𝒂𝒓𝒂 𝒄𝒓𝒆𝒂𝒓 𝒕𝒖 𝒔𝒕𝒊𝒄𝒌𝒆𝒓 🎨
+┃ 🦇 🔖 𝑯𝒐𝒍𝒂, 𝒏𝒆𝒄𝒆𝒔𝒊𝒕𝒐 𝒖𝒏𝒂 𝒊𝒎𝒂𝒈𝒆𝒏 𝒐 𝒗𝒊𝒅𝒆𝒐 
+┃ 🕷️ 𝒑𝒂𝒓𝒂 𝒄𝒓𝒆𝒂𝒓 𝒕𝒖 𝒔𝒕𝒊𝒄𝒌𝒆𝒓 𝒆𝒔𝒑𝒆𝒍𝒖𝒛𝒏𝒂𝒏𝒕𝒆 🎨
 ┃
 ╰━━━━━━━━━━━━━━━━━━⬣`, m, fake)
 
