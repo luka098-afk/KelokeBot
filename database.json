@@ -1296,26 +1296,13 @@
   },
   "chats": {
     "120363404278828828@g.us": {
-      "isBanned": false,
-      "sAutoresponder": "",
       "welcome": false,
-      "autoresponder": false,
-      "delete": false,
-      "autoAceptar": false,
-      "autoRechazar": false,
       "detect": true,
-      "economy": true,
-      "gacha": true,
-      "antiBot": false,
-      "antiBot2": false,
       "modoadmin": false,
       "antiLink": true,
-      "antifake": false,
-      "antiarabes": false,
       "reaction": false,
       "nsfw": false,
       "expired": 0,
-      "autosticker": false
     },
     "59896367249@s.whatsapp.net": {
       "isBanned": false,
