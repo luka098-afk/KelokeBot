@@ -14,7 +14,7 @@ let handler = async (m, { conn }) => {
     }
 
     if (stdout.includes('Already up to date.')) {
-      conn.reply(m.chat, `🎃 *¡Ya estás malditamente actualizado!* 🔪\n\nNo hay cambios que absorber... 🕸️`, m);
+      conn.reply(m.chat, `🎃 *¡Ya estás malditamente actualizado!* 🔪\n\nNo hay cambios que absorber...`, m);
     } else {
       conn.reply(m.chat, `🕷️ *¡RITUAL COMPLETADO CON ÉXITO!* 🧛‍♀️\n\n🩸 Cambios absorbidos:\n\`\`\`${stdout.trim()}\`\`\``, m);
     }

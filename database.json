@@ -1313,7 +1313,6 @@
       "autoAceptar": false,
       "autoRechazar": false,
       "detect": true,
-      "economy": true,
       "gacha": true,
       "antiBot": false,
       "antiBot2": false,
