@@ -1,9 +1,11 @@
 const handler = async (m, { conn }) => {
   const chat = global.db.data.chats[m.chat] || {};
-  const claves = Object.keys(chat).filter(k => typeof chat[k] === 'boolean');
+  
+  // Solo claves que existen explícitamente y son booleanas
+  const claves = Object.keys(chat).filter(k => typeof chat[k] === 'boolean' && k in chat);
 
   if (!claves.length) {
-    return conn.reply(m.chat, '*⚠️ No hay configuraciones booleanas activadas en este grupo.*', m);
+    return conn.reply(m.chat, '*⚠️ No hay configuraciones activadas en este grupo.*', m);
   }
 
   let texto = '╭━━🎛️ *CONFIGURACIÓN DEL GRUPO* ━━╮\n';
@@ -17,7 +19,7 @@ const handler = async (m, { conn }) => {
 
 function formatear(texto) {
   return texto
-    .replace(/([A-Z])/g, ' $1')       // separa camelCase en palabras
+    .replace(/([A-Z])/g, ' $1') // separa camelCase en palabras
     .replace(/^./, s => s.toUpperCase()); // primera letra en mayúscula
 }
 
