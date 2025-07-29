@@ -169,6 +169,7 @@ ${saludo}, *${taguser}*!
 🕷️┝⎆ [ ${usedPrefix}tourl2 <img> - Convertir en URL
 🕷️┝⎆ [ ${usedPrefix}hd <imagen> - Mejorar calidad
 🕷️┝⎆ [ ${usedPrefix}tourl <imagen> - Imagen a enlace
+┝⎆ [ ${usedPrefix}reportar <texto> - 🕷️ Invoca a los 𝔄𝔡𝔪𝔦𝔫𝔰 del más allá 🩸
 ◈┄──━━┉─࿂
 
 ◈───≼ 🧟 _*FUN*_ 🧟 ≽──⊚

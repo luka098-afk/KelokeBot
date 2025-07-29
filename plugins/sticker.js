@@ -1,49 +1,61 @@
-import { downloadMediaMessage } from '@whiskeysockets/baileys';
-import ffmpeg from 'fluent-ffmpeg';
-import fs from 'fs';
-import path from 'path';
+import { sticker } from '../lib/sticker.js'
+//import uploadFile from '../lib/uploadFile.js'
+//import uploadImage from '../lib/uploadImage.js'
+//import { webp2png } from '../lib/webp2mp4.js'
 
-const tmpPath = './temp'; // carpeta temporal
-if (!fs.existsSync(tmpPath)) fs.mkdirSync(tmpPath);
+let handler = async (m, { conn, args, usedPrefix, command }) => {
 
-export const stickerCommand = async (m, { conn, args, command, isOwner }) => {
-  if (!m.quoted || !m.quoted.imageMessage) {
-    await conn.sendMessage(m.chat, { text: '📷 Responde a una imagen para convertirla en sticker.' }, { quoted: m });
-    return;
-  }
+let stiker = false
+try {
+let q = m.quoted ? m.quoted : m
+let mime = (q.msg || q).mimetype || q.mediaType || ''
+if (/webp|image|video/g.test(mime)) {
+if (/video/g.test(mime)) if ((q.msg || q).seconds > 8) return m.reply(`🥷 *¡El video no puede durar mas de 8 segundos!*`)
+let img = await q.download?.()
 
-  try {
-    // Descargar imagen
-    const buffer = await downloadMediaMessage(m.quoted, 'buffer', {}, { logger: console });
-    const inputPath = path.join(tmpPath, `${Date.now()}.jpg`);
-    const outputPath = path.join(tmpPath, `${Date.now()}.webp`);
-    fs.writeFileSync(inputPath, buffer);
+if (!img) return conn.reply(m.chat, `🥥 𝙋𝙤𝙧 𝙁𝙖𝙫𝙤𝙧, 𝙚𝙣𝙫𝙞𝙖 𝙪𝙣𝙖 𝙞𝙢𝙖𝙜𝙚𝙣 𝙤 𝙫𝙞𝙙𝙚𝙤 𝙥𝙖𝙧𝙖 𝙝𝙖𝙘𝙚𝙧 𝙪𝙣 𝙨𝙩𝙞𝙘𝙠𝙚𝙧.`, m, rcanal)
 
-    // Convertir a sticker (formato webp)
-    await new Promise((resolve, reject) => {
-      ffmpeg(inputPath)
-        .outputOptions([
-          '-vcodec', 'libwebp',
-          '-vf', 'scale=512:512:force_original_aspect_ratio=decrease,fps=15,pad=512:512:-1:-1:color=white',
-          '-lossless', '1',
-          '-compression_level', '6',
-          '-qscale', '50',
-          '-preset', 'default'
-        ])
-        .toFormat('webp')
-        .save(outputPath)
-        .on('end', resolve)
-        .on('error', reject);
-    });
+let out
+try {
+stiker = await sticker(img, false, global.packsticker, global.packsticker2)
+} catch (e) {
+console.error(e)
+} finally {
+if (!stiker) {
+if (/webp/g.test(mime)) out = await webp2png(img)
+else if (/image/g.test(mime)) out = await uploadImage(img)
+else if (/video/g.test(mime)) out = await uploadFile(img)
+if (typeof out !== 'string') out = await uploadImage(img)
+stiker = await sticker(false, out, global.packsticker, global.author)
+}}
+} else if (args[0]) {
+if (isUrl(args[0])) stiker = await sticker(false, args[0], global.packsticker, global.packsticker2)
 
-    const stickerBuffer = fs.readFileSync(outputPath);
-    await conn.sendMessage(m.chat, { sticker: stickerBuffer }, { quoted: m });
+else return m.reply(`⚠️El url es incorrecto`)
 
-    // Limpieza
-    fs.unlinkSync(inputPath);
-    fs.unlinkSync(outputPath);
-  } catch (err) {
-    console.error(err);
-    await conn.sendMessage(m.chat, { text: '❌ Ocurrió un error al crear el sticker.' }, { quoted: m });
-  }
-};
+}
+} catch (e) {
+console.error(e)
+if (!stiker) stiker = e
+} finally {
+if (stiker) conn.sendFile(m.chat, stiker, 'sticker.webp', '',m, true, { contextInfo: { 'forwardingScore': 200, 'isForwarded': false, externalAdReply:{ showAdAttribution: false, title: packname, body: `𝑺𝒖𝒌𝒖𝒏𝒂 𝒎𝒅 • 𝘽𝙮 𝙩𝙝𝙚𝘽𝙡𝙖𝙘𝙠`, mediaType: 2, sourceUrl: redes, thumbnail: icons}}}, { quoted: m })
+
+else return conn.reply(m.chat, `╭━〔 🥥 𝗦𝘁𝗶𝗰𝗸𝗲𝗿 𝗧𝗶𝗺𝗲! 〕━⬣
+┃
+┃ 🖼️ 🔖 𝑯𝒐𝒍𝒂, 𝒏𝒆𝒄𝒆𝒔𝒊𝒕𝒐𝒔 𝒖𝒏𝒂 𝒊𝒎𝒂𝒈𝒆𝒏 𝒐 𝒗𝒊𝒅𝒆𝒐 
+┃ 🌳 𝒑𝒂𝒓𝒂 𝒄𝒓𝒆𝒂𝒓 𝒕𝒖 𝒔𝒕𝒊𝒄𝒌𝒆𝒓 🎨
+┃
+╰━━━━━━━━━━━━━━━━━━⬣`, m, fake)
+
+
+}}
+handler.help = ['stiker <img>', 'sticker <url>']
+handler.tags = ['sticker']
+handler.group = false;
+handler.register = true
+handler.command = ['s', 'sticker', 'stiker']
+
+export default handler
+
+const isUrl = (text) => {
+return text.match(new RegExp(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)(jpe?g|gif|png)/, 'gi'))}
