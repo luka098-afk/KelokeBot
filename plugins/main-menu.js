@@ -90,7 +90,7 @@ let handler = async (m, { conn, usedPrefix, __dirname, participants }) => {
     } else if (hora >= 13 && hora < 18) {
       saludo = 'Buenas tardes, ¿qué se te ofrece?'
     } else {
-      saludo = '🍭 ¿Por qué aún no duermes? 🥱'
+      saludo = '¿Por qué aún no duermes? 🥱'
     }
 
     // Fecha formateada para Uruguay
