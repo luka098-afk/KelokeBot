@@ -1,6 +1,3 @@
-//▪CÓDIGO BY DEVBRAYAN PRROS XD▪
-//▪ROXY BOT MD▪
-
 import axios from 'axios'
 
 // Obtener token y cookies desde la web de tmate
@@ -48,14 +45,14 @@ async function descargarDeTikTok(urlTikTok) {
   const enlaceMp3 = enlaces.find(v => /download mp3 audio/i.test(v.label))
 
   if (enlacesMp4.length > 0) {
-    return { type: 'video', title: titulo, mp4Links: enlacesMp4, mp3Link: enlaceMp3 }
+    return { type: 'video', mp4Links: enlacesMp4, mp3Link: enlaceMp3 }
   }
 
   const coincidenciasImg = [...html.matchAll(/<img[^>]+src="(https:\/\/tikcdn\.app\/a\/images\/[^"]+)"/gi)]
   const imagenes = [...new Set(coincidenciasImg.map(m => m[1]))]
 
   if (imagenes.length > 0) {
-    return { type: 'image', title: titulo, images: imagenes, mp3Link: enlaceMp3 }
+    return { type: 'image', images: imagenes, mp3Link: enlaceMp3 }
   }
 
   throw new Error('No se encontró respuesta, puede que el enlace esté mal')
@@ -77,22 +74,28 @@ Ejemplo: *${usedPrefix + command}* https://vt.tiktok.com/abcd/`
     if (resultado.type === 'video') {
       await conn.sendMessage(m.chat, {
         video: { url: resultado.mp4Links[0].href },
-        caption: `🎬 *Descargador de Videos de TikTok*\n🎧 *Título:* ${resultado.title}`
+        caption: `✅ Video descargado exitosamente`
       })
     } else if (resultado.type === 'image') {
       for (let i = 0; i < resultado.images.length; i++) {
         await conn.sendMessage(m.chat, {
           image: { url: resultado.images[i] },
-          caption: `🖼️ *Imagen ${i + 1}*\n📌 *Título:* ${resultado.title}`
+          caption: `🖼️ *Imagen ${i + 1}*`
         })
       }
+      await conn.sendMessage(m.chat, {
+        text: `✅ Imágenes descargadas exitosamente`
+      })
     }
 
-    if (resultado.mp3Link) {
+    // Solo enviar MP3 si el contenido original es audio (no hay video)
+    if (resultado.mp3Link && resultado.type !== 'video') {
       await conn.sendMessage(m.chat, {
-        document: { url: resultado.mp3Link.href },
-        fileName: `${resultado.title}.mp3`,
+        audio: { url: resultado.mp3Link.href },
         mimetype: 'audio/mpeg'
+      })
+      await conn.sendMessage(m.chat, {
+        text: `🎵 Audio descargado exitosamente`
       })
     }
 
@@ -101,7 +104,7 @@ Ejemplo: *${usedPrefix + command}* https://vt.tiktok.com/abcd/`
   } catch (e) {
     await conn.sendMessage(m.chat, { react: { text: "⛔️", key: m.key } })
     await conn.sendMessage(m.chat, {
-      text: `😔 Vaya, falló la descarga desde TikTok, Senpai...\n> \`${e.message}\`\nIntenta enviar el enlace otra vez, ¿sí?`
+      text: `😔 Error al descargar desde TikTok\n> \`${e.message}\`\nIntenta enviar el enlace otra vez.`
     })
   }
 }
