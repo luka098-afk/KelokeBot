@@ -7,10 +7,14 @@ let handler = async (m, { conn }) => {
     const gitEnv = {
         ...process.env,
         GIT_PAGER: 'cat',
-        GIT_TERMINAL_PROMPT: '0'
+        GIT_TERMINAL_PROMPT: '0',
+        GIT_CONFIG_NOSYSTEM: '1'
     };
     
-    exec('git pull --no-rebase', { env: gitEnv }, (err, stdout, stderr) => {
+    // Comando completo con configuración inline
+    const gitCommand = 'git -c user.email="krebskrebs17@gmail.com" -c user.name="Luka098" -c pull.rebase=false pull --no-rebase';
+    
+    exec(gitCommand, { env: gitEnv }, (err, stdout, stderr) => {
         if (err) {
             conn.reply(m.chat, `☠️ *ERROR EN EL RITUAL*\n\n💀 Razón: ${err.message}`, m);
             return;
