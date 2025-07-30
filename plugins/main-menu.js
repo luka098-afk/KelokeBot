@@ -124,10 +124,8 @@ ${saludo}, *${taguser}*!
 ◈┄──━━┉─࿂
 
 ◈───≼ 🕸️ _*BUSCADORES*_ 🕸️ ≽──⊚
-🕷️┝⎆ [ ${usedPrefix}yts <nombre> - Buscar en YouTube
 🕷️┝⎆ [ ${usedPrefix}pinterest <texto> - Buscar imágenes
 🕷️┝⎆ [ ${usedPrefix}aptoide <app> - Buscar APK
-🕸️┝⎆ [ ${usedPrefix}tiktoksearch <texto> - Buscar en TT
 🕷️┝⎆ [ ${usedPrefix}ssweb <texto> - Buscar páginas
 ◈┄──━━┉─࿂
 
