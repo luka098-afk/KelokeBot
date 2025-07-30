@@ -13,17 +13,17 @@ const fake = {
 }
   try {
     if (!text.trim()) {
-      return conn.reply(m.chat, `*✨️ QUE MÚSICA QUIERES DESCARGAR*.`, m, fake)
+      return conn.reply(m.chat, `*🎵 Tienes que poner un término de búsqueda*\n\nEjemplo: *${usedPrefix + command}* linkin park lost`, m, fake)
     }
 
 let videoIdToFind = text.match(youtubeRegexID) || null
 let ytplay2 = await yts(videoIdToFind === null ? text : 'https://youtu.be/' + videoIdToFind[1])
 
 if (videoIdToFind) {
-const videoId = videoIdToFind[1]  
+const videoId = videoIdToFind[1]
 ytplay2 = ytplay2.all.find(item => item.videoId === videoId) || ytplay2.videos.find(item => item.videoId === videoId)
-} 
-ytplay2 = ytplay2.all?.[0] || ytplay2.videos?.[0] || ytplay2  
+}
+ytplay2 = ytplay2.all?.[0] || ytplay2.videos?.[0] || ytplay2
 if (!ytplay2 || ytplay2.length == 0) {
 return m.reply('✧ No se encontraron resultados para tu búsqueda.')
 }
@@ -35,9 +35,8 @@ views = views || 'no encontrado'
 ago = ago || 'no encontrado'
 url = url || 'no encontrado'
 author = author || 'no encontrado'
-    const vistas = formatViews(views)
-    const canal = author.name ? author.name : 'Desconocido'
-    const infoMessage = `「✦」Descargando *<${title || 'Desconocido'}>*\n\n> 📺 Canal ✦ *${canal}*\n> 👀 Vistas ✦ *${vistas || 'Desconocido'}*\n> ⏳ Duración ✦ *${timestamp || 'Desconocido'}*\n> 📆 Publicado ✦ *${ago || 'Desconocido'}*\n> 🖇️ Link ✦ ${url}`
+
+    const infoMessage = `🎵 ᴅᴇsᴄᴀʀɢᴀɴᴅᴏ... ♪`
     const thumb = (await conn.getFile(thumbnail))?.data
     const JT = {
       contextInfo: {
@@ -53,12 +52,12 @@ author = author || 'no encontrado'
         },
       },
     }
-    await conn.reply(m.chat, infoMessage, m, JT)    
+    await conn.reply(m.chat, infoMessage, m, JT)
     if (command === 'play' || command === 'yta' || command === 'ytmp3' || command === 'playaudio') {
       try {
         const api = await (await fetch(`https://api.vreden.my.id/api/ytmp3?url=${url}`)).json()
         const resulta = api.result
-        const result = resulta.download.url    
+        const result = resulta.download.url
         if (!result) throw new Error('✦ El enlace de audio no se generó correctamente.')
         await conn.sendMessage(m.chat, { audio: { url: result }, fileName: `${api.result.title}.mp3`, mimetype: 'audio/mpeg' }, { quoted: m })
       } catch (e) {
