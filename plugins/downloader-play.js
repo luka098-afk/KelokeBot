@@ -16,6 +16,11 @@ const fake = {
       return conn.reply(m.chat, `*🎵 Tienes que poner un término de búsqueda*\n\nEjemplo: *${usedPrefix + command}* linkin park lost`, m, fake)
     }
 
+    // Verificar si hay menciones (@)
+    if (text.includes('@')) {
+      return conn.reply(m.chat, `*🎵 Descargando...*\n\n💡 *Tip:* Pon el nombre del artista para una descarga más precisa`, m, fake)
+    }
+
 let videoIdToFind = text.match(youtubeRegexID) || null
 let ytplay2 = await yts(videoIdToFind === null ? text : 'https://youtu.be/' + videoIdToFind[1])
 
@@ -36,7 +41,8 @@ ago = ago || 'no encontrado'
 url = url || 'no encontrado'
 author = author || 'no encontrado'
 
-    const infoMessage = `🎵 ᴅᴇsᴄᴀʀɢᴀɴᴅᴏ... ♪`
+    const canal = author.name ? author.name : 'Desconocido'
+    const infoMessage = `🎵 ᴅᴇsᴄᴀʀɢᴀɴᴅᴏ... ♪\n\n*${canal} - ${title}*`
     const thumb = (await conn.getFile(thumbnail))?.data
     const JT = {
       contextInfo: {
@@ -59,7 +65,7 @@ author = author || 'no encontrado'
         const resulta = api.result
         const result = resulta.download.url
         if (!result) throw new Error('✦ El enlace de audio no se generó correctamente.')
-        await conn.sendMessage(m.chat, { audio: { url: result }, fileName: `${api.result.title}.mp3`, mimetype: 'audio/mpeg' }, { quoted: m })
+        await conn.sendMessage(m.chat, { audio: { url: result }, mimetype: 'audio/mpeg' }, { quoted: m })
       } catch (e) {
         return conn.reply(m.chat, '✦ No se pudo enviar el audio. Esto puede deberse a que el archivo es demasiado pesado o a un error en la generación de la URL. Por favor, intenta nuevamente más tarde.', m)
       }
@@ -67,7 +73,7 @@ author = author || 'no encontrado'
       try {
         const response = await fetch(`https://api.neoxr.eu/api/youtube?url=${url}&type=video&quality=480p&apikey=GataDios`)
         const json = await response.json()
-        await conn.sendFile(m.chat, json.data.url, json.title + '.mp4', title, m)
+        await conn.sendFile(m.chat, json.data.url, json.title + '.mp4', '', m)
       } catch (e) {
         return conn.reply(m.chat, '✦ No se pudo enviar el video. Esto puede deberse a que el archivo es demasiado pesado o a un error en la generación de la URL. Por favor, intenta nuevamente más tarde.', m)
       }
