@@ -1,69 +1,34 @@
-import { exec } from 'child_process';
-import { promisify } from 'util';
-
-const execAsync = promisify(exec);
-
 let handler = async (m, { conn }) => {
-    m.reply(`🩸 *𝘼𝘾𝙏𝙄𝙑𝘼𝙉𝘿𝙊 𝙀𝙇 𝙍𝙄𝙏𝙐𝘼𝙇...* 🧟‍♂️\n\n☠️ 𝘌𝘭 𝘣𝘰𝘵 𝘴𝘦 𝘦𝘴𝘵𝘢́ 𝘢𝘤𝘵𝘶𝘢𝘭𝘪𝘻𝘢𝘯𝘥𝘰 𝘥𝘦𝘴𝘥𝘦 𝘭𝘢𝘴 𝘱𝘳𝘰𝘧𝘶𝘯𝘥𝘪𝘥𝘢𝘥𝘦𝘴...`);
-    
     try {
-        // Configurar git primero
-        const gitConfig = [
-            'git config user.email "krebskrebs17@gmail.com"',
-            'git config user.name "Luka098"',
-            'git config pull.rebase false'
-        ];
+        m.reply(`🩸 *𝘼𝘾𝙏𝙄𝙑𝘼𝙉𝘿𝙊 𝙀𝙇 𝙍𝙄𝙏𝙐𝘼𝙇...* 🧟‍♂️\n\n☠️ 𝙍𝙚𝙞𝙣𝙞𝙘𝙞𝙖𝙣𝙙𝙤 𝙚𝙡 𝙗𝙤𝙩 𝙥𝙖𝙧𝙖 𝙖𝙥𝙡𝙞𝙘𝙖𝙧 𝙘𝙖𝙢𝙗𝙞𝙤𝙨...`);
         
-        // Ejecutar configuraciones
-        for (const config of gitConfig) {
+        // Verificar que el bot puede reiniciarse
+        if (!process || typeof process.exit !== 'function') {
+            throw new Error('No se puede reiniciar el bot en este entorno');
+        }
+        
+        // Timeout con manejo de errores
+        const restartTimeout = setTimeout(() => {
             try {
-                await execAsync(config, { 
-                    env: { ...process.env, GIT_PAGER: 'cat' },
-                    timeout: 5000 
-                });
-            } catch (configErr) {
-                console.log('Config warning:', configErr.message);
+                console.log('🔄 Reiniciando bot por comando .update');
+                process.exit(1);
+            } catch (exitError) {
+                console.error('❌ Error al intentar reiniciar:', exitError.message);
+                conn.reply(m.chat, `☠️ *ERROR EN EL RITUAL*\n\n💀 No se pudo reiniciar automáticamente\n🧟‍♂️ Reinicia manualmente el bot`, m);
             }
-        }
+        }, 2000);
         
-        // Hacer pull
-        const { stdout, stderr } = await execAsync('git pull', {
-            env: { 
-                ...process.env, 
-                GIT_PAGER: 'cat',
-                GIT_TERMINAL_PROMPT: '0'
-            },
-            timeout: 30000
-        });
-        
-        if (stderr && !stderr.includes('Already up to date')) {
-            console.warn('⚠️ Advertencia:', stderr);
-        }
-        
-        if (stdout.includes('Already up to date')) {
-            conn.reply(m.chat, `🎃 *¡Ya estás malditamente actualizado!* 🔪\n\nNo hay cambios que absorber...`, m);
-        } else {
-            conn.reply(m.chat, `🕷️ *¡RITUAL COMPLETADO CON ÉXITO!* 🧛‍♀️\n\n🩸 Cambios absorbidos:\n\`\`\`${stdout.trim()}\`\`\``, m);
-        }
+        // Limpiar timeout si algo sale mal
+        setTimeout(() => {
+            if (restartTimeout) {
+                clearTimeout(restartTimeout);
+                conn.reply(m.chat, `⚠️ *RITUAL CANCELADO*\n\n🕷️ Timeout de reinicio alcanzado`, m);
+            }
+        }, 5000);
         
     } catch (error) {
-        // Si todo falla, intentar con fetch manual
-        try {
-            await execAsync('git fetch origin main', {
-                env: { ...process.env, GIT_PAGER: 'cat' },
-                timeout: 15000
-            });
-            
-            await execAsync('git reset --hard origin/main', {
-                env: { ...process.env, GIT_PAGER: 'cat' },
-                timeout: 15000
-            });
-            
-            conn.reply(m.chat, `🕷️ *¡RITUAL FORZADO COMPLETADO!* 🧛‍♀️\n\n🩸 Bot actualizado por la fuerza...`, m);
-            
-        } catch (forceError) {
-            conn.reply(m.chat, `☠️ *ERROR EN EL RITUAL*\n\n💀 Razón: ${error.message}\n\n🧟‍♂️ Error de fuerza: ${forceError.message}`, m);
-        }
+        console.error('❌ Error en comando update:', error.message);
+        conn.reply(m.chat, `☠️ *ERROR EN EL RITUAL*\n\n💀 Razón: ${error.message}\n🧟‍♂️ Intenta reiniciar manualmente`, m);
     }
 };
 
