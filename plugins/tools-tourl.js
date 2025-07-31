@@ -1,10 +1,9 @@
-
-//▪CÓDIGO BY DEVBRAYAN PRROS XD▪
-//▪ROXY BOT MD▪
-
 import { writeFile, unlink, readFile } from 'fs/promises'
 import { join } from 'path'
 import { fileTypeFromBuffer } from 'file-type'
+import { FormData } from 'formdata-node'
+import { File } from 'formdata-node/file-from-path'
+import fetch from 'node-fetch'
 
 let handler = async (m, { conn }) => {
   await conn.sendMessage(m.chat, { react: { text: '☁️', key: m.key } })
@@ -73,10 +72,10 @@ async function uploadTo(url, buffer) {
 
   const tempPath = join('./tmp', `upload.${ext}`)
   await writeFile(tempPath, buffer)
-  const fileData = await readFile(tempPath)
+  const file = new File([await readFile(tempPath)], `upload.${ext}`, { type: mime })
 
   const form = new FormData()
-  form.append('file', new File([fileData], `upload.${ext}`, { type: mime }))
+  form.append('file', file)
 
   try {
     const res = await fetch(url, { method: 'POST', body: form })
