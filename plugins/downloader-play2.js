@@ -1,66 +1,54 @@
 import fetch from 'node-fetch'
 import yts from 'yt-search'
 
-const MAX_DURATION_MINUTES = 10
 const MAX_FILE_SIZE_MB = 100
 
 const handler = async (m, { conn, text, usedPrefix, command }) => {
-  if (!text) {
-    return m.reply(`📹 *Debes escribir el nombre del video o pegar un enlace de YouTube.*\n\nEjemplo:\n${usedPrefix + command} linkin park numb`, m)
-  }
+  if (!text) return m.reply(`📹 *Escribe el nombre del video o pega un enlace.*\nEjemplo:\n${usedPrefix + command} alone marshmello`, m)
 
   try {
-    // Buscar video
-    const match = text.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([\w-]{11})/)
-    let video
-
-    if (match) {
-      const videoId = match[1]
-      const result = await yts({ videoId })
-      video = result.video
-    } else {
-      const search = await yts(text)
-      video = search.videos[0]
-    }
-
-    if (!video) return m.reply('❌ No se encontró ningún video.')
+    const search = await yts(text)
+    const video = search.videos[0]
+    if (!video) return m.reply('❌ No encontré ningún video.')
 
     const url = video.url
-    const durationSeconds = video.seconds
-    const durationMinutes = durationSeconds / 60
+    const ytapi = await fetch(`https://api.vreden.my.id/api/ytmp4?url=${url}`)
+    const json = await ytapi.json()
+    const download = json?.result?.download
+    const downloadUrl = download?.url
+    const fileSize = parseFloat(download?.size?.toLowerCase()?.replace('mb', ''))
 
-    let downloadUrl = null
-    let fileSizeMB = null
+    if (!downloadUrl) throw 'No se pudo generar el enlace de descarga.'
 
-    // Intentar con API de Vreden
-    try {
-      const api = await fetch(`https://api.vreden.my.id/api/ytmp4?url=${url}`)
-      const json = await api.json()
-
-      downloadUrl = json?.result?.download?.url
-      const fileSizeStr = json?.result?.download?.size?.toLowerCase()?.replace('mb', '')
-      fileSizeMB = parseFloat(fileSizeStr)
-    } catch (e) {
-      console.warn('⚠️ Falló la API de Vreden')
+    // Si el archivo es menor a 100MB, lo intenta mandar
+    if (fileSize && fileSize < MAX_FILE_SIZE_MB) {
+      await conn.sendFile(
+        m.chat,
+        downloadUrl,
+        `${video.title}.mp4`,
+        `🎬 *${video.title}*\n📺 ${video.author.name}\n⏱️ ${video.timestamp}`,
+        m
+      )
+    } else {
+      // Si es más pesado, manda vista previa con botón
+      await conn.sendMessage(m.chat, {
+        image: { url: video.thumbnail },
+        caption: `🎬 *${video.title}*\n⏱️ ${video.timestamp}\n📦 *Archivo demasiado pesado para enviarlo directamente.*`,
+        contextInfo: {
+          externalAdReply: {
+            mediaType: 1,
+            previewType: 0,
+            mediaUrl: downloadUrl,
+            sourceUrl: downloadUrl,
+            thumbnail: await (await fetch(video.thumbnail)).buffer(),
+            renderLargerThumbnail: true
+          }
+        }
+      }, { quoted: m })
     }
-
-    if (!downloadUrl) throw new Error('No se pudo generar una URL válida para el video.')
-
-    // Reglas según duración y peso
-    if (durationMinutes > MAX_DURATION_MINUTES && fileSizeMB && fileSizeMB > MAX_FILE_SIZE_MB) {
-      return m.reply(`⚠️ *El video dura más de 10 minutos y pesa más de ${MAX_FILE_SIZE_MB} MB.*\nNo se puede enviar por limitaciones de WhatsApp.`)
-    }
-
-    await conn.sendFile(
-      m.chat,
-      downloadUrl,
-      `${video.title}.mp4`,
-      `🎬 *${video.title}*\n📺 Canal: ${video.author.name}\n⏱️ Duración: ${video.timestamp}\n📦 Tamaño: ${fileSizeMB ? fileSizeMB + ' MB' : 'desconocido'}`,
-      m
-    )
   } catch (e) {
     console.error(e)
-    m.reply(`✦ No se pudo enviar el video. Esto puede deberse a que el archivo es demasiado pesado o a un error en la generación de la URL. Por favor, intenta nuevamente más tarde.`)
+    m.reply(`✦ No se pudo enviar el video. Esto puede deberse a que el archivo es demasiado pesado o a un error en la URL. Intenta más tarde.`)
   }
 }
 
