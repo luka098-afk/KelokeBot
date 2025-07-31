@@ -60,7 +60,7 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
 
     await conn.reply(m.chat, infoMessage, m, JT)
 
-    if (['play', 'yta', 'ytmp3', 'playaudio'].includes(command)) {
+    if (['play'].includes(command)) {
       try {
         const api = await (await fetch(`https://api.vreden.my.id/api/ytmp3?url=${url}`)).json()
         const resulta = api.result
@@ -70,7 +70,7 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
       } catch (e) {
         return conn.reply(m.chat, '✦ No se pudo enviar el audio. Esto puede deberse a que el archivo es demasiado pesado o a un error en la generación de la URL. Por favor, intenta nuevamente más tarde.', m)
       }
-    } else if (['play2', 'ytv', 'ytmp4',].includes(command)) {
+    } else if (['play',].includes(command)) {
       try {
         const response = await fetch(`https://api.neoxr.eu/api/youtube?url=${url}&type=video&quality=480p&apikey=GataDios`)
         const json = await response.json()
@@ -87,7 +87,7 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
   }
 }
 
-handler.command = handler.help = ['play', 'yta', 'ytmp3', 'ytv', 'ytmp4', 'playaudio',]
+handler.command = handler.help = ['play',]
 handler.tags = ['descargas']
 
 export default handler
