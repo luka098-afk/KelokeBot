@@ -1,8 +1,9 @@
-// plugins/video.js - REPARACIÓN SIMPLE SIN CAMBIAR PACKAGE.JSON
-import ytdl from 'ytdl-core'
+// plugins/video2.js - MÉTODO API (SIN DEPENDENCIAS EXTRA)
 import yts from 'yt-search'
 import fs from 'fs'
 import path from 'path'
+import https from 'https'
+import { promisify } from 'util'
 
 const handler = async (m, { conn, text, usedPrefix, command }) => {
   if (!text) {
@@ -13,6 +14,7 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
   
   try {
     let videoUrl = text
+    let videoId = ''
     let searchResult
 
     // Si no es una URL, buscar en YouTube
@@ -26,78 +28,127 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
       
       searchResult = search.videos[0]
       videoUrl = searchResult.url
+      videoId = searchResult.videoId
+    } else {
+      videoId = isUrl[1]
     }
 
-    // CONFIGURACIÓN ANTI-410: User-Agent y headers actualizados
-    const requestOptions = {
-      requestOptions: {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-          'Accept-Language': 'en-US,en;q=0.5',
-          'Accept-Encoding': 'gzip, deflate',
-          'DNT': '1',
-          'Connection': 'keep-alive',
-          'Upgrade-Insecure-Requests': '1'
-        }
-      }
-    }
+    // Mostrar info del video encontrado
+    if (searchResult) {
+      const infoText = `📹 *Video encontrado*\n\n` +
+                       `📝 ${searchResult.title.substring(0, 50)}${searchResult.title.length > 50 ? '...' : ''}\n` +
+                       `👤 ${searchResult.author.name}\n` +
+                       `⏱️ ${searchResult.timestamp}\n` +
+                       `👀 ${searchResult.views.toLocaleString()}\n\n` +
+                       `⬇️ *Obteniendo enlace de descarga...*`
 
-    // Obtener información con configuración anti-bloqueo
-    let info
-    try {
-      info = await ytdl.getInfo(videoUrl, requestOptions)
-    } catch (error) {
-      console.error('Error al obtener info:', error)
-      
-      // Intentar método alternativo con delay
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      
-      try {
-        info = await ytdl.getInfo(videoUrl, {
-          ...requestOptions,
-          requestOptions: {
-            ...requestOptions.requestOptions,
-            transform: (chunk) => chunk
+      await conn.sendMessage(m.chat, {
+        text: infoText,
+        contextInfo: {
+          externalAdReply: {
+            title: searchResult.title,
+            body: `${searchResult.author.name} • ${searchResult.timestamp}`,
+            thumbnailUrl: searchResult.thumbnail,
+            sourceUrl: videoUrl,
+            mediaType: 1,
+            renderLargerThumbnail: true
           }
-        })
-      } catch (secondError) {
-        return conn.reply(m.chat, '❌ Video no disponible o restringido\n\nIntenta con otro video', m)
-      }
-    }
-
-    const title = info.videoDetails.title
-    const duration = parseInt(info.videoDetails.lengthSeconds)
-    const author = info.videoDetails.author.name
-    const views = info.videoDetails.viewCount
-    const thumbnail = info.videoDetails.thumbnails[0]?.url
-
-    // Verificar duración (máximo 10 minutos)
-    if (duration > 600) {
-      return conn.reply(m.chat, `❌ Video demasiado largo: ${Math.floor(duration / 60)} minutos\nMáximo: 10 minutos`, m)
-    }
-
-    // Mostrar información
-    const infoText = `📹 *Video encontrado*\n\n` +
-                     `📝 ${title.substring(0, 50)}${title.length > 50 ? '...' : ''}\n` +
-                     `👤 ${author}\n` +
-                     `⏱️ ${Math.floor(duration / 60)}:${(duration % 60).toString().padStart(2, '0')}\n` +
-                     `👀 ${parseInt(views).toLocaleString()}\n\n` +
-                     `⬇️ *Descargando...*`
-
-    await conn.sendMessage(m.chat, {
-      text: infoText,
-      contextInfo: {
-        externalAdReply: {
-          title: title,
-          body: `${author} • ${Math.floor(duration / 60)}:${(duration % 60).toString().padStart(2, '0')}`,
-          thumbnailUrl: thumbnail,
-          sourceUrl: videoUrl,
-          mediaType: 1,
-          renderLargerThumbnail: true
         }
+      }, { quoted: m })
+    }
+
+    // APIs públicas para descargar (múltiples respaldos)
+    const APIs = [
+      `https://api.cobalt.tools/api/json`,
+      `https://api.youtubei.download/v1/video?url=${encodeURIComponent(videoUrl)}`,
+      `https://youtube-mp36.p.rapidapi.com/dl?id=${videoId}`
+    ]
+
+    let downloadUrl = null
+    let videoInfo = null
+
+    // Método 1: Cobalt Tools
+    try {
+      const cobaltResponse = await fetch('https://api.cobalt.tools/api/json', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          url: videoUrl,
+          vQuality: '720',
+          vFormat: 'mp4',
+          isAudioOnly: false
+        })
+      })
+
+      const cobaltData = await cobaltResponse.json()
+      
+      if (cobaltData.status === 'success' || cobaltData.url) {
+        downloadUrl = cobaltData.url
+        videoInfo = {
+          title: searchResult?.title || 'Video de YouTube',
+          author: searchResult?.author?.name || 'Canal desconocido'
+        }
+        console.log('✅ Cobalt Tools funcionó')
       }
-    }, { quoted: m })
+    } catch (cobaltError) {
+      console.log('❌ Cobalt Tools falló:', cobaltError.message)
+    }
+
+    // Método 2: API alternativa si Cobalt falla
+    if (!downloadUrl) {
+      try {
+        const altResponse = await fetch(`https://api.vevioz.com/api/button/mp4/320/${videoId}`)
+        const altData = await altResponse.json()
+        
+        if (altData.success && altData.url) {
+          downloadUrl = altData.url
+          videoInfo = {
+            title: altData.title || searchResult?.title || 'Video de YouTube',
+            author: searchResult?.author?.name || 'Canal desconocido'
+          }
+          console.log('✅ API alternativa funcionó')
+        }
+      } catch (altError) {
+        console.log('❌ API alternativa falló:', altError.message)
+      }
+    }
+
+    // Método 3: Respaldo final
+    if (!downloadUrl) {
+      try {
+        const backupResponse = await fetch(`https://api.alltubedownload.net/check?url=${encodeURIComponent(videoUrl)}`)
+        const backupData = await backupResponse.json()
+        
+        if (backupData && backupData.formats) {
+          const mp4Format = backupData.formats.find(f => f.ext === 'mp4' && f.height <= 720)
+          if (mp4Format) {
+            downloadUrl = mp4Format.url
+            videoInfo = {
+              title: backupData.title || searchResult?.title || 'Video de YouTube',
+              author: searchResult?.author?.name || 'Canal desconocido'
+            }
+            console.log('✅ API de respaldo funcionó')
+          }
+        }
+      } catch (backupError) {
+        console.log('❌ API de respaldo falló:', backupError.message)
+      }
+    }
+
+    if (!downloadUrl) {
+      return conn.reply(m.chat, 
+        '❌ *No se pudo obtener el enlace de descarga*\n\n' +
+        '🔄 *Posibles causas:*\n' +
+        '• Video con restricciones\n' +
+        '• APIs temporalmente no disponibles\n' +
+        '• Video muy reciente\n\n' +
+        '💡 Intenta nuevamente en unos minutos', m)
+    }
+
+    await conn.reply(m.chat, '📥 *Descargando video...*', m)
 
     // Crear directorio temporal
     const tempDir = './temp'
@@ -105,123 +156,140 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
       fs.mkdirSync(tempDir, { recursive: true })
     }
 
-    const cleanTitle = title.replace(/[^\w\s-]/g, '').replace(/\s+/g, '_').substring(0, 40)
+    // Generar nombre de archivo
+    const cleanTitle = (videoInfo.title || 'video')
+      .replace(/[^\w\s-]/g, '')
+      .replace(/\s+/g, '_')
+      .substring(0, 40)
+    
     const filename = `${cleanTitle}_${Date.now()}.mp4`
     const filepath = path.join(tempDir, filename)
 
-    // CONFIGURACIÓN DE DESCARGA ANTI-410
-    const downloadOptions = {
-      quality: 'lowest', // Calidad más baja para evitar problemas
-      filter: format => {
-        return format.container === 'mp4' && 
-               format.hasVideo && 
-               format.hasAudio &&
-               format.contentLength // Solo formatos con tamaño conocido
-      },
-      requestOptions: {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-          'Accept': '*/*',
-          'Accept-Language': 'en-US,en;q=0.9',
-          'Connection': 'keep-alive',
-          'DNT': '1',
-          'Referer': 'https://www.youtube.com/',
-          'Origin': 'https://www.youtube.com'
-        },
-        timeout: 30000 // 30 segundos timeout
-      }
+    // Función para descargar archivo
+    const downloadFile = (url, dest) => {
+      return new Promise((resolve, reject) => {
+        const file = fs.createWriteStream(dest)
+        const request = https.get(url, (response) => {
+          // Verificar que la respuesta sea exitosa
+          if (response.statusCode !== 200) {
+            reject(new Error(`HTTP ${response.statusCode}: ${response.statusMessage}`))
+            return
+          }
+
+          response.pipe(file)
+
+          file.on('finish', () => {
+            file.close()
+            resolve()
+          })
+
+          file.on('error', (err) => {
+            fs.unlink(dest, () => {}) // Eliminar archivo parcial
+            reject(err)
+          })
+        })
+
+        request.on('error', (err) => {
+          fs.unlink(dest, () => {})
+          reject(err)
+        })
+
+        // Timeout de 5 minutos
+        request.setTimeout(300000, () => {
+          request.destroy()
+          fs.unlink(dest, () => {})
+          reject(new Error('Timeout de descarga'))
+        })
+      })
     }
 
     try {
-      // Crear stream con configuración anti-bloqueo
-      const video = ytdl(videoUrl, downloadOptions)
-      const writeStream = fs.createWriteStream(filepath)
+      // Descargar el video
+      await downloadFile(downloadUrl, filepath)
 
-      // Manejar errores del stream
-      video.on('error', (error) => {
-        console.error('Error en stream de video:', error)
-        writeStream.destroy()
-        if (fs.existsSync(filepath)) {
-          fs.unlinkSync(filepath)
-        }
-      })
-
-      writeStream.on('error', (error) => {
-        console.error('Error en writeStream:', error)
-        if (fs.existsSync(filepath)) {
-          fs.unlinkSync(filepath)
-        }
-      })
-
-      // Descargar con timeout
-      await Promise.race([
-        new Promise((resolve, reject) => {
-          video.pipe(writeStream)
-          writeStream.on('finish', resolve)
-          video.on('error', reject)
-          writeStream.on('error', reject)
-        }),
-        new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Timeout de descarga')), 120000) // 2 minutos
-        )
-      ])
-
-      // Verificar archivo
+      // Verificar archivo descargado
       const stats = fs.statSync(filepath)
+      
       if (stats.size === 0) {
         fs.unlinkSync(filepath)
-        throw new Error('Archivo vacío')
+        throw new Error('Archivo descargado vacío')
       }
 
       // Verificar tamaño máximo (100MB)
       const maxSize = 100 * 1024 * 1024
       if (stats.size > maxSize) {
         fs.unlinkSync(filepath)
-        return conn.reply(m.chat, `❌ Video muy grande: ${(stats.size / 1024 / 1024).toFixed(1)}MB\nMáximo: 100MB`, m)
+        return conn.reply(m.chat, 
+          `❌ *Video muy grande*\n\n` +
+          `📊 Tamaño: ${(stats.size / 1024 / 1024).toFixed(1)} MB\n` +
+          `📏 Máximo: 100 MB`, m)
       }
 
-      // Enviar video
+      console.log(`✅ Video descargado: ${(stats.size / 1024 / 1024).toFixed(2)} MB`)
+
+      // Enviar el video
       await conn.sendMessage(m.chat, {
         video: fs.readFileSync(filepath),
-        caption: `✅ *Descarga completada*\n\n📝 ${title}\n👤 ${author}`,
+        caption: `✅ *Descarga completada*\n\n` +
+                `📝 *Título:* ${videoInfo.title}\n` +
+                `👤 *Canal:* ${videoInfo.author}\n\n` +
+                `🔗 *Fuente:* YouTube`,
         mimetype: 'video/mp4'
       }, { quoted: m })
 
-      // Limpiar archivo
+      // Limpiar archivo temporal
       fs.unlinkSync(filepath)
 
     } catch (downloadError) {
-      console.error('Error en descarga:', downloadError)
+      console.error('Error descargando:', downloadError)
       
       if (fs.existsSync(filepath)) {
         fs.unlinkSync(filepath)
       }
 
-      // Mensajes de error específicos
-      if (downloadError.message.includes('410') || downloadError.message.includes('403')) {
-        return conn.reply(m.chat, 
-          '❌ *YouTube bloqueó la descarga*\n\n' +
-          '🔄 *Soluciones:*\n' +
-          '• Espera 5-10 minutos\n' +
-          '• Intenta con otro video\n' +
-          '• El video puede estar restringido', m)
-      } else if (downloadError.message.includes('Timeout')) {
-        return conn.reply(m.chat, '❌ *Timeout de descarga*\n\nEl video tardó demasiado en descargar', m)
-      } else {
-        return conn.reply(m.chat, `❌ *Error de descarga*\n\n${downloadError.message}`, m)
-      }
+      return conn.reply(m.chat, 
+        `❌ *Error en la descarga*\n\n` +
+        `${downloadError.message}\n\n` +
+        `💡 Intenta con otro video`, m)
     }
 
   } catch (error) {
     console.error('Error general:', error)
-    return conn.reply(m.chat, `❌ Error: ${error.message}`, m)
+    return conn.reply(m.chat, `❌ Error inesperado: ${error.message}`, m)
   }
 }
 
-handler.help = ['video'].map(v => v + ' <búsqueda/url>')
+// Función para limpiar archivos antiguos
+const cleanTempFiles = () => {
+  const tempDir = './temp'
+  if (!fs.existsSync(tempDir)) return
+  
+  const files = fs.readdirSync(tempDir)
+  const now = Date.now()
+  
+  files.forEach(file => {
+    try {
+      const filePath = path.join(tempDir, file)
+      const stats = fs.statSync(filePath)
+      const age = now - stats.mtime.getTime()
+      
+      // Eliminar archivos de más de 1 hora
+      if (age > 3600000) {
+        fs.unlinkSync(filePath)
+      }
+    } catch (err) {
+      console.error('Error limpiando archivo:', err)
+    }
+  })
+}
+
+// Limpiar cada hora
+setInterval(cleanTempFiles, 3600000)
+
+handler.help = ['video2'].map(v => v + ' <búsqueda/url>')
 handler.tags = ['downloader']
-handler.command = ['video', 'ytmp4', 'ytvideo']
+handler.command = ['video2', 'ytapi', 'dlapi']
 handler.register = true
-handler.limit = 3
+handler.limit = 2
 
 export default handler
