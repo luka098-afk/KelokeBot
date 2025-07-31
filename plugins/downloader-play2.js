@@ -1,5 +1,6 @@
 import yts from 'yt-search';
 import fetch from 'node-fetch';
+const { generateWAMessageFromContent, generateWAMessageContent, proto } = (await import('@whiskeysockets/baileys')).default;
 
 const handler = async (m, { conn, args, usedPrefix, command }) => {
   if (!args[0]) return conn.reply(m.chat, `*❗ Ingresa un título para buscar en YouTube.*\n✧ \`Ejemplo:\` ${usedPrefix}${command} Joji - Ew`, m);
@@ -7,32 +8,71 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
   await m.react('🔍');
 
   try {
-    const query = args.join(" ");
-    const res = await yts(query);
-    const video = res.videos[0];
+    let query = args.join(" ");
+    let res = await yts(query);
+    let video = res.videos[0];
 
     if (!video) throw 'No se encontró el video.';
 
-    const thumbnail = await (await fetch(video.thumbnail)).buffer();
+    const imageRes = await fetch(video.thumbnail);
+    const imageBuffer = await imageRes.buffer();
 
-    const caption = `*🎧 Título:* ${video.title}
-*⏳ Duración:* ${video.timestamp}
-*📺 Canal:* ${video.author.name}
-*🔗 URL:* ${video.url}`;
+    const imageMsg = await generateWAMessageContent({ image: imageBuffer }, {
+      upload: conn.waUploadToServer
+    });
+
+    const caption = `🎧 *${video.title}*\n\n⏱️ *Duración:* ${video.timestamp}\n📺 *Canal:* ${video.author.name}\n🔗 *URL:* ${video.url}`;
 
     const buttons = [
-      { buttonId: `${usedPrefix}ytmp3 ${video.url}`, buttonText: { displayText: '🎧 MP3' }, type: 1 },
-      { buttonId: `${usedPrefix}ytmp4 ${video.url}`, buttonText: { displayText: '🎥 MP4' }, type: 1 }
+      {
+        name: 'cta_url',
+        buttonParamsJson: JSON.stringify({
+          display_text: '🎧 Descargar MP3',
+          url: `https://wa.me/?text=${encodeURIComponent(`${usedPrefix}ytmp3 ${video.url}`)}`
+        })
+      },
+      {
+        name: 'cta_url',
+        buttonParamsJson: JSON.stringify({
+          display_text: '🎥 Descargar MP4',
+          url: `https://wa.me/?text=${encodeURIComponent(`${usedPrefix}ytmp4 ${video.url}`)}`
+        })
+      }
     ];
 
-    await conn.sendMessage(m.chat, {
-      image: thumbnail,
-      caption,
-      footer: '🔊 Proyecto G - Descargas YouTube',
-      buttons
-    }, { quoted: m });
+    const card = {
+      body: proto.Message.InteractiveMessage.Body.fromObject({ text: caption }),
+      footer: proto.Message.InteractiveMessage.Footer.fromObject({ text: 'Proyecto G - Descargas YouTube' }),
+      header: proto.Message.InteractiveMessage.Header.fromObject({
+        hasMediaAttachment: true,
+        imageMessage: imageMsg.imageMessage
+      }),
+      nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.fromObject({
+        buttons
+      })
+    };
 
+    const msg = generateWAMessageFromContent(m.chat, {
+      viewOnceMessage: {
+        message: {
+          messageContextInfo: {
+            deviceListMetadata: {},
+            deviceListMetadataVersion: 2
+          },
+          interactiveMessage: proto.Message.InteractiveMessage.fromObject({
+            body: proto.Message.InteractiveMessage.Body.create({ text: caption }),
+            footer: proto.Message.InteractiveMessage.Footer.create({ text: 'Proyecto G - Descargas YouTube' }),
+            carouselMessage: proto.Message.InteractiveMessage.CarouselMessage.fromObject({
+              cards: [card]
+            })
+          })
+        }
+      }
+    }, { userJid: m.sender });
+
+    await conn.relayMessage(m.chat, msg.message, { messageId: msg.key.id });
     await m.react('✅');
+
   } catch (e) {
     console.error(e);
     await m.react('⚠️');
