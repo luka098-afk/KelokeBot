@@ -136,7 +136,6 @@ ${saludo}, *${taguser}*!
 🕷️┝⎆ [ ${usedPrefix}tagall - Mencionar a todos
 🕷️┝⎆ [ ${usedPrefix}setppgrupo <img> - Cambiar foto grupo
 🩸┝⎆ [ ${usedPrefix}k <@tag> - Expulsar miembro
-🕷️┝⎆ [ ${usedPrefix}tag <mensaje> - Etiquetar con mensaje
 🩸┝⎆ [ ${usedPrefix}del - Eliminar mensaje
 🩸┝⎆ [ ${usedPrefix}p <@tag> - Dar admin
 🩸┝⎆ [ ${usedPrefix}d <@tag> - Quitar admin

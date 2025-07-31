@@ -1,5 +1,5 @@
 const handler = async (m, { conn, participants, usedPrefix, command }) => {
-  const emoji = '🌸';
+  const emoji = '🔪';
 
   // Detectar usuario a expulsar: o por mención o por mensaje citado
   let user;
@@ -40,9 +40,13 @@ const handler = async (m, { conn, participants, usedPrefix, command }) => {
   }
 
   await conn.groupParticipantsUpdate(m.chat, [user], 'remove');
+  
+  // Reaccionar al comando con el cuchillo
+  await m.react('🔪');
+  
   conn.reply(m.chat, `
 ╭─❖ 「 *Usuario Expulsado* 」 ❖─
-│ ${emoji} 𝙀𝙡 𝙢𝙞𝙚𝙢𝙗𝙧𝙤 𝙛𝙪𝙚 𝙚𝙭𝙥𝙪𝙡𝙨𝙖𝙙𝙤 𝙘𝙤𝙣 𝙪𝙣 *𝙄𝙢𝙥𝙖𝙘𝙩𝙧𝙪𝙚𝙣𝙤*. ⚡
+│ ${emoji} 𝙀𝙡 𝙢𝙞𝙚𝙢𝙗𝙧𝙤 𝙛𝙪𝙚 𝙚𝙡𝙞𝙢𝙞𝙣𝙖𝙙𝙤 𝙘𝙤𝙣 𝙪𝙣 *𝘾𝙤𝙧𝙩𝙚 𝙇𝙞𝙢𝙥𝙞𝙤*. ${emoji}
 ╰─────────────❖`, m);
 };
 
