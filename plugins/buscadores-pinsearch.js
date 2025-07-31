@@ -1,71 +1,4 @@
 import axios from 'axios';
-import baileys from '@whiskeysockets/baileys';
-
-async function sendAlbumMessage(jid, medias, options = {}) {
-  if (typeof jid !== "string") {
-    throw new TypeError(`jid must be string, received: ${jid} (${jid?.constructor?.name})`);
-  }
-
-  for (const media of medias) {
-    if (!media.type || (media.type !== "image" && media.type !== "video")) {
-      throw new TypeError(`media.type must be "image" or "video", received: ${media.type} (${media.type?.constructor?.name})`);
-    }
-    if (!media.data || (!media.data.url && !Buffer.isBuffer(media.data))) {
-      throw new TypeError(`media.data must be object with url or buffer, received: ${media.data} (${media.data?.constructor?.name})`);
-    }
-  }
-
-  if (medias.length < 2) {
-    throw new RangeError("Minimum 2 media");
-  }
-
-  const caption = options.text || options.caption || "";
-  const delay = !isNaN(options.delay) ? options.delay : 500;
-  delete options.text;
-  delete options.caption;
-  delete options.delay;
-
-  const album = baileys.generateWAMessageFromContent(
-    jid,
-    {
-      messageContextInfo: {},
-      albumMessage: {
-        expectedImageCount: medias.filter(media => media.type === "image").length,
-        expectedVideoCount: medias.filter(media => media.type === "video").length,
-        ...(options.quoted
-          ? {
-              contextInfo: {
-                remoteJid: options.quoted.key.remoteJid,
-                fromMe: options.quoted.key.fromMe,
-                stanzaId: options.quoted.key.id,
-                participant: options.quoted.key.participant || options.quoted.key.remoteJid,
-                quotedMessage: options.quoted.message,
-              },
-            }
-          : {}),
-      },
-    },
-    {}
-  );
-
-  await conn.relayMessage(album.key.remoteJid, album.message, { messageId: album.key.id });
-
-  for (let i = 0; i < medias.length; i++) {
-    const { type, data } = medias[i];
-    const img = await baileys.generateWAMessage(
-      album.key.remoteJid,
-      { [type]: data, ...(i === 0 ? { caption } : {}) },
-      { upload: conn.waUploadToServer }
-    );
-    img.message.messageContextInfo = {
-      messageAssociation: { associationType: 1, parentMessageKey: album.key },
-    };
-    await conn.relayMessage(img.key.remoteJid, img.message, { messageId: img.key.id });
-    await baileys.delay(delay);
-  }
-
-  return album;
-}
 
 const pins = async (judul) => {
   try {
@@ -84,40 +17,104 @@ const pins = async (judul) => {
   }
 };
 
-let handler = async (m, { conn, text }) => {
-  if (!text) return conn.reply(m.chat, `${emojis} Ingresa un texto. Ejemplo: .pinterest ${botname}`, m, fake);
+// Almacenar resultados por chat para poder cargar más imágenes
+const chatResults = new Map();
 
+let handler = async (m, { conn, text }) => {
+  if (!text) return conn.reply(m.chat, `⚰️ Ingresa un texto. Ejemplo: .pinterest ${botname}`, m, fake);
 
   try {
-    m.react('✨️');
+    m.react('🕸️');
+    
+    // Buscar nuevas imágenes
     const results = await pins(text);
-    if (!results || results.length === 0) return conn.reply(m.chat, `No se encontraron resultados para "${text}".`, m, fake);
-
-    const maxImages = Math.min(results.length, 15);
-    const medias = [];
-
-    for (let i = 0; i < maxImages; i++) {
-      medias.push({
-        type: 'image',
-        data: { url: results[i].image_large_url || results[i].image_medium_url || results[i].image_small_url }
-      });
+    if (!results || results.length === 0) {
+      return conn.reply(m.chat, `🎃 No se encontraron resultados para "${text}".`, m, fake);
     }
 
-    await sendAlbumMessage(m.chat, medias, {
-      caption: `𝗥𝗲𝘀𝘂𝗹𝘁𝗮𝗱𝗼𝘀 𝗱𝗲: ${text}\n𝗖𝗮𝗻𝘁𝗶𝗱𝗮𝗱 𝗱𝗲 𝗿𝗲𝘀𝘂𝗹𝘁𝗮𝗱𝗼𝘀: 15\n𝗖𝗿𝗲𝗮𝗱𝗼𝗿: ${dev}`,
-      quoted: m
+    // Guardar resultados y reiniciar índice
+    chatResults.set(m.chat, {
+      images: results,
+      currentIndex: 0,
+      searchTerm: text
     });
 
-    await conn.sendMessage(m.chat, { react: { text: '🌸', key: m.key } });
+    await sendSingleImageWithButton(conn, m, results[0], text, 0, results.length);
+    await conn.sendMessage(m.chat, { react: { text: '🦇', key: m.key } });
 
   } catch (error) {
-    conn.reply(m.chat, 'Error al obtener imágenes de Pinterest.', m, fake);
+    conn.reply(m.chat, '💀 Error al obtener imágenes de Pinterest.', m, fake);
   }
 };
+
+const sendSingleImageWithButton = async (conn, m, imageData, searchTerm, currentIndex, totalImages) => {
+  const buttons = [
+    {
+      name: 'quick_reply',
+      buttonParamsJson: JSON.stringify({
+        display_text: '🕷️ NUEVA IMAGEN',
+        id: `nextpinterest_${m.chat}_${searchTerm}`
+      })
+    }
+  ];
+
+  const imageMessage = {
+    image: { url: imageData.image_large_url || imageData.image_medium_url || imageData.image_small_url },
+    caption: `⚱️ Resultado de: ${searchTerm}\n🕯️ Imagen ${currentIndex + 1} de ${totalImages}\n💀 Creador: ${dev}`,
+    footer: '🎃 Presiona el botón para ver otra imagen',
+    buttons: buttons,
+    headerType: 4
+  };
+
+  await conn.sendMessage(m.chat, imageMessage, { quoted: m });
+};
+
+// Handler para el botón de nueva imagen
+const handleNextImage = async (m, { conn }) => {
+  const chatId = m.chat;
+  const chatData = chatResults.get(chatId);
+  
+  if (!chatData) {
+    return conn.reply(m.chat, '🦴 No hay búsqueda activa. Usa .pinterest [término] primero.', m, fake);
+  }
+
+  try {
+    m.react('⚰️');
+    
+    // Avanzar al siguiente índice
+    chatData.currentIndex = (chatData.currentIndex + 1) % chatData.images.length;
+    
+    const nextImage = chatData.images[chatData.currentIndex];
+    await sendSingleImageWithButton(conn, m, nextImage, chatData.searchTerm, chatData.currentIndex, chatData.images.length);
+    
+    await conn.sendMessage(m.chat, { react: { text: '🕸️', key: m.key } });
+    
+  } catch (error) {
+    conn.reply(m.chat, '💀 Error al cargar la siguiente imagen.', m, fake);
+  }
+};
+
+// Agregar handler para los botones
+conn.ev.on('messages.upsert', async ({ messages }) => {
+  const m = messages[0];
+  if (!m.message) return;
+  
+  const messageType = Object.keys(m.message)[0];
+  if (messageType === 'interactiveResponseMessage') {
+    const response = m.message.interactiveResponseMessage;
+    const buttonId = response.nativeFlowResponseMessage?.paramsJson || 
+                    response.legacyContextMessage?.selectMessage?.selectedId ||
+                    '';
+    
+    if (buttonId.startsWith('nextpinterest_')) {
+      await handleNextImage(m, { conn });
+    }
+  }
+});
 
 handler.help = ['pinterest'];
 handler.command = ['pinterest', 'pin'];
 handler.tags = ['buscador'];
-handler.register = true
+handler.register = true;
 
 export default handler;

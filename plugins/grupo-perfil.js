@@ -3,15 +3,25 @@ import { proto, generateWAMessageContent, generateWAMessageFromContent } from '@
 let handler = async (m, { conn }) => {
   if (!m.isGroup) return m.reply('❌ Este comando solo está disponible en grupos.')
 
-  const user = m.mentionedJid && m.mentionedJid[0] ? m.mentionedJid[0] : m.sender
-  const username = await conn.getName(user)
-  const number = user.split('@')[0]
-  const isRegistered = global.db.data.users[user]?.registered ? '✅ Registrado' : '❌ No registrado'
+  // Determinar el usuario objetivo y formatear correctamente el JID
+  let targetUser
+  if (m.mentionedJid && m.mentionedJid.length > 0) {
+    targetUser = m.mentionedJid[0]
+  } else {
+    targetUser = m.sender
+  }
+
+  // Asegurar formato JID correcto
+  const userJid = targetUser.includes('@') ? targetUser : `${targetUser}@s.whatsapp.net`
+  
+  const username = await conn.getName(userJid)
+  const number = userJid.split('@')[0]
+  const isRegistered = global.db.data.users[userJid]?.registered ? '✅ Registrado' : '❌ No registrado'
 
   // Obtener foto de perfil o usar imagen por defecto
   let profilePicUrl
   try {
-    profilePicUrl = await conn.profilePictureUrl(user, 'image')
+    profilePicUrl = await conn.profilePictureUrl(userJid, 'image')
   } catch (e) {
     profilePicUrl = 'http://imgfz.com/i/JkN0gqv.jpeg' // Imagen por defecto
   }
@@ -38,13 +48,6 @@ let handler = async (m, { conn }) => {
           buttonParamsJson: JSON.stringify({
             display_text: '📢 Canal de WhatsApp',
             url: 'https://whatsapp.com/channel/0029VawwvsW7j6g1upS0i531'
-          })
-        },
-        {
-          name: 'cta_url',
-          buttonParamsJson: JSON.stringify({
-            display_text: '📦 Repositorio del Bot',
-            url: ''
           })
         },
         {
