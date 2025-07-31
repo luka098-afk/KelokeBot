@@ -16,7 +16,6 @@ let handler = async (m, { conn }) => {
   
   const username = await conn.getName(userJid)
   const number = userJid.split('@')[0]
-  const isRegistered = global.db.data.users[userJid]?.registered ? '✅ Registrado' : '❌ No registrado'
 
   // Obtener foto de perfil o usar imagen por defecto
   let profilePicUrl
@@ -32,10 +31,10 @@ let handler = async (m, { conn }) => {
 
   const card = {
     body: proto.Message.InteractiveMessage.Body.fromObject({
-      text: `👤 *Perfil de Usuario*\n\n📛 Nombre: ${username}\n📱 Número: wa.me/${number}\n📝 Registro: ${isRegistered}`
+      text: `👤 *Perfil de Usuario*\n\n📛 Nombre: ${username}\n📱 Número: wa.me/${number}`
     }),
     footer: proto.Message.InteractiveMessage.Footer.fromObject({
-      text: 'Bot: kelokebot'
+      text: ''
     }),
     header: proto.Message.InteractiveMessage.Header.fromObject({
       hasMediaAttachment: true,
@@ -73,7 +72,7 @@ let handler = async (m, { conn }) => {
             text: '✨ Información de perfil'
           }),
           footer: proto.Message.InteractiveMessage.Footer.create({
-            text: 'Sistema de Perfiles • kelokebot'
+            text: 'Sistema de Perfiles'
           }),
           carouselMessage: proto.Message.InteractiveMessage.CarouselMessage.fromObject({
             cards: [card]
