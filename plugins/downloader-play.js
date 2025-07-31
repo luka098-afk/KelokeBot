@@ -70,7 +70,7 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
       } catch (e) {
         return conn.reply(m.chat, '✦ No se pudo enviar el audio. Esto puede deberse a que el archivo es demasiado pesado o a un error en la generación de la URL. Por favor, intenta nuevamente más tarde.', m)
       }
-    } else if (['play2', 'ytv', 'ytmp4', 'mp4'].includes(command)) {
+    } else if (['play2', 'ytv', 'ytmp4',].includes(command)) {
       try {
         const response = await fetch(`https://api.neoxr.eu/api/youtube?url=${url}&type=video&quality=480p&apikey=GataDios`)
         const json = await response.json()
@@ -87,7 +87,7 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
   }
 }
 
-handler.command = handler.help = ['play', 'yta', 'ytmp3', 'ytv', 'ytmp4', 'playaudio', 'mp4']
+handler.command = handler.help = ['play', 'yta', 'ytmp3', 'ytv', 'ytmp4', 'playaudio',]
 handler.tags = ['descargas']
 
 export default handler
