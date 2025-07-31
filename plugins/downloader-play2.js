@@ -1,19 +1,23 @@
 import fetch from 'node-fetch'
 import yts from 'yt-search'
 
+const MAX_DURATION_MINUTES = 10
+const MAX_FILE_SIZE_MB = 100
+
 const handler = async (m, { conn, text, usedPrefix, command }) => {
   if (!text) {
     return m.reply(`📹 *Debes escribir el nombre del video o pegar un enlace de YouTube.*\n\nEjemplo:\n${usedPrefix + command} linkin park numb`, m)
   }
 
   try {
-    const match = text.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\\?v=|embed\\/))([\\w-]{11})/)
+    // Buscar video
+    const match = text.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([\w-]{11})/)
     let video
 
     if (match) {
       const videoId = match[1]
-      const results = await yts({ videoId })
-      video = results.video
+      const result = await yts({ videoId })
+      video = result.video
     } else {
       const search = await yts(text)
       video = search.videos[0]
@@ -22,37 +26,36 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
     if (!video) return m.reply('❌ No se encontró ningún video.')
 
     const url = video.url
+    const durationSeconds = video.seconds
+    const durationMinutes = durationSeconds / 60
+
     let downloadUrl = null
+    let fileSizeMB = null
 
-    // --- Primer intento: Neoxr API ---
+    // Intentar con API de Vreden
     try {
-      const api1 = await fetch(`https://api.neoxr.eu/api/youtube?url=${url}&type=video&quality=480p&apikey=GataDios`)
-      const json1 = await api1.json()
-      downloadUrl = json1?.data?.url
+      const api = await fetch(`https://api.vreden.my.id/api/ytmp4?url=${url}`)
+      const json = await api.json()
+
+      downloadUrl = json?.result?.download?.url
+      const fileSizeStr = json?.result?.download?.size?.toLowerCase()?.replace('mb', '')
+      fileSizeMB = parseFloat(fileSizeStr)
     } catch (e) {
-      console.warn('⚠️ Neoxr API falló, intentando fallback...')
+      console.warn('⚠️ Falló la API de Vreden')
     }
 
-    // --- Segundo intento: Vreden API (fallback) ---
-    if (!downloadUrl) {
-      try {
-        const api2 = await fetch(`https://api.vreden.my.id/api/ytmp4?url=${url}`)
-        const json2 = await api2.json()
-        downloadUrl = json2?.result?.download?.url
-      } catch (e) {
-        console.warn('⚠️ Fallback Vreden API también falló')
-      }
-    }
+    if (!downloadUrl) throw new Error('No se pudo generar una URL válida para el video.')
 
-    if (!downloadUrl) {
-      throw new Error('No se pudo obtener ningún enlace válido.')
+    // Reglas según duración y peso
+    if (durationMinutes > MAX_DURATION_MINUTES && fileSizeMB && fileSizeMB > MAX_FILE_SIZE_MB) {
+      return m.reply(`⚠️ *El video dura más de 10 minutos y pesa más de ${MAX_FILE_SIZE_MB} MB.*\nNo se puede enviar por limitaciones de WhatsApp.`)
     }
 
     await conn.sendFile(
       m.chat,
       downloadUrl,
       `${video.title}.mp4`,
-      `🎬 *${video.title}*\n📺 Canal: ${video.author.name}\n⏱️ Duración: ${video.timestamp}\n👁️ Vistas: ${video.views.toLocaleString()}`,
+      `🎬 *${video.title}*\n📺 Canal: ${video.author.name}\n⏱️ Duración: ${video.timestamp}\n📦 Tamaño: ${fileSizeMB ? fileSizeMB + ' MB' : 'desconocido'}`,
       m
     )
   } catch (e) {
