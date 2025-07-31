@@ -87,7 +87,11 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
     const thumb = (await conn.getFile(thumbnail))?.data;
     const infoMessage = `➤ ▢ *Título:*\n> ${title}\n➤ ▢ *Vistas:*\n> ${formatViews(views)}\n➤ ▢ *Enlace:*\n> ${url}\n\n🎧 Procesando tu descarga...`;
 
-    await conn.sendFile(m.chat, 'https://files.catbox.moe/kjh6ga.jpg', 'thumb.jpg', infoMessage, m);
+    // Enviar imagen remota sin error de ruta
+    await conn.sendMessage(m.chat, {
+      image: { url: 'https://files.catbox.moe/kjh6ga.jpg' },
+      caption: infoMessage
+    }, { quoted: m });
 
     if (command === 'play2') {
       const audio = await ddownr.download(url, "mp3");
