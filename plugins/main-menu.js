@@ -132,9 +132,7 @@ ${saludo}, *${taguser}*!
 ◈───≼ ⚰️ _*ADMINS*_ ⚰️ ≽──⊚
 🩸┝⎆ [ ${usedPrefix}ht <texto> - Mención masiva
 🩸┝⎆ [ ${usedPrefix}advertencia <@tag> <texto> - Advertencia
-🧟┝⎆ [ ${usedPrefix}perfil - Ver perfil grupo
-🕸️┝⎆ [ ${usedPrefix}g - Cerrar grupo
-🕸️┝⎆ [ ${usedPrefix}g - Abrir grupo
+🕸️┝⎆ [ ${usedPrefix}g - Abrir/Cerrar grupo
 🕷️┝⎆ [ ${usedPrefix}tagall - Mencionar a todos
 🕷️┝⎆ [ ${usedPrefix}setppgrupo <img> - Cambiar foto grupo
 🩸┝⎆ [ ${usedPrefix}k <@tag> - Expulsar miembro
@@ -168,6 +166,7 @@ ${saludo}, *${taguser}*!
 🕷️┝⎆ [ ${usedPrefix}hd <imagen> - Mejorar calidad
 🕷️┝⎆ [ ${usedPrefix}tourl <imagen> - Imagen a enlace
 ┝⎆ [ ${usedPrefix}reportar <texto> - 🕷️ Invoca a los 𝔄𝔡𝔪𝔦𝔫𝔰 del más allá 🩸
+🧟┝⎆ [ ${usedPrefix}perfil - Ver perfil grupo
 ◈┄──━━┉─࿂
 
 ◈───≼ 🧟 _*FUN*_ 🧟 ≽──⊚

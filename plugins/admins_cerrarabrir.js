@@ -1,26 +1,29 @@
-const handler = async (m, { conn, isAdmin, isBotAdmin, args }) => {
+const handler = async (m, { conn, isAdmin, isBotAdmin }) => {
   if (!m.isGroup) return m.reply('❗ Este comando solo se puede usar en grupos.')
   if (!isAdmin) return m.reply('🛡️ Solo los administradores pueden usar este comando.')
   if (!isBotAdmin) return m.reply('🤖 Necesito ser administrador para cambiar la configuración del grupo.')
 
-  if (!args[0]) return m.reply('⚠️ Debes especificar "abrir" o "cerrar".\nEjemplo: .g abrir')
-
-  const accion = args[0].toLowerCase()
-
-  if (accion === 'abrir') {
-    await conn.groupSettingUpdate(m.chat, 'not_announcement')
-    return m.reply('🔓 *El grupo ha sido abierto.*\nAhora todos pueden enviar mensajes.')
-  } 
-
-  if (accion === 'cerrar') {
-    await conn.groupSettingUpdate(m.chat, 'announcement')
-    return m.reply('🔒 *El grupo ha sido cerrado.*\nSolo los administradores pueden enviar mensajes.')
+  try {
+    // Obtener información actual del grupo
+    const groupInfo = await conn.groupMetadata(m.chat)
+    const isAnnouncement = groupInfo.announce
+    
+    if (isAnnouncement) {
+      // El grupo está cerrado, abrirlo
+      await conn.groupSettingUpdate(m.chat, 'not_announcement')
+      return m.reply('🔓 *El grupo ha sido abierto.*\nAhora todos pueden enviar mensajes.')
+    } else {
+      // El grupo está abierto, cerrarlo
+      await conn.groupSettingUpdate(m.chat, 'announcement')
+      return m.reply('🔒 *El grupo ha sido cerrado.*\nSolo los administradores pueden enviar mensajes.')
+    }
+  } catch (error) {
+    console.error('Error al obtener info del grupo:', error)
+    return m.reply('❌ Error al cambiar la configuración del grupo.')
   }
-
-  return m.reply('⚠️ Comando no reconocido. Usa "abrir" o "cerrar".')
 }
 
-handler.help = ['g abrir', 'g cerrar']
+handler.help = ['g']
 handler.tags = ['grupo']
 handler.command = ['g']
 handler.group = true
