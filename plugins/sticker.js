@@ -120,21 +120,6 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
         sticker: stickerBuffer
       }, { quoted: m })
       
-      // Mensaje adicional con info (opcional)
-      await conn.sendMessage(m.chat, {
-        text: `✅ *Sticker creado exitosamente*\n📦 *Tamaño:* ${formatBytes(stickerBuffer.length)}\n🏷️ *Pack:* ${packname}`,
-        contextInfo: {
-          externalAdReply: {
-            showAdAttribution: false,
-            title: packname,
-            body: `🎃 Keloke 👻`,
-            mediaType: 1,
-            sourceUrl: redes,
-            thumbnail: icons
-          }
-        }
-      }, { quoted: m })
-      
       await m.react('✅')
       
     } catch (sendError) {
