@@ -3,7 +3,7 @@ import fetch from 'node-fetch';
 import { prepareWAMessageMedia, generateWAMessageFromContent } from '@whiskeysockets/baileys';
 
 const handler = async (m, { conn, args, usedPrefix, command }) => {
-  if (!args[0]) return conn.reply(m.chat, `*❗ Ingresa un título para buscar en YouTube.*\n✧ \`Ejemplo:\` ${usedPrefix}${command} Joji - Ew`, m, fake);
+  if (!args[0]) return conn.reply(m.chat, `*❗ Ingresa un título para buscar en YouTube.*\n✧ \`Ejemplo:\` ${usedPrefix}${command} Joji - Ew`, m);
 
   await m.react('🎲');
   try {
@@ -24,8 +24,7 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
       thumbnail = await (await fetch('https://telegra.ph/file/36f2a1bd2aaf902e4d1ff.jpg')).buffer();
     }
 
-
-const caption = `*🌳  YOUTUBE PLAY 🎬*
+    const caption = `*🌳  YOUTUBE PLAY 🎬*
 
 *✧ titulo:* ${video.titulo || 'no encontrado'}
 *✧ duracion:* ${video.duracion || 'no encontrado'}
@@ -33,6 +32,7 @@ const caption = `*🌳  YOUTUBE PLAY 🎬*
 *✧ canal:* ${video.canal || 'no encontrado'}
 *✧ vistas:* ${video.vistas || 'no encontrado'}
 *✧ url:* ${video.url}`;
+    
     let ytSections = searchResults.slice(1, 11).map((v, index) => ({
       title: `${index + 1}┃ ${v.titulo}`,
       rows: [
@@ -84,7 +84,6 @@ const caption = `*🌳  YOUTUBE PLAY 🎬*
     await conn.sendMessage(m.chat, {
       image: thumbnail,
       caption: caption,
-      footer: club,
       contextInfo: {
         mentionedJid: [m.sender],
         forwardingScore: 999,
@@ -111,16 +110,6 @@ const caption = `*🌳  YOUTUBE PLAY 🎬*
             }),
           },
         },
-/*        {
-          type: 4,
-          nativeFlowInfo: {
-            name: 'single_select',
-            paramsJson: JSON.stringify({
-              title: '𝖱𝖾𝗌𝗎𝗅𝗍𝖺𝖽𝗈𝗌 De Apple Music',
-              sections: applemusicSections,
-            }),
-          },
-        },*/
         {
           type: 4,
           nativeFlowInfo: {
@@ -140,7 +129,7 @@ const caption = `*🌳  YOUTUBE PLAY 🎬*
   } catch (e) {
     console.error(e);
     await m.react('✖️');
-    conn.reply(m.chat, '*`Error al buscar el video.`*', m, fake);
+    conn.reply(m.chat, '*`Error al buscar el video.`*', m);
   }
 };
 
@@ -180,13 +169,4 @@ async function searchSpotify(query) {
     console.error('Error en Spotify API:', error.message);
     return [];
   }
-}
-
-function convertTimeToSpanish(timeText) {
-  return timeText
-    .replace(/year/, 'año').replace(/years/, 'años')
-    .replace(/month/, 'mes').replace(/months/, 'meses')
-    .replace(/day/, 'día').replace(/days/, 'días')
-    .replace(/hour/, 'hora').replace(/hours/, 'horas')
-    .replace(/minute/, 'minuto').replace(/minutes/, 'minutos');
 }
