@@ -1,4 +1,50 @@
 let handler = async function (m, { conn, groupMetadata }) {
+  // Si hay menciones, mostrar ID del usuario mencionado
+  if (m.mentionedJid && m.mentionedJid.length > 0) {
+    const userJid = m.mentionedJid[0]
+    const userName = await conn.getName(userJid) || 'Usuario'
+    const number = userJid.split('@')[0]
+    
+    const mensaje = `
+╭─✿ *ID de Usuario* ✿─╮
+│  *Nombre:* ${userName}
+│  *Número:* ${number}
+│  *JID/ID:* ${userJid}
+╰─────────────────────╯`.trim()
+    
+    return conn.reply(m.chat, mensaje, m, { mentions: [userJid] })
+  }
+
+  // Si no hay menciones y es un grupo, mostrar ID del grupo
+  if (m.isGroup) {
+    const mensaje = `
+╭─✿ *ID del Grupo* ✿─╮
+│  *Nombre:* ${groupMetadata.subject}
+│  *JID/ID:* ${m.chat}
+│  *Participantes:* ${groupMetadata.participants.length}
+╰─────────────────────╯`.trim()
+    
+    return conn.reply(m.chat, mensaje, m)
+  }
+
+  // Si no es grupo y no hay menciones, mostrar ayuda
+  const ayuda = `
+📋 *Uso del comando ID/LID:*
+
+🏷️ *.id @usuario* - Ver ID de usuario
+🏢 *.id* (en grupo) - Ver ID del grupo
+📱 *.lid* - Ver lista completa de participantes
+
+💡 *Ejemplos:*
+• .id @juan
+• .id (en un grupo)
+• .lid (lista completa)`.trim()
+  
+  return conn.reply(m.chat, ayuda, m)
+}
+
+// Handler para lista completa de participantes
+let handlerLid = async function (m, { conn, groupMetadata }) {
   if (!m.isGroup) return m.reply('❌ Este comando solo funciona en grupos.')
 
   const participantes = groupMetadata?.participants || []
@@ -32,9 +78,16 @@ ${contenido}`
   return conn.reply(m.chat, mensajeFinal, m, { mentions: mencionados })
 }
 
-handler.command = ['lid']
-handler.help = ['lid']
-handler.tags = ['group']
-handler.group = true
+// Configuración para .id
+handler.command = ['id']
+handler.help = ['id', 'id @user']
+handler.tags = ['info']
 
-export default handler
+// Configuración para .lid 
+handlerLid.command = ['lid']
+handlerLid.help = ['lid']
+handlerLid.tags = ['group']
+handlerLid.group = true
+
+// Exportar ambos handlers
+export { handler as default, handlerLid }
