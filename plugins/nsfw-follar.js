@@ -31,21 +31,10 @@ let handler = async (m, { conn, usedPrefix }) => {
   }
 
   if (m.isGroup) {
-    // Videos NSFW (pon tus enlaces reales aquí)
-    const pp1 = '';
-    const pp2 = '';
-    const pp3 = '';
-    const pp4 = '';
-    const pp5 = '';
-    const pp6 = '';
-
-    const videos = [pp1, pp2, pp3, pp4, pp5, pp6];
-    const video = videos[Math.floor(Math.random() * videos.length)];
-
     let mentions = [who];
     await conn.sendMessage(
       m.chat,
-      { video: { url: video }, gifPlayback: true, caption: str, mentions },
+      { text: str, mentions },
       { quoted: m }
     );
   }
