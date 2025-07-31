@@ -161,7 +161,6 @@ ${saludo}, *${taguser}*!
 ◈───≼ 🕸️ _*HERRAMIENTAS*_ 🕸️ ≽──⊚
 🩸┝⎆ [ ${usedPrefix}s <img> - Crear sticker
 🩸┝⎆ [ ${usedPrefix}brat <texto> - Sticker brat style
-🕷️┝⎆ [ ${usedPrefix}iqc <texto> - Buscar info IQ
 🕷️┝⎆ [ ${usedPrefix}rvocal <audio> - Cambiar voz
 🕷️┝⎆ [ ${usedPrefix}tourl2 <img> - Convertir en URL
 🕷️┝⎆ [ ${usedPrefix}hd <imagen> - Mejorar calidad
@@ -184,9 +183,6 @@ ${saludo}, *${taguser}*!
 ◈┄──━━┉─࿂
 
 ◈───≼ 🕷️ _*MAIN & RPG*_ 🕷️ ≽──⊚
-🩸┝⎆ [ ${usedPrefix}reg <nombre edad> - Registrarse
-🩸┝⎆ [ ${usedPrefix}unreg - Borrar registro
-🧟┝⎆ [ ${usedPrefix}menu - Ver el menú principal
 🕷️┝⎆ [ ${usedPrefix}juegos - Juegos disponibles
 🕸️┝⎆ [ ${usedPrefix}ping - Velocidad del bot
 🕷️┝⎆ [ ${usedPrefix}grupos - Lista de grupos
