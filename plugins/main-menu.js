@@ -150,7 +150,6 @@ ${saludo}, *${taguser}*!
 
 ◈───≼ 🧟‍♂️ _*OWNER*_ 🧟‍♂️ ≽──⊚
 🕷️┝⎆ [ ${usedPrefix}reiniciar - Reiniciar bot
-🕷️┝⎆ [ ${usedPrefix}dsowner - Info del dev
 🕸️┝⎆ [ ${usedPrefix}setname <nombre> - Cambiar nombre bot
 🕸️┝⎆ [ ${usedPrefix}setpp <img> - Cambiar foto bot
 🕷️┝⎆ [ ${usedPrefix}restart - Reinicio manual
