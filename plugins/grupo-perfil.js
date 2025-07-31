@@ -13,9 +13,8 @@ let handler = async (m, { conn }) => {
 
   // Asegurar formato JID correcto
   const userJid = targetUser.includes('@') ? targetUser : `${targetUser}@s.whatsapp.net`
-  
+
   const username = await conn.getName(userJid)
-  const number = userJid.split('@')[0]
 
   // Obtener foto de perfil o usar imagen por defecto
   let profilePicUrl
@@ -31,7 +30,7 @@ let handler = async (m, { conn }) => {
 
   const card = {
     body: proto.Message.InteractiveMessage.Body.fromObject({
-      text: `👤 *Perfil de Usuario*\n\n📛 Nombre: ${username}\n📱 Número: wa.me/${number}`
+      text: `👤 *Perfil de Usuario*\n\n📛 Nombre: ${username}`
     }),
     footer: proto.Message.InteractiveMessage.Footer.fromObject({
       text: ''
@@ -82,7 +81,10 @@ let handler = async (m, { conn }) => {
     }
   }, {})
 
-  await conn.relayMessage(m.chat, msg.message, { messageId: msg.key.id })
+  await conn.relayMessage(m.chat, msg.message, { 
+    messageId: msg.key.id,
+    mentions: [userJid] 
+  })
   await m.react('👤')
 }
 
