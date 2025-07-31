@@ -11,14 +11,14 @@ const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
 const fetchSticker = async (text, attempt = 1) => {
     try {
-        console.log(`Intentando generar sticker brat: "${text}" (intento ${attempt})`)
+        console.log(`🎨 Generando brat sticker: "${text}" (intento ${attempt})`)
         
         const response = await axios.get(`https://api.hanggts.xyz/imagecreator/brat`, {
             params: { text },
             responseType: 'arraybuffer',
             timeout: 30000,
             headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
             }
         })
         
@@ -26,26 +26,26 @@ const fetchSticker = async (text, attempt = 1) => {
             throw new Error('Respuesta vacía del servidor')
         }
         
-        console.log(`Sticker generado exitosamente, tamaño: ${response.data.length} bytes`)
-        return response.data
+        console.log(`✅ Imagen brat descargada: ${response.data.length} bytes`)
+        return Buffer.from(response.data)
         
-    } catch (error) {
-        console.error(`Error en intento ${attempt}:`, error.message)
+    } catch (err) {
+        console.error(`❌ Error en intento ${attempt}:`, err.message)
         
-        if (error.response?.status === 429 && attempt <= 3) {
-            const retryAfter = error.response.headers['retry-after'] || 5
-            console.log(`Rate limit alcanzado, esperando ${retryAfter} segundos...`)
+        if (err.response?.status === 429 && attempt <= 3) {
+            const retryAfter = err.response.headers['retry-after'] || 5
+            console.log(`🚫 Rate limit alcanzado, esperando ${retryAfter} segundos...`)
             await delay(retryAfter * 1000)
             return fetchSticker(text, attempt + 1)
         }
         
-        if (error.code === 'ECONNABORTED' && attempt <= 2) {
-            console.log(`Timeout, reintentando en ${attempt * 2} segundos...`)
+        if (err.code === 'ECONNABORTED' && attempt <= 2) {
+            console.log(`⏰ Timeout, reintentando en ${attempt * 2} segundos...`)
             await delay(attempt * 2000)
             return fetchSticker(text, attempt + 1)
         }
         
-        throw error
+        throw err
     }
 }
 
@@ -72,44 +72,64 @@ let handler = async (m, { conn, text }) => {
     // Reaccionar con emoji de espera
     await m.react(rwait)
 
+    let stickerBuffer = null
+
     try {
-        const buffer = await fetchSticker(text.trim())
+        // Descargar la imagen brat
+        console.log('🔄 Descargando imagen brat...')
+        const imageBuffer = await fetchSticker(text.trim())
         
+        if (!imageBuffer || !Buffer.isBuffer(imageBuffer) || imageBuffer.length === 0) {
+            throw new Error('No se pudo descargar la imagen brat')
+        }
+
         // Obtener configuración del usuario
         let userId = m.sender
         let packstickers = global.db?.data?.users?.[userId] || {}
-        let texto1 = packstickers.text1 || global.packsticker || 'Brat Sticker'
-        let texto2 = packstickers.text2 || global.packsticker2 || 'Bot'
+        let packname = packstickers.text1 || global.packsticker || 'Brat Sticker'
+        let author = packstickers.text2 || global.packsticker2 || 'Bot'
 
-        console.log(`Convirtiendo a sticker con pack: "${texto1}" - "${texto2}"`)
-        
-        let stiker = await sticker(buffer, false, texto1, texto2)
+        console.log(`🔄 Convirtiendo a sticker con pack: "${packname}" - "${author}"`)
 
-        if (stiker && stiker.length > 0) {
-            await conn.sendFile(m.chat, stiker, 'brat.webp', '', m)
-            await m.react(done)
-        } else {
+        // Convertir a sticker usando nuestra librería mejorada
+        stickerBuffer = await sticker(imageBuffer, false, packname, author)
+
+        if (!stickerBuffer || !Buffer.isBuffer(stickerBuffer) || stickerBuffer.length === 0) {
             throw new Error("No se pudo convertir a sticker")
         }
-        
+
+        console.log(`✅ Sticker brat creado: ${stickerBuffer.length} bytes`)
+
+        // Enviar sticker directamente desde memoria (sin guardar archivos)
+        await conn.sendMessage(m.chat, {
+            sticker: stickerBuffer
+        }, { quoted: m })
+
+        await m.react(done)
+
     } catch (err) {
-        console.error('Error completo en handler:', err)
+        console.error('❌ Error completo en handler:', err)
         await m.react(error)
-        
-        let errorMsg = "⚠️ Ocurrió un error al generar el sticker."
-        
-        if (err.message.includes('timeout')) {
+
+        let errorMsg = "⚠️ Ocurrió un error al generar el sticker brat."
+
+        // Mensajes de error específicos
+        if (err.message.includes('timeout') || err.code === 'ECONNABORTED') {
             errorMsg = "⏰ Tiempo de espera agotado. Intenta de nuevo."
-        } else if (err.message.includes('429')) {
+        } else if (err.message.includes('429') || err.response?.status === 429) {
             errorMsg = "🚫 Demasiadas solicitudes. Espera un momento e intenta de nuevo."
-        } else if (err.message.includes('500')) {
-            errorMsg = "🔧 Error del servidor. Intenta de nuevo más tarde."
-        } else if (err.message.includes('network')) {
+        } else if (err.message.includes('500') || err.response?.status >= 500) {
+            errorMsg = "🔧 Error del servidor de brat. Intenta de nuevo más tarde."
+        } else if (err.message.includes('network') || err.code === 'ENOTFOUND') {
             errorMsg = "🌐 Error de conexión. Verifica tu internet."
+        } else if (err.message.includes('FFmpeg')) {
+            errorMsg = "🔧 Error de conversión. El servidor brat podría estar enviando un formato inválido."
+        } else if (err.message.includes('Respuesta vacía')) {
+            errorMsg = "📭 El servidor brat no devolvió ninguna imagen. Intenta con otro texto."
         }
-        
+
         return conn.sendMessage(m.chat, {
-            text: `${errorMsg}\n\n*Detalles:* ${err.message}`,
+            text: `${errorMsg}\n\n*Texto usado:* "${text}"\n*Error técnico:* ${err.message}`,
         }, { quoted: m })
     }
 }
