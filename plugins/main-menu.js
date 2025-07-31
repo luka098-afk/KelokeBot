@@ -142,6 +142,7 @@ ${saludo}, *${taguser}*!
 🧟‍♂️┝⎆ [ ${usedPrefix}autoadmin - El bot te da admin
 ☠️┝⎆ [ ${usedPrefix}banuser @tag - Banea al etiquetado
 ✨┝⎆ [ ${usedPrefix}unbanuser @tag - Desbanea al etiquetado
+┝⎆ [ ${usedPrefix}listban - ⚰️ Lista Negra de los Condenados💀
 👁️‍🗨️┝⎆ [ ${usedPrefix}detect on/off - Detecta acciones hechas por admins
 🕸️┝⎆ [ ${usedPrefix}ruletaban @tag ] - 𝕽𝖚𝖑𝖊𝖙𝖆 𝕬𝖑𝖊𝖆𝖙𝖔𝖗𝖎𝖆 ☠️
 🩸┝⎆ [ ${usedPrefix}link - Obtiene el link del grupo
