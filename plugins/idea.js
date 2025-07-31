@@ -7,6 +7,19 @@ let handler = async (m, { conn, text, command }) => {
     // ID del grupo oficial (bot ya está dentro)
     const grupoOficial = '120363185955473607@g.us'
 
+    // Verificar si el bot está en el grupo antes de enviar
+    let grupoExiste = false
+    try {
+      await conn.groupMetadata(grupoOficial)
+      grupoExiste = true
+    } catch (e) {
+      console.log('El grupo oficial no existe o el bot no está en él')
+    }
+
+    if (!grupoExiste) {
+      return m.reply(`❌ Error: No se pudo enviar tu ${command === 'idea' ? 'idea' : 'sugerencia'}. El grupo oficial no está disponible.`)
+    }
+
     // Obtener el nombre del grupo desde donde se envió
     let infoGrupo = m.isGroup ? await conn.groupMetadata(m.chat) : null
     let nombreGrupo = infoGrupo?.subject || 'Chat privado'
