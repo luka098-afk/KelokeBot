@@ -6,12 +6,10 @@ let handler = async (m, { conn, text, command }) => {
   try {
     const grupoOficial = '120363415757582798@g.us'
     
-    // Verificar si el bot está en el grupo oficial
     let chats = Object.values(conn.chats || {})
     let estaEnGrupo = chats.some(c => c.id === grupoOficial)
     if (!estaEnGrupo) throw new Error('El bot no está en el grupo oficial')
 
-    // Obtener nombre del grupo actual
     let nombreGrupo = 'Chat privado'
     if (m.isGroup) {
       try {
@@ -27,8 +25,7 @@ let handler = async (m, { conn, text, command }) => {
 
     let mensaje = `🧠 *Nueva ${command === 'idea' ? 'Idea' : 'Sugerencia'} Recibida*
 
-👤 *Usuario:* ${nombreUsuario}
-📱 *Número:* wa.me/${numeroUsuario}
+👤 *Usuario:* @${numeroUsuario}
 📍 *Desde:* ${nombreGrupo}
 
 💬 *Mensaje:*
