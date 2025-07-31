@@ -1,43 +1,43 @@
-import ytdl from 'ytdl-core';
+import fetch from 'node-fetch';
 
 const handler = async (m, { conn, args, usedPrefix }) => {
-  if (!args[0]) return m.reply(`✦ Ingresa el enlace de YouTube\nEjemplo: ${usedPrefix}video https://youtu.be/abc123`);
+  if (!args[0]) return m.reply(`✦ Ingresa el nombre del artista o canción\nEjemplo: ${usedPrefix}video @artista`);
 
-  const url = args[0];
-  if (!ytdl.validateURL(url)) return m.reply('✦ URL inválida.');
+  const query = args.join(' ');
+  const searchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
+  
+  // Realizar búsqueda en YouTube
+  const res = await fetch(searchUrl);
+  const html = await res.text();
+  const videoIdMatch = html.match(/"videoId":"([^"]+)"/);
+  
+  if (!videoIdMatch) return m.reply('✦ No se encontraron resultados.');
 
-  try {
-    await m.react('🔄');
+  const videoId = videoIdMatch[1];
+  const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
 
-    // Descarga en calidad 18 (360p mp4, tamaño razonable)
-    const stream = ytdl(url, { quality: '18' });
+  // Obtener información del video
+  const infoRes = await fetch(`https://youtube-download-api.matheusishiyama.repl.co/info/?url=${encodeURIComponent(videoUrl)}`);
+  const info = await infoRes.json();
+  
+  if (!info.title) return m.reply('✦ No se pudo obtener información del video.');
 
-    // Acumular chunks para buffer
-    let chunks = [];
-    for await (const chunk of stream) chunks.push(chunk);
-    const buffer = Buffer.concat(chunks);
+  // Descargar video en MP4
+  const videoRes = await fetch(`https://youtube-download-api.matheusishiyama.repl.co/mp4/?url=${encodeURIComponent(videoUrl)}`);
+  
+  if (!videoRes.ok) return m.reply('✦ Error al descargar el video.');
 
-    // Limitar tamaño a 50MB para WhatsApp
-    if (buffer.length > 50 * 1024 * 1024) {
-      return m.reply('✦ Video demasiado pesado para enviar por WhatsApp (máx 50MB).');
-    }
+  const videoBuffer = await videoRes.buffer();
 
-    // Enviar video
-    await conn.sendMessage(m.chat, {
-      video: buffer,
-      mimetype: 'video/mp4',
-      caption: '🎬 Aquí tienes tu video',
-    }, { quoted: m });
-
-    await m.react('✅');
-  } catch (e) {
-    console.error(e);
-    await m.react('⚠️');
-    m.reply('✦ Error al descargar o enviar el video.');
-  }
+  // Enviar video
+  await conn.sendMessage(m.chat, {
+    video: videoBuffer,
+    mimetype: 'video/mp4',
+    caption: `🎬 ${info.title}`,
+  }, { quoted: m });
 };
 
-handler.help = ['video <url>'];
+handler.help = ['video <artista>'];
 handler.tags = ['downloader'];
 handler.command = ['video'];
 
