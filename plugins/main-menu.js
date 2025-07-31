@@ -113,7 +113,7 @@ ${saludo}, *${taguser}*!
 ┃  Estado: en desarrollo oscuro... 🩸  ┃
 ╚═══════════════════════════════════╝
 *【𝕷 𝖎 𝖘 𝖙 𝖆 - 𝕯𝖊 - 𝕮 𝖔 𝖒 𝖆 𝖓 𝖉 𝖔 𝖘】*
-
+${usedPrefix}idea - manda una idea a los owner
 ◈───≼ 🧟‍♀️ _*DESCARGAS*_ 🧟‍♀️ ≽──⊚
 🕷️┝⎆ [ ${usedPrefix}tiktok <link> - Descargar video TT
 🕷️┝⎆ [ ${usedPrefix}play <nombre> - Descargar canción
