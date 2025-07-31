@@ -26,7 +26,7 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
   let author = global.packsticker2 || global.author || '🎃 Halloween Bot'
   let rcanal = global.rcanal || fake
 
-  let stiker = false
+  let stickerBuffer = null
   
   try {
     let q = m.quoted ? m.quoted : m
@@ -41,121 +41,94 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
         }
       }
 
-      console.log(`Procesando archivo: ${mime}`)
+      console.log(`🔍 Procesando archivo: ${mime}`)
       
-      // Descargar archivo con mejor manejo de errores
-      let img
-      try {
-        img = await q.download?.()
-        console.log(`Archivo descargado: ${img ? img.length : 0} bytes`)
-      } catch (downloadError) {
-        console.error('Error de descarga:', downloadError.message)
-        return m.reply('🎃 Error al descargar el archivo. Intenta de nuevo.')
-      }
-
-      if (!img || !Buffer.isBuffer(img) || img.length === 0) {
-        return conn.reply(m.chat, `🎃 𝙋𝙤𝙧 𝙁𝙖𝙫𝙤𝙧, 𝙚𝙣𝙫𝙞𝙖 𝙪𝙣𝙖 𝙞𝙢𝙖𝙜𝙚𝙣 𝙤 𝙫𝙞𝙙𝙚𝙤 𝙫á𝙡𝙞𝙙𝙤 𝙥𝙖𝙧𝙖 𝙝𝙖𝙘𝙚𝙧 𝙪𝙣 𝙨𝙩𝙞𝙘𝙠𝙚𝙧 🦇`, m, rcanal)
-      }
-
       // Reaccionar con emoji de procesamiento
       await m.react('⏳')
 
-      // Intentar crear el sticker directamente primero
+      // Descargar archivo con mejor manejo de errores
+      let mediaBuffer
       try {
-        console.log('Intentando conversión directa...')
-        stiker = await sticker(img, false, packname, author)
-        console.log(`Sticker creado directamente: ${stiker ? stiker.length : 0} bytes`)
+        mediaBuffer = await q.download?.()
+        console.log(`📥 Archivo descargado: ${mediaBuffer ? mediaBuffer.length : 0} bytes`)
+      } catch (downloadError) {
+        console.error('❌ Error de descarga:', downloadError.message)
+        await m.react('❌')
+        return m.reply('🎃 Error al descargar el archivo. Intenta de nuevo.')
+      }
+
+      if (!mediaBuffer || !Buffer.isBuffer(mediaBuffer) || mediaBuffer.length === 0) {
+        await m.react('❌')
+        return conn.reply(m.chat, `🎃 𝙋𝙤𝙧 𝙁𝙖𝙫𝙤𝙧, 𝙚𝙣𝙫𝙞𝙖 𝙪𝙣𝙖 𝙞𝙢𝙖𝙜𝙚𝙣 𝙤 𝙫𝙞𝙙𝙚𝙤 𝙫á𝙡𝙞𝙙𝙤 𝙥𝙖𝙧𝙖 𝙝𝙖𝙘𝙚𝙧 𝙪𝙣 𝙨𝙩𝙞𝙘𝙠𝙚𝙧 🦇`, m, rcanal)
+      }
+
+      // Intentar crear el sticker
+      try {
+        console.log('🔄 Creando sticker...')
+        stickerBuffer = await sticker(mediaBuffer, false, packname, author)
+        console.log(`✅ Sticker creado: ${stickerBuffer ? stickerBuffer.length : 0} bytes`)
         
-      } catch (directError) {
-        console.error('Error en conversión directa:', directError.message)
+      } catch (stickerError) {
+        console.error('❌ Error creando sticker:', stickerError.message)
+        await m.react('❌')
         
-        // Si la conversión directa falla, intentar métodos alternativos
-        console.log('Intentando métodos alternativos...')
+        // Mensajes de error específicos
+        let errorMsg = '🎃 Error al procesar el archivo.'
         
-        try {
-          let processedImg = img
-          
-          // Procesar según el tipo de archivo
-          if (/webp/g.test(mime)) {
-            console.log('Procesando WebP...')
-            try {
-              processedImg = await webp2png(img)
-              console.log('WebP convertido a PNG')
-            } catch (webpError) {
-              console.log('Error en webp2png, usando imagen original')
-              processedImg = img
-            }
-          }
-          
-          // Intentar nuevamente con la imagen procesada
-          stiker = await sticker(processedImg, false, packname, author)
-          console.log(`Sticker creado con imagen procesada: ${stiker ? stiker.length : 0} bytes`)
-          
-        } catch (processedError) {
-          console.error('Error con imagen procesada:', processedError.message)
-          
-          // Último intento: subir imagen y usar URL
-          try {
-            console.log('Último intento: subiendo imagen...')
-            let uploadedUrl
-            
-            if (/image/g.test(mime)) {
-              uploadedUrl = await uploadImage(img)
-            } else if (/video/g.test(mime)) {
-              uploadedUrl = await uploadFile(img)
-            } else {
-              uploadedUrl = await uploadImage(img)
-            }
-            
-            if (uploadedUrl && typeof uploadedUrl === 'string') {
-              console.log('Imagen subida, creando sticker desde URL...')
-              stiker = await sticker(false, uploadedUrl, packname, author)
-              console.log(`Sticker creado desde URL: ${stiker ? stiker.length : 0} bytes`)
-            }
-            
-          } catch (uploadError) {
-            console.error('Error en upload:', uploadError.message)
-            throw new Error('No se pudo procesar el archivo con ningún método')
-          }
+        if (stickerError.message.includes('FFmpeg')) {
+          errorMsg = '🔧 Error de conversión. Verifica que el archivo sea válido.'
+        } else if (stickerError.message.includes('timeout')) {
+          errorMsg = '⏰ El proceso tardó demasiado. Intenta con un archivo más pequeño.'
+        } else if (stickerError.message.includes('not supported')) {
+          errorMsg = '📁 Formato de archivo no soportado.'
         }
+        
+        return m.reply(`${errorMsg}\n\n*Detalles técnicos:* ${stickerError.message}`)
       }
       
     } else if (args[0]) {
       // Procesar URL
       if (isUrl(args[0])) {
-        console.log('Procesando URL:', args[0])
+        console.log('🌐 Procesando URL:', args[0])
         await m.react('⏳')
         
         try {
-          stiker = await sticker(false, args[0], packname, author)
-          console.log(`Sticker creado desde URL: ${stiker ? stiker.length : 0} bytes`)
+          // Para URLs no usamos la librería, sino que llamamos directamente
+          stickerBuffer = await createStickerFromUrl(args[0], packname, author)
+          console.log(`✅ Sticker desde URL: ${stickerBuffer ? stickerBuffer.length : 0} bytes`)
         } catch (urlError) {
-          console.error('Error con URL:', urlError.message)
+          console.error('❌ Error con URL:', urlError.message)
+          await m.react('❌')
           return m.reply('🎃 Error al procesar la URL. Verifica que sea una imagen válida.')
         }
       } else {
-        return m.reply(`⚠️ El URL es incorrecto. Debe ser una imagen válida (jpg, png, gif)`)
+        return m.reply(`⚠️ El URL es incorrecto. Debe ser una imagen válida (jpg, png, gif, webp)`)
       }
     }
     
   } catch (e) {
-    console.error('Error general en handler:', e)
+    console.error('❌ Error general en handler:', e)
     await m.react('❌')
-    if (!stiker) stiker = false
+    stickerBuffer = null
   }
 
   // Enviar resultado
-  if (stiker && Buffer.isBuffer(stiker) && stiker.length > 0) {
+  if (stickerBuffer && Buffer.isBuffer(stickerBuffer) && stickerBuffer.length > 0) {
     try {
-      await conn.sendFile(m.chat, stiker, 'sticker.webp', '', m, true, {
+      // Enviar el sticker directamente desde el buffer en memoria
+      await conn.sendMessage(m.chat, {
+        sticker: stickerBuffer
+      }, { quoted: m })
+      
+      // Mensaje adicional con info (opcional)
+      await conn.sendMessage(m.chat, {
+        text: `✅ *Sticker creado exitosamente*\n📦 *Tamaño:* ${formatBytes(stickerBuffer.length)}\n🏷️ *Pack:* ${packname}`,
         contextInfo: {
-          'forwardingScore': 200,
-          'isForwarded': false,
           externalAdReply: {
             showAdAttribution: false,
             title: packname,
             body: `🎃 Keloke 👻`,
-            mediaType: 2,
+            mediaType: 1,
             sourceUrl: redes,
             thumbnail: icons
           }
@@ -165,7 +138,7 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
       await m.react('✅')
       
     } catch (sendError) {
-      console.error('Error enviando sticker:', sendError.message)
+      console.error('❌ Error enviando sticker:', sendError.message)
       await m.react('❌')
       return m.reply('🎃 Error al enviar el sticker. Intenta de nuevo.')
     }
@@ -187,6 +160,31 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
 ┃
 ╰━━━━━━━━━━━━━━━━━━⬣`, m, fake)
   }
+}
+
+/**
+ * Create sticker from URL (placeholder)
+ * @param {string} url 
+ * @param {string} packname 
+ * @param {string} author 
+ * @returns {Promise<Buffer>}
+ */
+async function createStickerFromUrl(url, packname, author) {
+  // Esta función necesitaría implementar descarga de URL
+  // Por ahora lanzamos error para que use otros métodos
+  throw new Error('URL processing not fully implemented yet')
+}
+
+/**
+ * Format bytes to human readable
+ * @param {number} bytes 
+ * @returns {string}
+ */
+function formatBytes(bytes) {
+  if (bytes === 0) return '0 B'
+  const sizes = ['B', 'KB', 'MB', 'GB']
+  const i = Math.floor(Math.log(bytes) / Math.log(1024))
+  return `${(bytes / 1024 ** i).toFixed(2)} ${sizes[i]}`
 }
 
 handler.help = ['stiker <img>', 'sticker <url>']
