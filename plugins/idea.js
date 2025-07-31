@@ -5,7 +5,7 @@ let handler = async (m, { conn, text, command }) => {
 
   try {
     // ID del grupo oficial - CAMBIA ESTE ID POR EL CORRECTO
-    const grupoOficial = '120363185955473607@g.us'
+    const grupoOficial = '120363415757582798@g.us'
 
     // Solo obtener información básica sin verificar el grupo
     let nombreGrupo = 'Chat privado'
