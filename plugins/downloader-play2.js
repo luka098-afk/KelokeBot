@@ -5,7 +5,7 @@ import yts from 'yt-search';
 const handler = async (m, { conn, text, usedPrefix, command, args }) => {
   try {
     if (!text) {
-      return conn.reply(m.chat, `🌾 *Ingresa un link de YouTube o el nombre del video*\n\n*Ejemplo:*\n${usedPrefix + command} https://youtu.be/abc123\n${usedPrefix + command} Despacito Luis Fonsi`, m);
+      return conn.reply(m.chat, `🌾 *Ingresa un link de YouTube o el nombre del video*\n\n*Ejemplo:*\n${usedPrefix + command} https://youtu.be/abc123\n${usedPrefix + command} linkin park somewhere i belong`, m);
     }
 
     await m.react('⏱️');
@@ -103,21 +103,13 @@ const handler = async (m, { conn, text, usedPrefix, command, args }) => {
       `> 🗓️ *𝑷𝒖𝒃𝒍𝒊𝒄𝒂𝒅𝒐:* ${ago}\n` +
       `> 💾 *𝑻𝒂𝒎𝒂𝒏̃𝒐:* ${sizeStr}\n` +
       `> 🔗 *𝑳𝒊𝒏𝒌:* ${url}\n\n` +
-      ` *➭ 𝑬𝒍 𝒗𝒊𝒅𝒆𝒐 𝒔𝒆 𝒆𝒔𝒕𝒂 𝒆𝒏𝒗𝒊𝒂𝒏𝒅𝒐, 𝑬𝒔𝒑𝒆𝒓𝒆 𝒖𝒏 𝒎𝒐𝒎𝒆𝒏𝒕𝒊𝒕𝒐 𝒐𝒏𝒊𝒄𝒉𝒂𝒏~ 🌸*`;
+      ` *➭ 𝑬𝒍 𝒗𝒊𝒅𝒆𝒐 𝒔𝒆 𝒆𝒔𝒕𝒂 𝒆𝒏𝒗𝒊𝒂𝒏𝒅𝒐, 𝑬𝒔𝒑𝒆𝒓𝒆 𝒖𝒏 𝒎𝒐𝒎𝒆𝒏𝒕𝒊𝒕𝒐~ 🌸*`;
 
     // Enviar información del video con thumbnail
     try {
       await conn.sendMessage(m.chat, {
         image: { url: thumbnail },
-        caption: textoInfo,
-        contextInfo: {
-          isForwarded: true,
-          forwardedNewsletterMessageInfo: {
-            newsletterJid: '120363401008003732@newsletter',
-            newsletterName: '=͟͟͞𝑆𝑢𝑘𝑢𝑛𝑎 𝑈𝑙𝑡𝑟𝑎 • 𝐂𝐡𝐚𝐧𝐧𝐞𝐥 ⌺',
-            serverMessageId: -1
-          }
-        }
+        caption: textoInfo
       }, { quoted: m });
     } catch (error) {
       console.error('Error enviando imagen:', error);
@@ -143,7 +135,7 @@ const handler = async (m, { conn, text, usedPrefix, command, args }) => {
       const cleanTitle = title.replace(/[^\w\s-]/g, '').trim().substring(0, 50);
       const fileName = `${cleanTitle}.mp4`;
 
-      await conn.sendFile(m.chat, videoBuffer, fileName, '\n🖍️ 𝑨𝒒𝒖𝒊 𝒕𝒊𝒆𝒏𝒆𝒔 𝒕𝒖 𝒗𝒊𝒅𝒆𝒐, 𝒐𝒏𝒊𝒄𝒉𝒂𝒏~ 🌸', m);
+      await conn.sendFile(m.chat, videoBuffer, fileName, '\n🖍️ 𝑨𝒒𝒖𝒊 𝒕𝒊𝒆𝒏𝒆𝒔 𝒕𝒖 𝒗𝒊𝒅𝒆𝒐~ 🌸', m);
 
       await m.react('✅');
 
