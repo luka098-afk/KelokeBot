@@ -1,11 +1,27 @@
+// Objeto para almacenar los cooldowns de usuarios
+let userCooldowns = {}
+
 let handler = async (m, { conn, text, command }) => {
+  const userId = m.sender
+  const ahora = Date.now()
+  const cooldownTime = 24 * 60 * 60 * 1000 // 24 horas en milisegundos
+
   if (!text) {
-    return m.reply(`✍️ Escribe tu ${command === 'idea' ? 'idea' : 'sugerencia'}.\nEjemplo:\n.${command} que el bot tenga más juegos.`)
+    return m.reply(`✍️ Escribe tu ${command === 'idea' ? 'idea' : 'sugerencia'}.\n\n⚠️ *Importante:* Cada usuario puede enviar solo una ${command === 'idea' ? 'idea' : 'sugerencia'} cada 24 horas.\n\n💭 *Piensa muy bien tu mensaje antes de enviarlo.*\n\nEjemplo:\n.${command} que el bot tenga más juegos.`)
+  }
+
+  // Verificar cooldown
+  if (userCooldowns[userId] && (ahora - userCooldowns[userId]) < cooldownTime) {
+    const tiempoRestante = cooldownTime - (ahora - userCooldowns[userId])
+    const horasRestantes = Math.floor(tiempoRestante / (1000 * 60 * 60))
+    const minutosRestantes = Math.floor((tiempoRestante % (1000 * 60 * 60)) / (1000 * 60))
+    
+    return m.reply(`⏰ *Ya enviaste una ${command === 'idea' ? 'idea' : 'sugerencia'} recientemente.*\n\n🕐 *Tiempo restante:* ${horasRestantes}h ${minutosRestantes}m\n\n💡 *Recuerda:* Solo puedes enviar una ${command === 'idea' ? 'idea' : 'sugerencia'} cada 24 horas.`)
   }
 
   try {
     const grupoOficial = '120363415757582798@g.us'
-    
+
     let chats = Object.values(conn.chats || {})
     let estaEnGrupo = chats.some(c => c.id === grupoOficial)
     if (!estaEnGrupo) throw new Error('El bot no está en el grupo oficial')
@@ -33,17 +49,20 @@ let handler = async (m, { conn, text, command }) => {
 
 ⏰ *Fecha:* ${new Date().toLocaleString('es-ES', { timeZone: 'America/Argentina/Buenos_Aires' })}`
 
-    await conn.sendMessage(grupoOficial, { 
+    await conn.sendMessage(grupoOficial, {
       text: mensaje,
       mentions: [m.sender]
     })
 
-    await m.reply(`✅ ¡Gracias ${nombreUsuario}! Tu ${command === 'idea' ? 'idea' : 'sugerencia'} fue enviada correctamente.`)
-    
+    // Registrar el cooldown del usuario
+    userCooldowns[userId] = ahora
+
+    await m.reply(`✅ ¡Gracias ${nombreUsuario}! Tu ${command === 'idea' ? 'idea' : 'sugerencia'} fue enviada correctamente.\n\n⏰ *Recuerda:* Podrás enviar otra ${command === 'idea' ? 'idea' : 'sugerencia'} en 24 horas.`)
+
   } catch (error) {
     console.error('Error enviando idea/sugerencia:', error)
     await m.reply(`❌ No se pudo enviar tu ${command === 'idea' ? 'idea' : 'sugerencia'}.
-    
+
 🔧 *Posibles causas:*
 • El bot no está en el grupo oficial
 • No tiene permisos
