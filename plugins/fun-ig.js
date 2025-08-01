@@ -1,39 +1,31 @@
 import fetch from 'node-fetch';
-import { writeFile } from 'fs/promises';
 
-let handler = async (m, { args, text, usedPrefix, command }) => {
-  const user = (args[0] || '').replace(/^@/, '').trim();
-  if (!user) return m.reply(`📸 *Uso del comando:*\n${usedPrefix + command} @usuario_ig`);
-
-  const url = `https://instagram.com/${user}`;
-  let res, html;
+let handler = async (m, { args, usedPrefix, command }) => {
+  const username = (args[0] || '').replace(/^@/, '').trim();
+  if (!username) return m.reply(`📸 *Uso del comando:*\n${usedPrefix + command} @usuario_ig`);
 
   try {
-    res = await fetch(url, {
+    const apiUrl = `https://www.save-free.com/es/profile-downloader/?q=${username}`;
+    const html = await fetch(apiUrl, {
       headers: {
-        'User-Agent': 'Mozilla/5.0',
-        'Accept-Language': 'es-ES,es;q=0.9',
-      },
-    });
-    html = await res.text();
-  } catch {
-    return m.reply(`❌ No se pudo acceder al perfil de @${user}\n\n🔗 Enlace: https://instagram.com/${user}`);
-  }
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+        'Accept-Language': 'es-ES,es;q=0.9'
+      }
+    }).then(res => res.text());
 
-  let img = html.match(/"profile_pic_url_hd":"([^"]+)"/)?.[1] || html.match(/<meta property="og:image" content="([^"]+)"\/?>/)?.[1];
+    const imgMatch = html.match(/<img[^>]+src="([^"]+)"[^>]*class="profile-picture-img"/i);
+    if (!imgMatch || !imgMatch[1]) {
+      return m.reply(`❌ No se pudo obtener la imagen de perfil de @${username}.\n\n🔗 https://instagram.com/${username}`);
+    }
 
-  if (!img) {
-    return m.reply(`❌ No se pudo obtener el perfil de @${user}\n\n🔍 Asegúrate de que:\n• El nombre de usuario sea correcto\n• El perfil no esté restringido o eliminado\n\n🔗 Enlace: https://instagram.com/${user}`);
-  }
+    const imageUrl = imgMatch[1];
 
-  img = img.replace(/\\u0026/g, '&'); // Reemplazar caracteres escapados
+    const buffer = await fetch(imageUrl).then(res => res.buffer());
 
-  try {
-    const pic = await fetch(img);
-    const buffer = await pic.buffer();
-    await conn.sendFile(m.chat, buffer, 'perfil.jpg', `📸 *Foto de perfil de* @${user}\n🔗 https://instagram.com/${user}`, m, false, { mentions: [m.sender] });
-  } catch {
-    return m.reply(`❌ Error al descargar la imagen de perfil.`);
+    await conn.sendFile(m.chat, buffer, 'perfil.jpg', `📸 *Foto de perfil de* @${username}\n🔗 https://instagram.com/${username}`, m);
+  } catch (e) {
+    console.error(e);
+    m.reply(`❌ Error al obtener el perfil de @${username}\n\n🔗 https://instagram.com/${username}`);
   }
 };
 
