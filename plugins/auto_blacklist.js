@@ -44,7 +44,22 @@ const handler = async (m, { conn }) => {
 
         for (let user of participants) {
           console.log('Verificando usuario:', user)
-          const blockedUser = blacklist.find(u => u.jid === user)
+          
+          // Normalizar JIDs para comparación
+          const normalizeJid = (jid) => {
+            if (!jid) return ''
+            // Extraer solo el número del JID
+            return jid.split('@')[0]
+          }
+          
+          const userNumber = normalizeJid(user)
+          console.log('Número del usuario:', userNumber)
+          
+          const blockedUser = blacklist.find(u => {
+            const blockedNumber = normalizeJid(u.jid)
+            console.log('Comparando:', userNumber, 'con', blockedNumber)
+            return blockedNumber === userNumber
+          })
           
           if (blockedUser) {
             console.log('Usuario encontrado en lista negra:', user)
@@ -89,7 +104,13 @@ const handler = async (m, { conn }) => {
         const requestUser = m.messageStubParameters?.[0]
         
         if (requestUser) {
-          const blockedUser = blacklist.find(u => u.jid === requestUser)
+          const userNumber = requestUser.split('@')[0]
+          console.log('Número solicitante:', userNumber)
+          
+          const blockedUser = blacklist.find(u => {
+            const blockedNumber = u.jid.split('@')[0]
+            return blockedNumber === userNumber
+          })
           
           if (blockedUser) {
             console.log('Rechazando solicitud de:', requestUser)
@@ -116,7 +137,14 @@ const handler = async (m, { conn }) => {
     if (m.isGroup && m.sender && m.text) {
       console.log('Verificando mensaje de:', m.sender)
       
-      const blockedUser = blacklist.find(u => u.jid === m.sender)
+      const senderNumber = m.sender.split('@')[0]
+      console.log('Número del remitente:', senderNumber)
+      
+      const blockedUser = blacklist.find(u => {
+        const blockedNumber = u.jid.split('@')[0]
+        console.log('Comparando remitente:', senderNumber, 'con bloqueado:', blockedNumber)
+        return blockedNumber === senderNumber
+      })
       
       if (blockedUser) {
         console.log('Usuario bloqueado envió mensaje:', m.sender)
