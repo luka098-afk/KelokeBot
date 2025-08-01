@@ -1,22 +1,24 @@
-// Comando .reglas
-handler.help = ['reglas'];
-handler.tags = ['group'];
-handler.command = /^(reglas)$/i;
-handler.group = true;
+let handler = async (m, { conn, participants }) => {
+  if (!m.isGroup) {
+    return m.reply('❌ Este comando solo funciona en grupos.');
+  }
 
-handler.handler = async (m, { conn, isAdmin, isBotAdmin }) => {
   try {
-    const metadata = await conn.groupMetadata(m.chat);
-    const reglas = metadata.desc || 'Este grupo no tiene reglas establecidas.';
-    
-    await conn.sendMessage(m.chat, {
-      text: `📜 *Reglas del grupo:*\n\n${reglas}`,
-      mentions: [m.sender]
-    });
+    let groupMeta = await conn.groupMetadata(m.chat);
+    let desc = groupMeta.desc;
+
+    if (!desc) {
+      return m.reply('📜 *Reglas del grupo:*\nEste grupo no tiene una descripción configurada.');
+    }
+
+    return m.reply(`📜 *Reglas del grupo:*\n${desc}`);
   } catch (e) {
-    console.error('Error obteniendo reglas:', e);
-    await m.reply('❌ Error al obtener las reglas del grupo.');
+    console.error(e);
+    return m.reply('❌ No se pudo obtener la descripción del grupo.');
   }
 };
+
+handler.command = /^reglas$/i;
+handler.group = true;
 
 export default handler;
