@@ -103,108 +103,114 @@ let handler = async (m, { conn, usedPrefix, __dirname, participants }) => {
     })
 
     const body = `
-Bienvenido a 𝗞𝗲𝗹𝗼𝗸𝗲𝗕𝗼𝘁
-${saludo}, *${taguser}*!
-╔═══════ ⛓️ 𝐊𝐞𝐥𝐨𝐤𝐞𝐁𝐨𝐭 ⛓️ ═══════╗
-┃    𝙷𝚘𝚕𝚊, 𝚜𝚘𝚢 𝚝𝚞 𝚊𝚜𝚒𝚜𝚝𝚎𝚗𝚝𝚎 𝚣𝚘𝚖𝚋𝚒𝚎 🧟‍♂️    ┃
-┃        Usuario: *${taguser}*         ┃
-┃         Fecha: *${date}*          ┃
-┃        Uptime: *${uptime}*         ┃
-┃  Estado: en desarrollo oscuro... 🩸  ┃
-╚═══════════════════════════════════╝
-*【𝕷 𝖎 𝖘 𝖙 𝖆 - 𝕯𝖊 - 𝕮 𝖔 𝖒 𝖆 𝖓 𝖉 𝖔 𝖘】*
-
-┝🩸 ${usedPrefix}idea <texto> - Envía tu idea a los Owners ☠️🧠
-
-◈───≼ 🧟‍♀️ _*DESCARGAS*_ 🧟‍♀️ ≽──⊚
-🕷️┝⎆ [ ${usedPrefix}tiktok <link> - Descargar video TT
-🕷️┝⎆ [ ${usedPrefix}play <nombre> - Descargar canción
-🕸️┝⎆ [ ${usedPrefix}pindl <link> - Descargar imagen Pinterest
-🕷️┝⎆ [ ${usedPrefix}instagram <link> - Descargar de IG
-🕷️┝⎆ [ ${usedPrefix}facebook <link> - Descargar video FB
-🕷️┝⎆ [ ${usedPrefix}spotify <canción> - Descargar en Spotify
-◈┄──━━┉─࿂
-
-◈───≼ 🕸️ _*BUSCADORES*_ 🕸️ ≽──⊚
-🕷️┝⎆ [ ${usedPrefix}pinterest <texto> - Buscar imágenes
-🕷️┝⎆ [ ${usedPrefix}aptoide <app> - Buscar APK
-🕷️┝⎆ [ ${usedPrefix}ssweb <texto> - Buscar páginas
-◈┄──━━┉─࿂
-
-◈───≼ ⚰️ _*ADMINS*_ ⚰️ ≽──⊚
-🩸┝⎆ [ ${usedPrefix}ht <texto> - Mención masiva
-🩸┝⎆ [ ${usedPrefix}advertencia <@tag> <texto> - Advertencia
-🕸️┝⎆ [ ${usedPrefix}g - Abrir/Cerrar grupo
-🕷️┝⎆ [ ${usedPrefix}tagall - Mencionar a todos
-🕷️┝⎆ [ ${usedPrefix}setppgrupo <img> - Cambiar foto grupo
-🩸┝⎆ [ ${usedPrefix}k <@tag> - Expulsar miembro
-🩸┝⎆ [ ${usedPrefix}del - Eliminar mensaje
-🩸┝⎆ [ ${usedPrefix}p <@tag> - Dar admin
-🩸┝⎆ [ ${usedPrefix}d <@tag> - Quitar admin
-🧟‍♂️┝⎆ [ ${usedPrefix}autoadmin - El bot te da admin
-☠️┝⎆ [ ${usedPrefix}banuser @tag - Banea al etiquetado
-✨┝⎆ [ ${usedPrefix}unbanuser @tag - Desbanea al etiquetado
-┝⎆ [ ${usedPrefix}listban - ⚰️ Lista Negra de los Condenados💀
-👁️‍🗨️┝⎆ [ ${usedPrefix}detect on/off - Detecta acciones hechas por admins
-🕸️┝⎆ [ ${usedPrefix}ruletaban @tag ] - 𝕽𝖚𝖑𝖊𝖙𝖆 𝕬𝖑𝖊𝖆𝖙𝖔𝖗𝖎𝖆 ☠️
-🩸┝⎆ [ ${usedPrefix}link - Obtiene el link del grupo
-◈┄──━━┉─࿂
-
-◈───≼ 🧟‍♂️ _*OWNER*_ 🧟‍♂️ ≽──⊚
-🕷️┝⎆ [ ${usedPrefix}reiniciar - Reiniciar bot
-🕸️┝⎆ [ ${usedPrefix}setname <nombre> - Cambiar nombre bot
-🕸️┝⎆ [ ${usedPrefix}setpp <img> - Cambiar foto bot
-🕷️┝⎆ [ ${usedPrefix}restart - Reinicio manual
-🕷️┝⎆ [ ${usedPrefix}update - Actualizar bot
-◈┄──━━┉─࿂
-
-◈───≼ 🕸️ _*HERRAMIENTAS*_ 🕸️ ≽──⊚
-🩸┝⎆ [ ${usedPrefix}s <img> - Crear sticker
-🩸┝⎆ [ ${usedPrefix}brat <texto> - Sticker brat style
-🕷️┝⎆ [ ${usedPrefix}rvocal <audio> - Cambiar voz
-🕷️┝⎆ [ ${usedPrefix}tourl2 <img> - Convertir en URL
-🕷️┝⎆ [ ${usedPrefix}hd <imagen> - Mejorar calidad
-🕷️┝⎆ [ ${usedPrefix}tourl <imagen> - Imagen a enlace
-┝⎆ [ ${usedPrefix}reportar <texto> - 🕷️ Invoca a los 𝔄𝔡𝔪𝔦𝔫𝔰 del más allá 🩸
-🧟┝⎆ [ ${usedPrefix}perfil - Ver perfil grupo
-◈┄──━━┉─࿂
-
-◈───≼ 🧟 _*FUN*_ 🧟 ≽──⊚
-🕷️┝⎆ [ ${usedPrefix}kiss - Enviar beso
-🕷️┝⎆ [ ${usedPrefix}top <texto> - Ranking divertido
-🕸️┝⎆ [ ${usedPrefix}gay - Porcentaje gay
-🕷️┝⎆ [ ${usedPrefix}pajeame - Joda sexual
-🕷️┝⎆ [ ${usedPrefix}doxeo @usuario - Info falsa divertida
-🕷️┝⎆ [ ${usedPrefix}doxiing @usuario - Doxeo random
-🕸️┝⎆ [ ${usedPrefix}formarpareja - Crea una pareja
-🕸️┝⎆ [ ${usedPrefix}formarpareja5 - Crea pareja 5.0
-🎃┝⎆ [ ${usedPrefix}sortear - Sorteo al azar entre mortales
-🩸┝⎆ [ ${usedPrefix}sorpresa - ¿quieres saber el secreto?☠️
-◈┄──━━┉─࿂
-
-◈───≼ 🕷️ _*MAIN & RPG*_ 🕷️ ≽──⊚
-🕷️┝⎆ [ ${usedPrefix}juegos - Juegos disponibles
-🕸️┝⎆ [ ${usedPrefix}ping - Velocidad del bot
-🕷️┝⎆ [ ${usedPrefix}grupos - Lista de grupos
-🕷️┝⎆ [ ${usedPrefix}owner - Info del owner
-◈┄──━━┉─࿂
-
-◈───≼ 🧟‍♂️ _*IA & ARTE*_ 🧟‍♂️ ≽──⊚
-🕸️┝⎆ [ ${usedPrefix}magicstudio <texto> - Generar imagen
-🕷️┝⎆ [ ${usedPrefix}bot <texto> - Chat IA
-🕷️┝⎆ [ ${usedPrefix}editfoto <descripción> - Editar foto IA
-🕷️┝⎆ [ ${usedPrefix}wpw - Wallpaper random
-🕷️┝⎆ [ ${usedPrefix}gemini <texto> - Gemini IA
-🕷️┝⎆ [ ${usedPrefix}bgremover <imagen> - Quitar fondo
-◈┄──━━┉─࿂
-
-◈───≼ ☠️ _*NSFW*_ ☠️ ≽──⊚
-🩸┝⎆ [ ${usedPrefix}penetrar - Acción explícita
-🕸️┝⎆ [ ${usedPrefix}huevo - Agarrarle el huevo a alguien
-🕷️┝⎆ [ ${usedPrefix}sexo - Acción sexual
-🕷️┝⎆ [ ${usedPrefix}violar - Contenido fuerte
-🕷️┝⎆ [ ${usedPrefix}follar - Simulación sexual
-◈┄──━━┉─࿂
+╓═══════════════════════⧖⧖⧖═══════════════════════╖
+║                  [ PRØY3CTØ  ]                  ║
+║               ↯ ↯ ↯ ↯ ↯ ↯ ↯ ↯ ↯ ↯               ║
+║             SYS$CORE: DE5TABILIZADO               ║
+╟──────────────▄▄▄▄▄▄▄▄▄▄▄▄▄▄──────────────╢
+║ Bienvenido a 𝗞𝗲𝗹𝗼𝗸𝗲𝗕𝗼𝘁                             ║
+║ ${saludo}, *${taguser}*!                             ║
+║ ╔═══════ ⛓️ 𝐊𝐞𝐥𝐨𝐤𝐞𝐁𝐨𝐭 ⛓️ ═══════╗                   ║
+║ ┃    𝙷𝚘𝚕𝚊, 𝚜𝚘𝚢 𝚝𝚞 𝚊𝚜𝚒𝚜𝚝𝚎𝚗𝚝𝚎 𝚣𝚘𝚖𝚋𝚒𝚎 👻    ┃ ║
+║ ┃        Usuario: *${taguser}*             ┃ ║
+║ ┃         Fecha: *${date}*              ┃ ║
+║ ┃        Uptime: *${uptime}*             ┃ ║
+║ ┃  Estado: en desarrollo... ⚡           ┃ ║
+║ ╚═════════════════════════════════════╝ ║
+║ *【𝕷 𝖎 𝖘 𝖙 𝖆 - 𝕯𝖊 - 𝕮 𝖔 𝖒 𝖆 𝖓 𝖉 𝖔 𝖘】*               ║
+║                                                 ║
+║ ┝🔥 ${usedPrefix}idea <texto> - Envía tu idea a los Owners 💡 ║
+║                                                 ║
+║ ◈───≼ 🎯 _*DESCARGAS*_ 🎯 ≽──⊚                   ║
+║ 🕹️┝⎆ [ ${usedPrefix}tiktok <link> - Descargar video TT           ║
+║ 🕹️┝⎆ [ ${usedPrefix}play <nombre> - Descargar canción             ║
+║ 🖼️┝⎆ [ ${usedPrefix}pindl <link> - Descargar imagen Pinterest     ║
+║ 📸┝⎆ [ ${usedPrefix}instagram <link> - Descargar de IG            ║
+║ 📹┝⎆ [ ${usedPrefix}facebook <link> - Descargar video FB          ║
+║ 🎵┝⎆ [ ${usedPrefix}spotify <canción> - Descargar en Spotify      ║
+║ ◈┄──━━┉─࿂                                          ║
+║                                                 ║
+║ ◈───≼ 🔍 _*BUSCADORES*_ 🔍 ≽──⊚                   ║
+║ 🖼️┝⎆ [ ${usedPrefix}pinterest <texto> - Buscar imágenes           ║
+║ 📲┝⎆ [ ${usedPrefix}aptoide <app> - Buscar APK                    ║
+║ 🌐┝⎆ [ ${usedPrefix}ssweb <texto> - Buscar páginas                ║
+║ ◈┄──━━┉─࿂                                          ║
+║                                                 ║
+║ ◈───≼ 🛡️ _*ADMINS*_ 🛡️ ≽──⊚                       ║
+║ 🔔┝⎆ [ ${usedPrefix}ht <texto> - Mención masiva                   ║
+║ ⚠️┝⎆ [ ${usedPrefix}advertencia <@tag> <texto> - Advertencia      ║
+║ 🔒┝⎆ [ ${usedPrefix}g - Abrir/Cerrar grupo                       ║
+║ 📣┝⎆ [ ${usedPrefix}tagall - Mencionar a todos                   ║
+║ 🖼️┝⎆ [ ${usedPrefix}setppgrupo <img> - Cambiar foto grupo        ║
+║ ❌┝⎆ [ ${usedPrefix}k <@tag> - Expulsar miembro                   ║
+║ 🗑️┝⎆ [ ${usedPrefix}del - Eliminar mensaje                        ║
+║ ✅┝⎆ [ ${usedPrefix}p <@tag> - Dar admin                          ║
+║ 🚫┝⎆ [ ${usedPrefix}d <@tag> - Quitar admin                       ║
+║ 🛠️┝⎆ [ ${usedPrefix}autoadmin - El bot te da admin               ║
+║ ☠️┝⎆ [ ${usedPrefix}banuser @tag - Banea al etiquetado            ║
+║ ✨┝⎆ [ ${usedPrefix}unbanuser @tag - Desbanea al etiquetado       ║
+║ 📋┝⎆ [ ${usedPrefix}listban - ⚰️ Lista Negra de los Condenados💀  ║
+║ 👁️┝⎆ [ ${usedPrefix}detect on/off - Detecta acciones hechas por admins ║
+║ 🎲┝⎆ [ ${usedPrefix}ruletaban @tag ] - 𝕽𝖚𝖑𝖊𝖙𝖆 𝕬𝖑𝖊𝖆𝖙𝖔𝖗𝖎𝖆 ☠️             ║
+║ 🔗┝⎆ [ ${usedPrefix}link - Obtiene el link del grupo               ║
+║ ◈┄──━━┉─࿂                                          ║
+║                                                 ║
+║ ◈───≼ 🧙‍♂️ _*OWNER*_ 🧙‍♂️ ≽──⊚                        ║
+║ 🕹️┝⎆ [ ${usedPrefix}reiniciar - Reiniciar bot                   ║
+║ 🖋️┝⎆ [ ${usedPrefix}setname <nombre> - Cambiar nombre bot        ║
+║ 🖼️┝⎆ [ ${usedPrefix}setpp <img> - Cambiar foto bot              ║
+║ 🔄┝⎆ [ ${usedPrefix}restart - Reinicio manual                   ║
+║ ⬆️┝⎆ [ ${usedPrefix}update - Actualizar bot                      ║
+║ ◈┄──━━┉─࿂                                          ║
+║                                                 ║
+║ ◈───≼ 🧰 _*HERRAMIENTAS*_ 🧰 ≽──⊚                     ║
+║ 🖼️┝⎆ [ ${usedPrefix}s <img> - Crear sticker                      ║
+║ 🎨┝⎆ [ ${usedPrefix}brat <texto> - Sticker brat style            ║
+║ 🎤┝⎆ [ ${usedPrefix}rvocal <audio> - Cambiar voz                ║
+║ 🔗┝⎆ [ ${usedPrefix}tourl2 <img> - Convertir en URL             ║
+║ 🔍┝⎆ [ ${usedPrefix}hd <imagen> - Mejorar calidad               ║
+║ 🔗┝⎆ [ ${usedPrefix}tourl <imagen> - Imagen a enlace            ║
+║ 📝┝⎆ [ ${usedPrefix}reportar <texto> - Invoca a los Admins       ║
+║ 🧙┝⎆ [ ${usedPrefix}perfil - Ver perfil grupo                    ║
+║ ◈┄──━━┉─࿂                                          ║
+║                                                 ║
+║ ◈───≼ 🎉 _*FUN*_ 🎉 ≽──⊚                           ║
+║ 💋┝⎆ [ ${usedPrefix}kiss - Enviar beso                        ║
+║ 🏆┝⎆ [ ${usedPrefix}top <texto> - Ranking divertido           ║
+║ 🏳️┝⎆ [ ${usedPrefix}gay - Porcentaje gay                      ║
+║ 🍆┝⎆ [ ${usedPrefix}pajeame - Joda sexual                     ║
+║ 🤡┝⎆ [ ${usedPrefix}doxeo @usuario - Info falsa divertida     ║
+║ 🎭┝⎆ [ ${usedPrefix}doxiing @usuario - Doxeo random          ║
+║ 💑┝⎆ [ ${usedPrefix}formarpareja - Crea una pareja            ║
+║ 💞┝⎆ [ ${usedPrefix}formarpareja5 - Crea pareja 5.0           ║
+║ 🎲┝⎆ [ ${usedPrefix}sortear - Sorteo al azar entre mortales   ║
+║ 🎁┝⎆ [ ${usedPrefix}sorpresa - ¿quieres saber el secreto?     ║
+║ ◈┄──━━┉─࿂                                          ║
+║                                                 ║
+║ ◈───≼ 🎮 _*MAIN & RPG*_ 🎮 ≽──⊚                       ║
+║ 🎲┝⎆ [ ${usedPrefix}juegos - Juegos disponibles              ║
+║ ⚡┝⎆ [ ${usedPrefix}ping - Velocidad del bot                  ║
+║ 📋┝⎆ [ ${usedPrefix}grupos - Lista de grupos                  ║
+║ 🧙‍♂️┝⎆ [ ${usedPrefix}owner - Info del owner                    ║
+║ ◈┄──━━┉─࿂                                          ║
+║                                                 ║
+║ ◈───≼ 🎨 _*IA & ARTE*_ 🎨 ≽──⊚                           ║
+║ 🖌️┝⎆ [ ${usedPrefix}magicstudio <texto> - Generar imagen      ║
+║ 🤖┝⎆ [ ${usedPrefix}bot <texto> - Chat IA                    ║
+║ 🖼️┝⎆ [ ${usedPrefix}editfoto <descripción> - Editar foto IA   ║
+║ 🖼️┝⎆ [ ${usedPrefix}wpw - Wallpaper random                   ║
+║ 🌌┝⎆ [ ${usedPrefix}gemini <texto> - Gemini IA               ║
+║ 🖼️┝⎆ [ ${usedPrefix}bgremover <imagen> - Quitar fondo         ║
+║ ◈┄──━━┉─࿂                                          ║
+║                                                 ║
+║ ◈───≼ ⚠️ _*NSFW*_ ⚠️ ≽──⊚                           ║
+║ ❌┝⎆ [ ${usedPrefix}penetrar - Acción explícita              ║
+║ 🥚┝⎆ [ ${usedPrefix}huevo - Agarrarle el huevo a alguien     ║
+║ 🔥┝⎆ [ ${usedPrefix}sexo - Acción sexual                     ║
+║ 🚫┝⎆ [ ${usedPrefix}violar - Contenido fuerte               ║
+║ 💦┝⎆ [ ${usedPrefix}follar - Simulación sexual               ║
+║ ◈┄──━━┉─࿂                                          ║
+╚═══════⧗⧗⧗ SYSTEM FAIL ═══╝
 `.trim()
 
     // Unir header + body
