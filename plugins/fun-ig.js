@@ -4,57 +4,63 @@ import { join } from 'path'
 import { fileTypeFromBuffer } from 'file-type'
 
 let handler = async (m, { conn, text }) => {
-  if (!text) return m.reply('⚠️ Por favor escribe el nombre de usuario de Instagram.\nEjemplo: .ig felipebaliski')
+  if (!text) return m.reply('⚠️ Escribe el nombre de usuario de Instagram. Ejemplo: .ig chesterbe')
+
+  // Eliminar @ si el usuario lo pone
+  text = text.replace(/^@/, '').trim()
 
   try {
-    let res = await fetch(`https://www.instagram.com/${text}/`, {
+    const perfilUrl = `https://www.instagram.com/${text}/`
+    const res = await fetch(perfilUrl, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
-        'Accept': 'text/html,application/xhtml+xml',
-        'Accept-Language': 'en-US,en;q=0.5',
-        'Connection': 'keep-alive'
+        'Accept': 'text/html',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Referer': 'https://www.google.com/'
       }
     })
 
-    if (!res.ok) throw new Error(`HTTP ${res.status}: Usuario no encontrado o perfil no accesible`)
-    let html = await res.text()
-    if (!html || html.length < 100) throw new Error('Respuesta vacía o inválida de Instagram')
+    if (!res.ok) throw new Error(`HTTP ${res.status} - No se pudo acceder al perfil`)
 
-    // Buscar la URL de la imagen de perfil
-    let imageMatch = html.match(/<meta property="og:image" content="(.*?)"/)
-    let fotoPerfil = imageMatch ? imageMatch[1] : null
-    if (!fotoPerfil) throw new Error('No se pudo obtener la foto de perfil')
+    const html = await res.text()
+    if (!html || html.length < 200) throw new Error('Contenido vacío o inválido.')
+
+    // Intentar extraer la URL de la imagen desde el JSON embebido (más confiable)
+    let imageMatch = html.match(/"profile_pic_url_hd":"([^"]+)"/) || html.match(/<meta property="og:image" content="(.*?)"/)
+    if (!imageMatch) throw new Error('No se encontró imagen de perfil.')
+
+    let fotoPerfil = imageMatch[1].replace(/\\u0026/g, '&')
 
     // Descargar imagen
-    let buffer = await fetch(fotoPerfil).then(res => res.buffer())
-    let tipo = await fileTypeFromBuffer(buffer)
-    let ext = tipo?.ext || 'jpg'
-    let filename = join('./tmp', `igpf_${text}.${ext}`)
+    const buffer = await fetch(fotoPerfil).then(res => res.buffer())
+    const tipo = await fileTypeFromBuffer(buffer)
+    const ext = tipo?.ext || 'jpg'
+    const filename = join('./tmp', `igpf_${text}.${ext}`)
 
     await writeFile(filename, buffer)
 
-    let message = `
+    const caption = `
 📸 *Instagram:* https://instagram.com/${text}
 🔍 *Usuario:* @${text}
-🖼️ *Foto de perfil:*
+🖼️ *Foto de perfil descargada:*
     `.trim()
 
     await conn.sendMessage(m.chat, {
       image: { url: filename },
-      caption: message
+      caption
     }, { quoted: m })
 
   } catch (e) {
-    console.error('Error detallado:', e.message)
+    console.error('[❌ ERROR .ig]', e.message)
 
-    let errorMessage = `
+    const errorMessage = `
 ❌ No se pudo obtener el perfil de @${text}
 
-🔍 Asegúrate de que:
-• El nombre de usuario sea correcto
-• El perfil no esté restringido o eliminado
+🔍 Verifica que:
+• El nombre de usuario exista
+• El perfil esté disponible públicamente
 
-🔗 Enlace: https://instagram.com/${text}
+🔗 https://instagram.com/${text}
     `.trim()
 
     m.reply(errorMessage)
