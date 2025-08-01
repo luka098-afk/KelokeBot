@@ -1,95 +1,66 @@
-import fetch from "node-fetch"
-import yts from "yt-search"
-
-const emoji = "🎵"
-const rwait = "⏳"
-const done = "✅"
-const error = "❌"
+import fetch from 'node-fetch';
+import yts from 'yt-search';
 
 const handler = async (m, { conn, text, usedPrefix, command }) => {
-  try {
-    if (!text) {
-      return conn.reply(m.chat, `${emoji} *YouTube Video Downloader*\n\n📝 *Uso:* ${usedPrefix + command} <enlace o nombre>\n💡 *Ejemplo:* ${usedPrefix + command} despacito`, m)
-    }
-
-    await m.react(rwait)
-
-    let videoInfo, urlYt
-    const isYoutubeUrl = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+$/.test(text)
-
-    if (isYoutubeUrl) {
-      const id = text.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/))([^\s&]+)/)?.[1]
-      if (!id) throw new Error('No se pudo extraer el ID del video')
-      const result = await yts({ videoId: id })
-      videoInfo = result
-      urlYt = text
-    } else {
-      const search = await yts(text)
-      if (!search?.videos?.length) throw new Error('No se encontraron resultados')
-      videoInfo = search.videos[0]
-      urlYt = videoInfo.url
-    }
-
-    const { title, timestamp, author = {}, views, ago, thumbnail } = videoInfo
-    const canal = author.name || 'Desconocido'
-    const vistas = views.toLocaleString('es-ES')
-
-    const res = await fetch(`https://api.stellarwa.xyz/api/download/ytmp4?url=${encodeURIComponent(urlYt)}`, {
-      headers: {
-        'Authorization': 'stellar-nzBMWh9P'
-      }
-    })
-
-    if (!res.ok) throw new Error(`API error (${res.status})`)
-    const json = await res.json()
-
-    const downloadUrl = json?.result?.url
-    if (!downloadUrl || !downloadUrl.startsWith('http')) throw new Error('Enlace de descarga inválido')
-
-    await conn.sendMessage(m.chat, {
-      video: { url: downloadUrl },
-      fileName: `${title.replace(/[^\w\s]/gi, '')}.mp4`,
-      mimetype: "video/mp4",
-      caption:
-        `🎬 *${title}*\n` +
-        `⏱️ *Duración:* ${timestamp}\n` +
-        `👤 *Canal:* ${canal}\n` +
-        `👁️ *Vistas:* ${vistas}\n` +
-        `🗓️ *Publicado:* ${ago}\n` +
-        `🔗 *Link:* ${urlYt}`,
-      contextInfo: {
-        externalAdReply: {
-          title,
-          body: `Por: ${canal}`,
-          thumbnailUrl: thumbnail,
-          mediaType: 2,
-          sourceUrl: urlYt
-        }
-      }
-    }, { quoted: m })
-
-    await m.react(done)
-
-  } catch (e) {
-    console.error('❌ Error en .play2:', e)
-    await m.react(error)
-
-    let msg = "❌ *No se pudo descargar el video.*"
-    if (e.message.includes('No se encontraron')) {
-      msg = "🔍 *No se encontraron resultados.*"
-    } else if (e.message.includes('timeout')) {
-      msg = "⏰ *Tiempo agotado.*"
-    } else if (e.message.includes('API')) {
-      msg = "⚠️ *Error en la API.* Verifica tu clave."
-    }
-    m.reply(`${msg}\n\n*Detalles:* ${e.message}`)
+  if (!text) {
+    return m.reply(`📽️ *Uso:* ${usedPrefix + command} <nombre o link de YouTube>`);
   }
-}
 
-handler.help = ['play2 <enlace o nombre>']
-handler.command = ['play2']
-handler.tags = ['descargas']
-handler.limit = true
-handler.register = true
+  await m.react("⏳");
 
-export default handler
+  let video, url;
+  const isUrl = /(youtube\.com|youtu\.be)/i.test(text);
+
+  if (isUrl) {
+    url = text;
+  } else {
+    const search = await yts(text);
+    if (!search?.videos?.length) {
+      await m.react("❌");
+      return m.reply("⚠️ No se encontraron resultados.");
+    }
+    video = search.videos[0];
+    url = video.url;
+  }
+
+  try {
+    const api = `https://api.stellarwa.xyz/dow/ytmp4?url=${encodeURIComponent(url)}`;
+    const res = await fetch(api);
+    const json = await res.json();
+
+    if (!json?.url) throw new Error("No se obtuvo una URL de descarga válida.");
+
+    const title = video?.title || json.title || "Video";
+    const thumbnail = video?.thumbnail || null;
+    const canal = video?.author?.name || "YouTube";
+
+    // Mostrar solo una imagen con descripción
+    await conn.sendMessage(m.chat, {
+      image: { url: thumbnail },
+      caption:
+        `🎬 *${title}*\n📺 *Canal:* ${canal}\n\n⏳ *Descargando video...*`,
+    }, { quoted: m });
+
+    // Enviar el video descargado
+    await conn.sendMessage(m.chat, {
+      video: { url: json.url },
+      fileName: `${title.replace(/[^\w\s]/gi, '')}.mp4`,
+      mimetype: 'video/mp4',
+      caption: `✅ *Video descargado correctamente*\n\n🎥 *${title}*\n🔗 ${url}`,
+    }, { quoted: m });
+
+    await m.react("✅");
+
+  } catch (err) {
+    console.error(err);
+    await m.react("❌");
+    m.reply(`❌ Ocurrió un error al descargar.\n\n🔍 Detalles:\n${err.message}`);
+  }
+};
+
+handler.help = ['play2 <nombre o link>'];
+handler.command = ['play2'];
+handler.tags = ['descargas'];
+handler.limit = true;
+
+export default handler;
