@@ -2,30 +2,26 @@ import fetch from 'node-fetch';
 
 let handler = async (m, { args, usedPrefix, command }) => {
   const username = (args[0] || '').replace(/^@/, '').trim();
-  if (!username) return m.reply(`📸 *Uso del comando:*\n${usedPrefix + command} @usuario_ig`);
+  if (!username) return m.reply(`📸 Uso:\n${usedPrefix + command} @usuario_ig`);
 
   try {
-    const apiUrl = `https://www.save-free.com/es/profile-downloader/?q=${username}`;
-    const html = await fetch(apiUrl, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
-        'Accept-Language': 'es-ES,es;q=0.9'
-      }
-    }).then(res => res.text());
+    const res = await fetch(`https://www.instagram.com/${username}/`, {
+      headers: { 'User-Agent': 'Mozilla/5.0', 'Accept-Language': 'es' }
+    });
+    const html = await res.text();
 
-    const imgMatch = html.match(/<img[^>]+src="([^"]+)"[^>]*class="profile-picture-img"/i);
-    if (!imgMatch || !imgMatch[1]) {
-      return m.reply(`❌ No se pudo obtener la imagen de perfil de @${username}.\n\n🔗 https://instagram.com/${username}`);
-    }
+    const img = html.match(/"profile_pic_url_hd":"([^"]+)"/)?.[1]?.replace(/\\u0026/g, '&');
+    if (!img) throw new Error('No se encontró imagen');
 
-    const imageUrl = imgMatch[1];
+    const imgRes = await fetch(img);
+    if (!imgRes.ok) throw new Error('Error al descargar');
 
-    const buffer = await fetch(imageUrl).then(res => res.buffer());
-
-    await conn.sendFile(m.chat, buffer, 'perfil.jpg', `📸 *Foto de perfil de* @${username}\n🔗 https://instagram.com/${username}`, m);
+    const buffer = await imgRes.buffer();
+    await conn.sendFile(m.chat, buffer, 'perfil.jpg',
+      `📸 Foto de perfil de @${username}\n🔗 https://instagram.com/${username}`, m);
   } catch (e) {
     console.error(e);
-    m.reply(`❌ Error al obtener el perfil de @${username}\n\n🔗 https://instagram.com/${username}`);
+    m.reply(`❌ No se pudo obtener la imagen de perfil de @${username}\n🔗 https://instagram.com/${username}`);
   }
 };
 
