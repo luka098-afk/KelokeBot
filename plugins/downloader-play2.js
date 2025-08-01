@@ -1,66 +1,114 @@
-import fetch from 'node-fetch';
+import fetch from "node-fetch";
+import axios from 'axios';
 import yts from 'yt-search';
 
-const handler = async (m, { conn, text, usedPrefix, command }) => {
-  if (!text) {
-    return m.reply(`📽️ *Uso:* ${usedPrefix + command} <nombre o link de YouTube>`);
-  }
-
-  await m.react("⏳");
-
-  let video, url;
-  const isUrl = /(youtube\.com|youtu\.be)/i.test(text);
-
-  if (isUrl) {
-    url = text;
-  } else {
-    const search = await yts(text);
-    if (!search?.videos?.length) {
-      await m.react("❌");
-      return m.reply("⚠️ No se encontraron resultados.");
-    }
-    video = search.videos[0];
-    url = video.url;
-  }
-
+const handler = async (m, { conn, text }) => {
   try {
-    const api = `https://api.stellarwa.xyz/dow/ytmp4?url=${encodeURIComponent(url)}`;
-    const res = await fetch(api);
-    const json = await res.json();
+    if (!text) {
+      return conn.reply(m.chat, `📥 Ingresa un link o nombre de YouTube.`, m);
+    }
 
-    if (!json?.url) throw new Error("No se obtuvo una URL de descarga válida.");
+    m.react('⏱️');
 
-    const title = video?.title || json.title || "Video";
-    const thumbnail = video?.thumbnail || null;
-    const canal = video?.author?.name || "YouTube";
+    let videoInfo, urlYt;
 
-    // Mostrar solo una imagen con descripción
+    const isYoutubeUrl = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+$/.test(text);
+
+    if (isYoutubeUrl) {
+      const id = text.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/))([^\s&]+)/)?.[1];
+      if (!id) return m.reply(`⚠️ No se pudo extraer el ID del video.`);
+      const result = await yts({ videoId: id });
+      videoInfo = result;
+      urlYt = text;
+    } else {
+      const search = await yts(text);
+      if (!search?.videos?.length) {
+        return conn.reply(m.chat, `⚠️ No se encontraron resultados para: *${text}*`, m);
+      }
+      videoInfo = search.videos[0];
+      urlYt = videoInfo.url;
+    }
+
+    const {
+      title = 'Sin título',
+      timestamp = 'Desconocido',
+      author = {},
+      views = 0,
+      ago = 'Desconocido',
+      url = urlYt,
+      thumbnail
+    } = videoInfo;
+
+    const canal = author.name || 'Desconocido';
+    const vistas = views.toLocaleString('es-PE');
+
+    // PETICIÓN A STELLARWA
+    const { data } = await axios.get(`https://api.stellarwa.xyz/dow/ytmp4?url=${encodeURIComponent(url)}`, {
+      headers: {
+        'Authorization': 'stellar-nzBMWh9P'
+      }
+    });
+
+    if (!data?.status || !data?.data?.dl) {
+      throw new Error("No se pudo obtener el enlace de descarga.");
+    }
+
+    const videoUrl = data.data.dl;
+    const size = await getSize(videoUrl);
+    const sizeStr = size ? await formatSize(size) : 'Desconocido';
+
+    const textoInfo =
+      `🎬 *YOUTUBE - MP4*\n\n` +
+      `📌 *Título:* ${title}\n` +
+      `⏱️ *Duración:* ${timestamp}\n` +
+      `👤 *Canal:* ${canal}\n` +
+      `👁️ *Vistas:* ${vistas}\n` +
+      `🗓️ *Publicado:* ${ago}\n` +
+      `💾 *Tamaño:* ${sizeStr}\n` +
+      `🔗 *Link:* ${url}`;
+
     await conn.sendMessage(m.chat, {
       image: { url: thumbnail },
-      caption:
-        `🎬 *${title}*\n📺 *Canal:* ${canal}\n\n⏳ *Descargando video...*`,
+      caption: textoInfo
     }, { quoted: m });
 
-    // Enviar el video descargado
-    await conn.sendMessage(m.chat, {
-      video: { url: json.url },
-      fileName: `${title.replace(/[^\w\s]/gi, '')}.mp4`,
-      mimetype: 'video/mp4',
-      caption: `✅ *Video descargado correctamente*\n\n🎥 *${title}*\n🔗 ${url}`,
-    }, { quoted: m });
+    const videoBuffer = await fetch(videoUrl).then(res => res.buffer());
+    await conn.sendFile(m.chat, videoBuffer, `${title}.mp4`, '', m);
 
-    await m.react("✅");
+    m.react('✅');
 
-  } catch (err) {
-    console.error(err);
-    await m.react("❌");
-    m.reply(`❌ Ocurrió un error al descargar.\n\n🔍 Detalles:\n${err.message}`);
+  } catch (e) {
+    console.error(e);
+    m.reply(`❌ Error:\n${e.message}`);
   }
 };
 
-handler.help = ['play2 <nombre o link>'];
-handler.command = ['play2'];
+handler.help = ['ytmp4 <link o nombre>'];
+handler.command = ['ytmp4'];
 handler.tags = ['descargas'];
-handler.limit = true;
 
 export default handler;
+
+// Funciones auxiliares
+async function formatSize(bytes) {
+  const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+  let i = 0;
+  if (!bytes || isNaN(bytes)) return 'Desconocido';
+  while (bytes >= 1024 && i < units.length - 1) {
+    bytes /= 1024;
+    i++;
+  }
+  return `${bytes.toFixed(2)} ${units[i]}`;
+}
+
+async function getSize(url) {
+  try {
+    const response = await axios.head(url);
+    return response.headers['content-length']
+      ? parseInt(response.headers['content-length'], 10)
+      : null;
+  } catch (error) {
+    console.error("Error al obtener el tamaño:", error.message);
+    return null;
+  }
+}
