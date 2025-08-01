@@ -1,116 +1,170 @@
 import fs from 'fs'
 
 const handler = async (m, { conn }) => {
-  // Cargar lista negra
-  let blacklist = []
   try {
-    const data = fs.readFileSync('./database/listanegra.json', 'utf8')
-    blacklist = JSON.parse(data)
+    // Debug: mostrar información del mensaje
+    console.log('=== DEBUG AUTO-KICK ===')
+    console.log('messageStubType:', m.messageStubType)
+    console.log('isGroup:', m.isGroup)
+    console.log('sender:', m.sender)
+    console.log('chat:', m.chat)
+    console.log('messageStubParameters:', m.messageStubParameters)
+    
+    // Cargar lista negra
+    let blacklist = []
+    try {
+      const data = fs.readFileSync('./database/listanegra.json', 'utf8')
+      blacklist = JSON.parse(data)
+      console.log('Lista negra cargada:', blacklist.length, 'usuarios')
+    } catch (error) {
+      console.log('Error cargando lista negra:', error.message)
+      return
+    }
+
+    if (!blacklist.length) {
+      console.log('Lista negra vacía')
+      return
+    }
+
+    // CASO 1: Eventos de grupo (uniones, solicitudes)
+    if (m.messageStubType) {
+      console.log('Procesando evento de grupo...')
+      
+      const joinEvents = [27, 28, 31] // agregado por admin, unión por enlace, solicitud aceptada
+      const requestEvent = 30 // solicitud de unión
+      
+      if (joinEvents.includes(m.messageStubType)) {
+        console.log('Evento de unión detectado')
+        const participants = m.messageStubParameters || []
+        
+        if (!participants.length) {
+          console.log('No hay participantes en el evento')
+          return
+        }
+
+        for (let user of participants) {
+          console.log('Verificando usuario:', user)
+          const blockedUser = blacklist.find(u => u.jid === user)
+          
+          if (blockedUser) {
+            console.log('Usuario encontrado en lista negra:', user)
+            
+            try {
+              // Esperar un momento antes de expulsar
+              await new Promise(resolve => setTimeout(resolve, 1000))
+              
+              const result = await conn.groupParticipantsUpdate(m.chat, [user], 'remove')
+              console.log('Resultado de expulsión:', result)
+              
+              const message = `🚫 *USUARIO EXPULSADO*\n\n` +
+                             `👤 @${user.split('@')[0]}\n` +
+                             `📝 Razón: ${blockedUser.razon || 'En lista negra'}`
+              
+              await conn.sendMessage(m.chat, {
+                text: message,
+                mentions: [user]
+              })
+              
+            } catch (error) {
+              console.error('Error expulsando usuario:', error)
+              
+              // Intentar método alternativo
+              try {
+                await conn.sendMessage(m.chat, {
+                  text: `⚠️ No se pudo expulsar a @${user.split('@')[0]} automáticamente.\nMotivo: ${blockedUser.razon || 'Lista negra'}\n\n*Requiere intervención manual de un admin.*`,
+                  mentions: [user]
+                })
+              } catch (e) {
+                console.error('Error enviando mensaje de error:', e)
+              }
+            }
+          } else {
+            console.log('Usuario no está en lista negra:', user)
+          }
+        }
+      }
+      
+      if (m.messageStubType === requestEvent) {
+        console.log('Solicitud de unión detectada')
+        const requestUser = m.messageStubParameters?.[0]
+        
+        if (requestUser) {
+          const blockedUser = blacklist.find(u => u.jid === requestUser)
+          
+          if (blockedUser) {
+            console.log('Rechazando solicitud de:', requestUser)
+            
+            try {
+              await conn.groupRequestParticipantsUpdate(m.chat, [requestUser], 'reject')
+              
+              await conn.sendMessage(m.chat, {
+                text: `🚫 Solicitud rechazada: @${requestUser.split('@')[0]}\nRazón: ${blockedUser.razon || 'Lista negra'}`,
+                mentions: [requestUser]
+              })
+              
+            } catch (error) {
+              console.error('Error rechazando solicitud:', error)
+            }
+          }
+        }
+      }
+      
+      return // Terminar aquí para eventos stub
+    }
+
+    // CASO 2: Usuario envía mensaje
+    if (m.isGroup && m.sender && m.text) {
+      console.log('Verificando mensaje de:', m.sender)
+      
+      const blockedUser = blacklist.find(u => u.jid === m.sender)
+      
+      if (blockedUser) {
+        console.log('Usuario bloqueado envió mensaje:', m.sender)
+        
+        try {
+          // Intentar borrar el mensaje primero
+          await conn.sendMessage(m.chat, { delete: m.key }).catch(e => console.log('No se pudo borrar mensaje:', e))
+          
+          // Esperar un momento
+          await new Promise(resolve => setTimeout(resolve, 500))
+          
+          // Expulsar usuario
+          const result = await conn.groupParticipantsUpdate(m.chat, [m.sender], 'remove')
+          console.log('Usuario expulsado por mensaje:', result)
+          
+          await conn.sendMessage(m.chat, {
+            text: `🚫 *USUARIO EXPULSADO*\n\n` +
+                  `👤 @${m.sender.split('@')[0]}\n` +
+                  `📝 Razón: ${blockedUser.razon || 'En lista negra'}\n` +
+                  `⚠️ No puede participar en este grupo.`,
+            mentions: [m.sender]
+          })
+          
+        } catch (error) {
+          console.error('Error expulsando por mensaje:', error)
+          
+          // Si no se puede expulsar, avisar a los admins
+          try {
+            await conn.sendMessage(m.chat, {
+              text: `⚠️ *ALERTA ADMIN*\n\nUsuario en lista negra: @${m.sender.split('@')[0]}\n` +
+                    `Razón: ${blockedUser.razon || 'Lista negra'}\n\n` +
+                    `El bot no pudo expulsarlo automáticamente. Acción manual requerida.`,
+              mentions: [m.sender]
+            })
+          } catch (e) {
+            console.error('Error enviando alerta:', e)
+          }
+        }
+      }
+    }
+    
   } catch (error) {
-    console.log('No se pudo cargar listanegra.json:', error.message)
-    blacklist = []
+    console.error('Error general en auto-kick:', error)
   }
-
-  if (!blacklist.length) return
-
-  // CASO 1: Manejo de eventos de grupo (uniones, solicitudes, etc)
-  if (m.messageStubType) {
-    const isJoin = m.messageStubType === 27 || m.messageStubType === 28 // unión al grupo
-    const isJoinRequest = m.messageStubType === 30 // solicitud de unión
-    const isJoinRequestAccept = m.messageStubType === 31 // solicitud aceptada
-    
-    if (isJoin || isJoinRequestAccept) {
-      // Procesar uniones al grupo
-      const participants = m.messageStubParameters || []
-      if (!participants.length) return
-
-      for (let user of participants) {
-        const blockedUser = blacklist.find(u => u.jid === user)
-        
-        if (blockedUser) {
-          try {
-            await conn.groupParticipantsUpdate(m.chat, [user], 'remove')
-            
-            const message = `🚫 *USUARIO EXPULSADO AUTOMÁTICAMENTE*\n\n` +
-                           `👤 Usuario: @${user.split('@')[0]}\n` +
-                           `📝 Razón: *${blockedUser.razon || 'Sin razón especificada'}*\n` +
-                           `⚠️ Este usuario está en la lista negra del bot.`
-            
-            await conn.sendMessage(m.chat, {
-              text: message,
-              mentions: [user]
-            })
-            
-            console.log(`Usuario expulsado por unión: ${user} - Razón: ${blockedUser.razon}`)
-            
-          } catch (error) {
-            console.error(`Error al expulsar a ${user}:`, error)
-          }
-        }
-      }
-    }
-    
-    if (isJoinRequest) {
-      // Rechazar solicitudes de usuarios en lista negra
-      const requestUser = m.messageStubParameters?.[0]
-      if (requestUser) {
-        const blockedUser = blacklist.find(u => u.jid === requestUser)
-        
-        if (blockedUser) {
-          try {
-            await conn.groupRequestParticipantsUpdate(m.chat, [requestUser], 'reject')
-            
-            console.log(`Solicitud rechazada: ${requestUser} - Razón: ${blockedUser.razon}`)
-            
-            // Notificar a los admins sobre la solicitud rechazada
-            await conn.sendMessage(m.chat, {
-              text: `🚫 *SOLICITUD RECHAZADA AUTOMÁTICAMENTE*\n\n` +
-                    `👤 Usuario: @${requestUser.split('@')[0]}\n` +
-                    `📝 Razón: *${blockedUser.razon || 'Sin razón especificada'}*\n` +
-                    `⚠️ Este usuario está en la lista negra del bot.`,
-              mentions: [requestUser]
-            })
-            
-          } catch (error) {
-            console.error(`Error al rechazar solicitud de ${requestUser}:`, error)
-          }
-        }
-      }
-    }
-    
-    return // Terminar aquí para eventos de stub
-  }
-
-  // CASO 2: Usuario en lista negra envía mensaje en grupo
-  if (m.isGroup && m.sender) {
-    const blockedUser = blacklist.find(u => u.jid === m.sender)
-    
-    if (blockedUser) {
-      try {
-        // Eliminar el mensaje primero
-        await conn.sendMessage(m.chat, { delete: m.key })
-        
-        // Expulsar al usuario
-        await conn.groupParticipantsUpdate(m.chat, [m.sender], 'remove')
-        
-        const message = `🚫 *USUARIO EXPULSADO AUTOMÁTICAMENTE*\n\n` +
-                       `👤 Usuario: @${m.sender.split('@')[0]}\n` +
-                       `📝 Razón: *${blockedUser.razon || 'Sin razón especificada'}*\n` +
-                       `⚠️ Este usuario está en la lista negra y no puede participar en grupos.`
-        
-        await conn.sendMessage(m.chat, {
-          text: message,
-          mentions: [m.sender]
-        })
-        
-        console.log(`Usuario expulsado por mensaje: ${m.sender} - Razón: ${blockedUser.razon}`)
-        
-      } catch (error) {
-        console.error(`Error
+}
 
 // Configuración del handler
 handler.before = true
 handler.group = true
-handler.participant = true
 
 export default handler
