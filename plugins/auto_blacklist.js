@@ -1,6 +1,7 @@
 import fs from 'fs'
 
 const handler = async (m, { conn }) => {
+  // Solo procesar eventos de unión al grupo
   if (!m.messageStubType) return
 
   const isJoin =
@@ -9,31 +10,63 @@ const handler = async (m, { conn }) => {
 
   if (!isJoin) return
 
+  // Obtener participantes que se unieron
   const participants = m.messageStubParameters || []
   if (!participants.length) return
 
-  let data = []
+  // Cargar lista negra
+  let blacklist = []
   try {
-    data = JSON.parse(fs.readFileSync('./database/listanegra.json'))
-  } catch {
-    data = []
+    const data = fs.readFileSync('./database/listanegra.json', 'utf8')
+    blacklist = JSON.parse(data)
+  } catch (error) {
+    console.log('No se pudo cargar listanegra.json:', error.message)
+    blacklist = []
   }
 
+  // Verificar si la lista negra tiene datos
+  if (!blacklist.length) return
+
+  // Procesar cada usuario que se unió
   for (let user of participants) {
-    const block = data.find(u => u.jid === user)
-    if (block) {
+    const blockedUser = blacklist.find(u => u.jid === user)
+    
+    if (blockedUser) {
       try {
+        // Expulsar al usuario
         await conn.groupParticipantsUpdate(m.chat, [user], 'remove')
+        
+        // Enviar mensaje de notificación
+        const message = `🚫 *USUARIO EXPULSADO AUTOMÁTICAMENTE*\n\n` +
+                       `👤 Usuario: @${user.split('@')[0]}\n` +
+                       `📝 Razón: *${blockedUser.razon || 'Sin razón especificada'}*\n` +
+                       `⚠️ Este usuario está en la lista negra del bot.`
+        
         await conn.sendMessage(m.chat, {
-          text: `⛔ @${user.split('@')[0]} fue eliminado por estar en la lista negra.\n📝 Razón: *${block.razon}*`,
+          text: message,
           mentions: [user]
         })
-      } catch (e) {
-        console.error('Error al expulsar:', e)
+        
+        console.log(`Usuario expulsado: ${user} - Razón: ${blockedUser.razon}`)
+        
+      } catch (error) {
+        console.error(`Error al expulsar a ${user}:`, error)
+        
+        // Notificar el error a los admins si no se pudo expulsar
+        await conn.sendMessage(m.chat, {
+          text: `⚠️ No se pudo expulsar a @${user.split('@')[0]} (está en lista negra)\n` +
+                `Razón del bloqueo: *${blockedUser.razon || 'Sin razón'}*\n` +
+                `Error: Permisos insuficientes o usuario ya no está en el grupo.`,
+          mentions: [user]
+        })
       }
     }
   }
 }
 
-handler.before = handler.group = handler.participant = true
+// Configuración del handler
+handler.before = true
+handler.group = true
+handler.participant = true
+
 export default handler
