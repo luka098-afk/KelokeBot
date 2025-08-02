@@ -1,4 +1,4 @@
-// Detector de cuando añaden el bot a grupos
+// Detector de cuando añaden el bot a grupos - VERSIÓN SIN ERRORES
 export async function before(m, { conn }) {
   // Solo procesar en grupos
   if (!m.isGroup) return;
@@ -10,10 +10,10 @@ export async function before(m, { conn }) {
   console.log(`[DEBUG] Tipo: ${m.messageStubType}`);
   console.log(`[DEBUG] Parámetros:`, m.messageStubParameters);
   
-  // Detectar eventos de participantes
+  // Detectar eventos de participantes - AMPLIADO
   if (m.messageStubType) {
-    // 27 = añadido, 32 = se unió por link
-    if ([27, 32].includes(m.messageStubType)) {
+    // 20 = cambios en grupo, 27 = añadido, 32 = se unió por link, 28 = salió
+    if ([20, 27, 32].includes(m.messageStubType)) {
       const participants = m.messageStubParameters || [];
       console.log(`[DEBUG] Participantes en evento:`, participants);
       
@@ -48,7 +48,19 @@ async function checkAndRequestAdmin(conn, groupId) {
   console.log(`[DEBUG] Verificando admin en: ${groupId}`);
   
   try {
-    const groupMetadata = await conn.groupMetadata(groupId);
+    // Usar un retraso para evitar rate limit
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    const groupMetadata = await conn.groupMetadata(groupId).catch(error => {
+      console.log(`[DEBUG] Error obteniendo metadata: ${error.message}`);
+      return null;
+    });
+    
+    if (!groupMetadata) {
+      console.log('❌ No se pudo obtener metadata del grupo');
+      return;
+    }
+    
     const botJid = conn.user.jid;
     
     console.log(`[DEBUG] Buscando bot: ${botJid}`);
@@ -66,9 +78,17 @@ async function checkAndRequestAdmin(conn, groupId) {
     
     if (isAdmin) {
       console.log('✅ Bot ya es admin');
-      await conn.sendMessage(groupId, {
-        text: `🧟‍♂️ *¡Hola! Soy KelokeBot*\n\n✅ Tengo permisos de administrador\n🩸 ¡Listo para ayudar!\n⚰️ Usa \`.menu\` para ver comandos`
-      });
+      
+      // Enviar mensaje de bienvenida con retraso
+      setTimeout(async () => {
+        try {
+          await conn.sendMessage(groupId, {
+            text: `🧟‍♂️ *¡Hola! Soy KelokeBot*\n\n✅ Tengo permisos de administrador\n🩸 ¡Listo para ayudar!\n⚰️ Usa \`.menu\` para ver comandos`
+          });
+        } catch (error) {
+          console.log('Error enviando mensaje de bienvenida:', error.message);
+        }
+      }, 3000);
       return;
     }
     
@@ -92,10 +112,14 @@ async function checkAndRequestAdmin(conn, groupId) {
     };
     
     console.log('🚀 Iniciando primer mensaje...');
-    await sendAdminRequest(conn, groupId);
+    
+    // Enviar primer mensaje con retraso
+    setTimeout(() => {
+      sendAdminRequest(conn, groupId);
+    }, 5000);
     
   } catch (error) {
-    console.error('❌ Error en checkAndRequestAdmin:', error);
+    console.error('❌ Error en checkAndRequestAdmin:', error.message);
   }
 }
 
@@ -111,35 +135,47 @@ async function sendAdminRequest(conn, groupId) {
   
   // Verificar si ya es admin antes de enviar
   try {
-    const meta = await conn.groupMetadata(groupId);
+    const meta = await conn.groupMetadata(groupId).catch(() => null);
+    if (!meta) {
+      console.log('❌ No se pudo verificar metadata antes de enviar');
+      delete global.adminRequests[groupId];
+      return;
+    }
+    
     const botPart = meta.participants.find(p => p.id === botJid);
     
     if (botPart && (botPart.admin === 'admin' || botPart.admin === 'superadmin')) {
       delete global.adminRequests[groupId];
       console.log('✅ Bot ya es admin, cancelando solicitudes');
       
-      await conn.sendMessage(groupId, {
-        text: '✅ *¡Perfecto!*\n\n🧟‍♂️ KelokeBot ya tiene permisos de administrador.\n🩸 Ahora puedo funcionar correctamente.\n⚰️ ¡Gracias por la confianza!'
-      });
+      try {
+        await conn.sendMessage(groupId, {
+          text: '✅ *¡Perfecto!*\n\n🧟‍♂️ KelokeBot ya tiene permisos de administrador.\n🩸 Ahora puedo funcionar correctamente.\n⚰️ ¡Gracias por la confianza!'
+        });
+      } catch (error) {
+        console.log('Error enviando mensaje de confirmación:', error.message);
+      }
       return;
     }
   } catch (error) {
-    console.error('Error verificando admin:', error);
+    console.error('Error verificando admin:', error.message);
   }
   
   request.attempts++;
   console.log(`📤 Enviando intento ${request.attempts}/${request.maxAttempts}`);
   
-  // Obtener admins
+  // Obtener admins con manejo de errores
   let admins = [];
   try {
-    const meta = await conn.groupMetadata(groupId);
-    admins = meta.participants
-      .filter(p => p.admin === 'admin' || p.admin === 'superadmin')
-      .map(p => p.id);
-    console.log(`[DEBUG] Admins encontrados:`, admins);
+    const meta = await conn.groupMetadata(groupId).catch(() => null);
+    if (meta) {
+      admins = meta.participants
+        .filter(p => p.admin === 'admin' || p.admin === 'superadmin')
+        .map(p => p.id);
+      console.log(`[DEBUG] Admins encontrados:`, admins);
+    }
   } catch (error) {
-    console.error('Error obteniendo admins:', error);
+    console.error('Error obteniendo admins:', error.message);
   }
   
   let message;
@@ -172,8 +208,9 @@ async function sendAdminRequest(conn, groupId) {
       } else {
         await conn.sendMessage(groupId, { text: message });
       }
+      console.log('✅ Mensaje urgente enviado');
     } catch (error) {
-      console.error('Error enviando mensaje urgente:', error);
+      console.error('❌ Error enviando mensaje urgente:', error.message);
     }
     
     // Programar salida
@@ -181,7 +218,12 @@ async function sendAdminRequest(conn, groupId) {
       if (!global.adminRequests[groupId]) return;
       
       try {
-        const meta = await conn.groupMetadata(groupId);
+        const meta = await conn.groupMetadata(groupId).catch(() => null);
+        if (!meta) {
+          delete global.adminRequests[groupId];
+          return;
+        }
+        
         const botPart = meta.participants.find(p => p.id === botJid);
         
         if (botPart && (botPart.admin === 'admin' || botPart.admin === 'superadmin')) {
@@ -199,12 +241,12 @@ async function sendAdminRequest(conn, groupId) {
             delete global.adminRequests[groupId];
             console.log('🚪 Bot salió del grupo por falta de admin');
           } catch (error) {
-            console.error('Error saliendo del grupo:', error);
+            console.error('Error saliendo del grupo:', error.message);
           }
         }, 3000);
         
       } catch (error) {
-        console.error('Error en verificación final:', error);
+        console.error('Error en verificación final:', error.message);
         delete global.adminRequests[groupId];
       }
     }, request.finalWarning);
@@ -218,7 +260,7 @@ async function sendAdminRequest(conn, groupId) {
              `🔄 Próximo recordatorio en 10 minutos`;
   }
   
-  // Enviar mensaje
+  // Enviar mensaje con manejo de errores
   try {
     if (admins.length > 0) {
       await conn.sendMessage(groupId, {
@@ -231,7 +273,16 @@ async function sendAdminRequest(conn, groupId) {
     
     console.log('✅ Mensaje enviado correctamente');
   } catch (error) {
-    console.error('❌ Error enviando mensaje:', error);
+    console.error('❌ Error enviando mensaje:', error.message);
+    
+    // Si hay error de rate limit, reintentar en 30 segundos
+    if (error.message.includes('rate-overlimit')) {
+      console.log('⏰ Rate limit detectado, reintentando en 30 segundos...');
+      setTimeout(() => {
+        sendAdminRequest(conn, groupId);
+      }, 30000);
+      return;
+    }
   }
   
   // Programar siguiente intento
