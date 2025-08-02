@@ -3,8 +3,9 @@ export async function before(m, { conn }) {
     if (!m.text || !global.prefix || !global.prefix.test(m.text)) return;
 
     const Buffer = global.Buffer || ((...args) => new Uint8Array(...args));
-    const channelRD = global.channelRD || { id: '0029VawwvsW7j6g1upS0i531@newsletter', name: 'Oficial channel' };
-    const metanombre = global.metanombre || 'DevByG';
+    // Cambia este ID por el de tu canal
+    const channelRD = global.channelRD || { id: '120363386229166956@newsletter', name: 'Canal' };
+    const metanombre = global.metanombre || 'Bot';
 
     if (!Array.prototype.getRandom) {
       Array.prototype.getRandom = function () {
@@ -37,7 +38,7 @@ export async function before(m, { conn }) {
       },
       message: {
         contactMessage: {
-          displayName: 'DevByG',
+          displayName: 'Bot',
           vcard: `BEGIN:VCARD\nVERSION:3.0\nFN:Meta AI\nORG:Meta AI\nTEL;type=CELL;type=VOICE;waid=50231458537:+502 3145 8537\nEND:VCARD`,
           jpegThumbnail: Buffer.from([]),
           contextInfo: {
@@ -58,8 +59,8 @@ export async function before(m, { conn }) {
           newsletterName: channelRD.name
         },
         externalAdReply: {
-          title: 'DevByG',
-          body: 'KelokeBot',
+          title: 'Bot',
+          body: 'Sistema de comandos',
           mediaUrl: null,
           description: null,
           previewType: "PHOTO",
@@ -93,14 +94,14 @@ export async function before(m, { conn }) {
 
       if (chat?.isBanned) {
         const msg = {
-          text: `《✦》El bot *KelokeBot* está desactivado en este grupo.\n\n> ✦ Un *administrador* puede activarlo con:\n» *${usedPrefix}bot on*`,
+          text: `《✦》El bot está desactivado en este grupo.\n\n> ✦ Un *administrador* puede activarlo con:\n» *${usedPrefix}bot on*`,
           contextInfo: {
             mentionedJid: [m.sender],
             externalAdReply: {
-              title: 'DevByG',
-              body: 'kelokebot',
+              title: 'Bot Desactivado',
+              body: 'Únete a nuestro canal oficial',
               thumbnailUrl: 'http://imgfz.com/i/ysZD3vi.jpeg',
-              sourceUrl: '-',
+              sourceUrl: `https://whatsapp.com/channel/${channelRD.id.replace('120363386229166956@newsletter', '')}`,
               mediaType: 1,
               renderLargerThumbnail: true
             }
@@ -115,14 +116,14 @@ export async function before(m, { conn }) {
     } else {
       const comando = m.text.trim().split(' ')[0];
       const msg = {
-        text: `《✦》El comando *${comando}* no existe.\nPara ver la lista de comandos usa:\n» *${usedPrefix}help*`,
+        text: `《✦》El comando *${comando}* no existe.\nPara ver la lista de comandos usa:\n» *${usedPrefix}help*\n\n📢 *Únete a nuestro canal oficial:*\nhttps://whatsapp.com/channel/${channelRD.id.replace('@newsletter', '')}`,
         contextInfo: {
           mentionedJid: [m.sender],
           externalAdReply: {
-            title: 'DevByG',
-            body: 'kelokebot',
+            title: 'Comando no encontrado',
+            body: 'Únete a nuestro canal oficial',
             thumbnailUrl: 'http://imgfz.com/i/ysZD3vi.jpeg',
-            sourceUrl: '-',
+            sourceUrl: `https://whatsapp.com/channel/${channelRD.id.replace('120363386229166956@newsletter', '')}`,
             mediaType: 1,
             renderLargerThumbnail: true
           }
