@@ -3,7 +3,9 @@ export async function before(m, { conn }) {
     if (!m.text || !global.prefix || !global.prefix.test(m.text)) return;
 
     const Buffer = global.Buffer || ((...args) => new Uint8Array(...args));
+    // Tu canal real
     const channelRD = global.channelRD || { id: '120363386229166956@newsletter', name: 'Canal Oficial' };
+    const channelLink = 'https://whatsapp.com/channel/0029VawwvsW7j6g1upS0i531';
     const metanombre = global.metanombre || 'Bot';
 
     if (!Array.prototype.getRandom) {
@@ -92,38 +94,41 @@ export async function before(m, { conn }) {
       const user = global.db.data.users[m.sender];
 
       if (chat?.isBanned) {
-        const msg = {
-          text: `《✦》El bot está desactivado en este grupo.\n\n> ✦ Un *administrador* puede activarlo con:\n» *${usedPrefix}bot on*`,
-          contextInfo: {
-            mentionedJid: [m.sender],
-            externalAdReply: {
-              title: 'Bot Desactivado',
-              body: 'Canal',
-              thumbnailUrl: 'http://imgfz.com/i/ysZD3vi.jpeg',
-              sourceUrl: `https://whatsapp.com/channel/0029VawwvsW7j6g1upS0i531`,
-              mediaType: 1,
-              renderLargerThumbnail: true
+        const templateButtons = [
+          {
+            index: 1,
+            urlButton: {
+              displayText: '📢 Canal',
+              url: channelLink
             }
           }
-        };
+        ];
 
-        const buttonMessage = {
-          ...msg,
+        const templateMessage = {
+          text: `《✦》El bot está desactivado en este grupo.\n\n> ✦ Un *administrador* puede activarlo con:\n» *${usedPrefix}bot on*`,
           footer: 'Únete a nuestro canal oficial',
-          buttons: [
-            {
-              buttonId: 'canal_oficial',
-              buttonText: { displayText: '📢 Canal' },
-              type: 1
-            }
-          ],
+          templateButtons: templateButtons,
           headerType: 1
         };
 
         try {
-          await conn.sendMessage(m.chat, buttonMessage, { quoted: global.fakeMetaMsg });
+          await conn.sendMessage(m.chat, templateMessage, { quoted: global.fakeMetaMsg });
         } catch (e) {
-          // Si los botones fallan, envía el mensaje normal
+          // Si fallan los template buttons, usar el método original
+          const msg = {
+            text: `《✦》El bot está desactivado en este grupo.\n\n> ✦ Un *administrador* puede activarlo con:\n» *${usedPrefix}bot on*\n\n📢 Canal: ${channelLink}`,
+            contextInfo: {
+              mentionedJid: [m.sender],
+              externalAdReply: {
+                title: 'Bot Desactivado',
+                body: 'Canal',
+                thumbnailUrl: 'http://imgfz.com/i/ysZD3vi.jpeg',
+                sourceUrl: channelLink,
+                mediaType: 1,
+                renderLargerThumbnail: true
+              }
+            }
+          };
           await conn.sendMessage(m.chat, msg, { quoted: global.fakeMetaMsg });
         }
         return;
@@ -133,38 +138,41 @@ export async function before(m, { conn }) {
 
     } else {
       const comando = m.text.trim().split(' ')[0];
-      const msg = {
-        text: `《✦》El comando *${comando}* no existe.\nPara ver la lista de comandos usa:\n» *${usedPrefix}help*`,
-        contextInfo: {
-          mentionedJid: [m.sender],
-          externalAdReply: {
-            title: 'Comando no encontrado',
-            body: 'Canal',
-            thumbnailUrl: 'http://imgfz.com/i/ysZD3vi.jpeg',
-            sourceUrl: `https://whatsapp.com/channel/0029VawwvsW7j6g1upS0i531`,
-            mediaType: 1,
-            renderLargerThumbnail: true
+      const templateButtons = [
+        {
+          index: 1,
+          urlButton: {
+            displayText: '📢 Canal',
+            url: channelLink
           }
         }
-      };
+      ];
 
-      const buttonMessage = {
-        ...msg,
+      const templateMessage = {
+        text: `《✦》El comando *${comando}* no existe.\nPara ver la lista de comandos usa:\n» *${usedPrefix}help*`,
         footer: 'Únete a nuestro canal oficial',
-        buttons: [
-          {
-            buttonId: 'canal_oficial',
-            buttonText: { displayText: '📢 Canal' },
-            type: 1
-          }
-        ],
+        templateButtons: templateButtons,
         headerType: 1
       };
 
       try {
-        await conn.sendMessage(m.chat, buttonMessage, { quoted: global.fakeMetaMsg });
+        await conn.sendMessage(m.chat, templateMessage, { quoted: global.fakeMetaMsg });
       } catch (e) {
-        // Si los botones fallan, envía el mensaje normal
+        // Si fallan los template buttons, usar el método original
+        const msg = {
+          text: `《✦》El comando *${comando}* no existe.\nPara ver la lista de comandos usa:\n» *${usedPrefix}help*\n\n📢 Canal: ${channelLink}`,
+          contextInfo: {
+            mentionedJid: [m.sender],
+            externalAdReply: {
+              title: 'Comando no encontrado',
+              body: 'Canal',
+              thumbnailUrl: 'http://imgfz.com/i/ysZD3vi.jpeg',
+              sourceUrl: channelLink,
+              mediaType: 1,
+              renderLargerThumbnail: true
+            }
+          }
+        };
         await conn.sendMessage(m.chat, msg, { quoted: global.fakeMetaMsg });
       }
     }
