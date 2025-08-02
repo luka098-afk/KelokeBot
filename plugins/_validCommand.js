@@ -100,13 +100,32 @@ export async function before(m, { conn }) {
               title: 'Bot Desactivado',
               body: 'Canal',
               thumbnailUrl: 'http://imgfz.com/i/ysZD3vi.jpeg',
-              sourceUrl: `https://whatsapp.com/channel/120363386229166956`,
+              sourceUrl: `https://whatsapp.com/channel/0029VawwvsW7j6g1upS0i531`,
               mediaType: 1,
               renderLargerThumbnail: true
             }
           }
         };
-        await conn.sendMessage(m.chat, msg, { quoted: global.fakeMetaMsg });
+
+        const buttonMessage = {
+          ...msg,
+          footer: 'Únete a nuestro canal oficial',
+          buttons: [
+            {
+              buttonId: 'canal_oficial',
+              buttonText: { displayText: '📢 Canal' },
+              type: 1
+            }
+          ],
+          headerType: 1
+        };
+
+        try {
+          await conn.sendMessage(m.chat, buttonMessage, { quoted: global.fakeMetaMsg });
+        } catch (e) {
+          // Si los botones fallan, envía el mensaje normal
+          await conn.sendMessage(m.chat, msg, { quoted: global.fakeMetaMsg });
+        }
         return;
       }
 
@@ -122,13 +141,32 @@ export async function before(m, { conn }) {
             title: 'Comando no encontrado',
             body: 'Canal',
             thumbnailUrl: 'http://imgfz.com/i/ysZD3vi.jpeg',
-            sourceUrl: `https://whatsapp.com/channel/120363386229166956`,
+            sourceUrl: `https://whatsapp.com/channel/0029VawwvsW7j6g1upS0i531`,
             mediaType: 1,
             renderLargerThumbnail: true
           }
         }
       };
-      await conn.sendMessage(m.chat, msg, { quoted: global.fakeMetaMsg });
+
+      const buttonMessage = {
+        ...msg,
+        footer: 'Únete a nuestro canal oficial',
+        buttons: [
+          {
+            buttonId: 'canal_oficial',
+            buttonText: { displayText: '📢 Canal' },
+            type: 1
+          }
+        ],
+        headerType: 1
+      };
+
+      try {
+        await conn.sendMessage(m.chat, buttonMessage, { quoted: global.fakeMetaMsg });
+      } catch (e) {
+        // Si los botones fallan, envía el mensaje normal
+        await conn.sendMessage(m.chat, msg, { quoted: global.fakeMetaMsg });
+      }
     }
   } catch (error) {
     console.error(`Error en _validCommand.js: ${error}`);
