@@ -3,8 +3,7 @@ export async function before(m, { conn }) {
     if (!m.text || !global.prefix || !global.prefix.test(m.text)) return;
 
     const Buffer = global.Buffer || ((...args) => new Uint8Array(...args));
-    // Cambia este ID por el de tu canal
-    const channelRD = global.channelRD || { id: '120363386229166956@newsletter', name: 'Canal' };
+    const channelRD = global.channelRD || { id: '120363386229166956@newsletter', name: 'Canal Oficial' };
     const metanombre = global.metanombre || 'Bot';
 
     if (!Array.prototype.getRandom) {
@@ -99,9 +98,9 @@ export async function before(m, { conn }) {
             mentionedJid: [m.sender],
             externalAdReply: {
               title: 'Bot Desactivado',
-              body: 'Únete a nuestro canal oficial',
+              body: 'Canal',
               thumbnailUrl: 'http://imgfz.com/i/ysZD3vi.jpeg',
-              sourceUrl: `https://whatsapp.com/channel/${channelRD.id.replace('120363386229166956@newsletter', '')}`,
+              sourceUrl: `https://whatsapp.com/channel/120363386229166956`,
               mediaType: 1,
               renderLargerThumbnail: true
             }
@@ -116,14 +115,14 @@ export async function before(m, { conn }) {
     } else {
       const comando = m.text.trim().split(' ')[0];
       const msg = {
-        text: `《✦》El comando *${comando}* no existe.\nPara ver la lista de comandos usa:\n» *${usedPrefix}help*\n\n📢 *Únete a nuestro canal oficial:*\nhttps://whatsapp.com/channel/${channelRD.id.replace('@newsletter', '')}`,
+        text: `《✦》El comando *${comando}* no existe.\nPara ver la lista de comandos usa:\n» *${usedPrefix}help*`,
         contextInfo: {
           mentionedJid: [m.sender],
           externalAdReply: {
             title: 'Comando no encontrado',
-            body: 'Únete a nuestro canal oficial',
+            body: 'Canal',
             thumbnailUrl: 'http://imgfz.com/i/ysZD3vi.jpeg',
-            sourceUrl: `https://whatsapp.com/channel/${channelRD.id.replace('120363386229166956@newsletter', '')}`,
+            sourceUrl: `https://whatsapp.com/channel/120363386229166956`,
             mediaType: 1,
             renderLargerThumbnail: true
           }
