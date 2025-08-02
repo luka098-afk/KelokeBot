@@ -1,4 +1,4 @@
-// Detector específico para cuando el bot se une a grupos
+// Detector principal cuando el bot se une a grupos
 let handler = async (m, { conn }) => {
   // Solo procesar mensajes de sistema en grupos
   if (!m.isGroup || !m.messageStubType) return;
@@ -6,7 +6,7 @@ let handler = async (m, { conn }) => {
   const botJid = conn.user.jid;
   const groupId = m.chat;
   
-  console.log(`📱 Evento de grupo detectado: ${m.messageStubType} en ${groupId}`);
+  console.log(`📱 Evento detectado: ${m.messageStubType} en grupo`);
   
   // Eventos de interés:
   // 27 = Participante añadido
@@ -28,8 +28,8 @@ let handler = async (m, { conn }) => {
   
   console.log('🤖 ¡Bot detectado uniéndose al grupo!');
   
-  // Esperar un poco para que se actualice la metadata del grupo
-  await new Promise(resolve => setTimeout(resolve, 2000));
+  // Esperar un poco para que se actualice la metadata
+  await new Promise(resolve => setTimeout(resolve, 3000));
   
   try {
     // Verificar si ya es admin
@@ -37,7 +37,7 @@ let handler = async (m, { conn }) => {
     const botParticipant = groupMetadata.participants.find(p => p.id === botJid);
     
     if (!botParticipant) {
-      console.log('❌ Bot no encontrado en participantes del grupo');
+      console.log('❌ Bot no encontrado en participantes');
       return;
     }
     
@@ -45,18 +45,17 @@ let handler = async (m, { conn }) => {
     
     if (isAdmin) {
       console.log('✅ Bot ya tiene permisos de admin');
-      // Enviar mensaje de bienvenida
       await conn.sendMessage(groupId, {
         text: `🧟‍♂️ *¡Hola! Soy KelokeBot*\n\n✅ Tengo permisos de administrador\n🩸 ¡Listo para ayudar en este grupo!\n⚰️ Usa \`.menu\` para ver mis comandos`
       });
       return;
     }
     
-    console.log('⚠️ Bot sin permisos de admin, iniciando sistema de solicitud...');
+    console.log('⚠️ Bot sin permisos de admin, iniciando solicitud...');
     
     // Si ya existe una solicitud activa, no crear otra
     if (global.adminRequests && global.adminRequests[groupId]) {
-      console.log('🔄 Ya existe una solicitud activa para este grupo');
+      console.log('🔄 Ya existe una solicitud activa');
       return;
     }
     
@@ -89,7 +88,6 @@ let handler = async (m, { conn }) => {
       try {
         const admins = await getGroupAdmins();
         if (admins.length === 0) {
-          // Si no hay admins, enviar mensaje general
           await conn.sendMessage(groupId, { text: message });
           return;
         }
@@ -111,7 +109,7 @@ let handler = async (m, { conn }) => {
       const request = global.adminRequests[groupId];
       if (!request) return;
       
-      // Verificar si ya es admin
+      // Verificar si ya es admin antes de cada intento
       try {
         const meta = await conn.groupMetadata(groupId);
         const botPart = meta.participants.find(p => p.id === botJid);
@@ -195,8 +193,8 @@ let handler = async (m, { conn }) => {
       }
     };
     
-    // Iniciar proceso
-    console.log('🚀 Iniciando sistema de solicitud de admin...');
+    // Iniciar proceso inmediatamente
+    console.log('🚀 Iniciando sistema de solicitud...');
     requestLoop();
     
   } catch (error) {
@@ -204,7 +202,6 @@ let handler = async (m, { conn }) => {
   }
 };
 
-// Configuración específica para eventos de sistema
 handler.before = true;
 
 export default handler;
