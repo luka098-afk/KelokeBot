@@ -1,65 +1,59 @@
-// Detector cuando el bot se une a grupos - VERSIÓN CORREGIDA
-let handler = async (m, { conn }) => {
-  // Detectar múltiples tipos de eventos
+// Detector de cuando añaden el bot a grupos
+export async function before(m, { conn }) {
+  // Solo procesar en grupos
+  if (!m.isGroup) return;
+  
+  const botJid = conn.user.jid;
+  const groupId = m.chat;
+  
+  console.log(`[DEBUG] Mensaje en grupo: ${groupId}`);
+  console.log(`[DEBUG] Tipo: ${m.messageStubType}`);
+  console.log(`[DEBUG] Parámetros:`, m.messageStubParameters);
+  
+  // Detectar eventos de participantes
   if (m.messageStubType) {
-    const botJid = conn.user.jid;
-    const groupId = m.chat;
-    
-    console.log(`📱 Evento: ${m.messageStubType} | Grupo: ${groupId}`);
-    
-    // Eventos de participantes: 27=añadido, 32=unión por link, 28=salió
+    // 27 = añadido, 32 = se unió por link
     if ([27, 32].includes(m.messageStubType)) {
       const participants = m.messageStubParameters || [];
-      console.log(`👥 Participantes afectados:`, participants);
+      console.log(`[DEBUG] Participantes en evento:`, participants);
       
-      // Verificar si el bot está entre los participantes
+      // Verificar si el bot fue añadido
+      const botNumber = botJid.split('@')[0];
       const botWasAdded = participants.some(jid => {
-        const normalizedJid = jid.replace('@s.whatsapp.net', '@c.us');
-        const normalizedBotJid = botJid.replace('@s.whatsapp.net', '@c.us');
-        return normalizedJid === normalizedBotJid || jid.includes(botJid.split('@')[0]);
+        const participantNumber = jid.split('@')[0];
+        console.log(`[DEBUG] Comparando: ${participantNumber} vs ${botNumber}`);
+        return participantNumber === botNumber;
       });
       
       if (botWasAdded) {
-        console.log('🤖 ¡BOT AÑADIDO AL GRUPO!');
-        await handleBotJoined(conn, groupId);
+        console.log('🤖 ¡BOT AÑADIDO! Iniciando verificación...');
+        setTimeout(() => checkAndRequestAdmin(conn, groupId), 5000);
+        return;
       }
     }
   }
   
-  // También detectar cuando el bot envía su primer mensaje en un grupo nuevo
-  if (m.isGroup && m.fromMe && !global.processedGroups) {
-    global.processedGroups = new Set();
-  }
+  // Método alternativo: detectar primer mensaje en grupo nuevo
+  if (!global.checkedGroups) global.checkedGroups = new Set();
   
-  if (m.isGroup && !m.fromMe && !global.processedGroups?.has(m.chat)) {
-    console.log('🔍 Verificando nuevo grupo detectado...');
-    global.processedGroups = global.processedGroups || new Set();
-    global.processedGroups.add(m.chat);
-    
-    // Verificar si el bot necesita admin
-    setTimeout(async () => {
-      await checkAdminStatus(conn, m.chat);
-    }, 5000);
-  }
-};
-
-// Función para manejar cuando el bot se une
-async function handleBotJoined(conn, groupId) {
-  try {
-    console.log('⏳ Esperando metadata del grupo...');
-    await new Promise(resolve => setTimeout(resolve, 3000));
-    
-    await checkAdminStatus(conn, groupId);
-  } catch (error) {
-    console.error('❌ Error en handleBotJoined:', error);
+  if (!global.checkedGroups.has(groupId)) {
+    console.log(`[DEBUG] Nuevo grupo detectado: ${groupId}`);
+    global.checkedGroups.add(groupId);
+    setTimeout(() => checkAndRequestAdmin(conn, groupId), 3000);
   }
 }
 
-// Función para verificar estado de admin
-async function checkAdminStatus(conn, groupId) {
+// Función para verificar admin y solicitar si es necesario
+async function checkAndRequestAdmin(conn, groupId) {
+  console.log(`[DEBUG] Verificando admin en: ${groupId}`);
+  
   try {
     const groupMetadata = await conn.groupMetadata(groupId);
     const botJid = conn.user.jid;
+    
+    console.log(`[DEBUG] Buscando bot: ${botJid}`);
+    console.log(`[DEBUG] Participantes:`, groupMetadata.participants.map(p => p.id));
+    
     const botParticipant = groupMetadata.participants.find(p => p.id === botJid);
     
     if (!botParticipant) {
@@ -68,8 +62,7 @@ async function checkAdminStatus(conn, groupId) {
     }
     
     const isAdmin = botParticipant.admin === 'admin' || botParticipant.admin === 'superadmin';
-    
-    console.log(`🔐 Estado admin: ${isAdmin ? 'SÍ' : 'NO'}`);
+    console.log(`[DEBUG] ¿Es admin?: ${isAdmin}`);
     
     if (isAdmin) {
       console.log('✅ Bot ya es admin');
@@ -79,51 +72,51 @@ async function checkAdminStatus(conn, groupId) {
       return;
     }
     
-    console.log('⚠️ Iniciando sistema de solicitud admin...');
-    await initAdminRequest(conn, groupId);
+    console.log('⚠️ Bot SIN admin. Iniciando solicitudes...');
+    
+    // Verificar si ya hay una solicitud activa
+    if (global.adminRequests && global.adminRequests[groupId]) {
+      console.log('🔄 Ya existe solicitud para este grupo');
+      return;
+    }
+    
+    // Inicializar solicitud
+    global.adminRequests = global.adminRequests || {};
+    global.adminRequests[groupId] = {
+      attempts: 0,
+      maxAttempts: 5,
+      interval: 10 * 60 * 1000, // 10 minutos
+      finalWarning: 20 * 60 * 1000, // 20 minutos
+      startTime: Date.now(),
+      isTest: false
+    };
+    
+    console.log('🚀 Iniciando primer mensaje...');
+    await sendAdminRequest(conn, groupId);
     
   } catch (error) {
-    console.error('❌ Error verificando admin:', error);
+    console.error('❌ Error en checkAndRequestAdmin:', error);
   }
 }
 
-// Función para inicializar solicitud de admin
-async function initAdminRequest(conn, groupId) {
-  // Si ya existe una solicitud, no crear otra
-  if (global.adminRequests && global.adminRequests[groupId]) {
-    console.log('🔄 Solicitud ya existe para este grupo');
+// Función para enviar solicitud de admin
+async function sendAdminRequest(conn, groupId) {
+  const request = global.adminRequests[groupId];
+  if (!request) {
+    console.log('❌ No se encontró solicitud para:', groupId);
     return;
   }
   
-  global.adminRequests = global.adminRequests || {};
-  global.adminRequests[groupId] = {
-    attempts: 0,
-    maxAttempts: 5,
-    interval: 10 * 60 * 1000, // 10 minutos
-    finalWarning: 20 * 60 * 1000, // 20 minutos
-    startTime: Date.now(),
-    isTest: false
-  };
-  
-  console.log('🚀 Sistema de solicitud inicializado');
-  await executeAdminRequest(conn, groupId);
-}
-
-// Función principal de solicitud
-async function executeAdminRequest(conn, groupId) {
-  const request = global.adminRequests[groupId];
-  if (!request) return;
-  
   const botJid = conn.user.jid;
   
-  // Verificar si ya es admin antes de cada intento
+  // Verificar si ya es admin antes de enviar
   try {
     const meta = await conn.groupMetadata(groupId);
     const botPart = meta.participants.find(p => p.id === botJid);
     
     if (botPart && (botPart.admin === 'admin' || botPart.admin === 'superadmin')) {
       delete global.adminRequests[groupId];
-      console.log('✅ Bot ya es admin, deteniendo solicitudes');
+      console.log('✅ Bot ya es admin, cancelando solicitudes');
       
       await conn.sendMessage(groupId, {
         text: '✅ *¡Perfecto!*\n\n🧟‍♂️ KelokeBot ya tiene permisos de administrador.\n🩸 Ahora puedo funcionar correctamente.\n⚰️ ¡Gracias por la confianza!'
@@ -137,13 +130,14 @@ async function executeAdminRequest(conn, groupId) {
   request.attempts++;
   console.log(`📤 Enviando intento ${request.attempts}/${request.maxAttempts}`);
   
-  // Obtener admins del grupo
+  // Obtener admins
   let admins = [];
   try {
     const meta = await conn.groupMetadata(groupId);
     admins = meta.participants
       .filter(p => p.admin === 'admin' || p.admin === 'superadmin')
       .map(p => p.id);
+    console.log(`[DEBUG] Admins encontrados:`, admins);
   } catch (error) {
     console.error('Error obteniendo admins:', error);
   }
@@ -168,17 +162,21 @@ async function executeAdminRequest(conn, groupId) {
              `🩸 Por favor, otórguenme permisos de administrador.\n` +
              `☠️ Tiempo límite: *20 minutos*`;
     
-    // Enviar mensaje final
-    if (admins.length > 0) {
-      await conn.sendMessage(groupId, {
-        text: `🚨🚨🚨 *SOLICITUD DE PERMISOS* 🚨🚨🚨\n\n${message}\n\n👥 Admins: ${admins.map(admin => `@${admin.split('@')[0]}`).join(' ')}`,
-        mentions: admins
-      });
-    } else {
-      await conn.sendMessage(groupId, { text: message });
+    // Enviar mensaje urgente
+    try {
+      if (admins.length > 0) {
+        await conn.sendMessage(groupId, {
+          text: `🚨🚨🚨 *SOLICITUD DE PERMISOS* 🚨🚨🚨\n\n${message}\n\n👥 Admins: ${admins.map(admin => `@${admin.split('@')[0]}`).join(' ')}`,
+          mentions: admins
+        });
+      } else {
+        await conn.sendMessage(groupId, { text: message });
+      }
+    } catch (error) {
+      console.error('Error enviando mensaje urgente:', error);
     }
     
-    // Programar salida final
+    // Programar salida
     setTimeout(async () => {
       if (!global.adminRequests[groupId]) return;
       
@@ -195,12 +193,18 @@ async function executeAdminRequest(conn, groupId) {
           text: `💀 *TIEMPO AGOTADO* 💀\n\n🧟‍♂️ No recibí permisos de administrador.\n⚰️ Me retiro del grupo.\n🩸 Si me quieren de vuelta, añádanme con permisos de admin.\n\n☠️ ¡Hasta la vista, mortales!`
         });
         
-        await new Promise(resolve => setTimeout(resolve, 3000));
-        await conn.groupLeave(groupId);
-        delete global.adminRequests[groupId];
+        setTimeout(async () => {
+          try {
+            await conn.groupLeave(groupId);
+            delete global.adminRequests[groupId];
+            console.log('🚪 Bot salió del grupo por falta de admin');
+          } catch (error) {
+            console.error('Error saliendo del grupo:', error);
+          }
+        }, 3000);
         
       } catch (error) {
-        console.error('Error en salida final:', error);
+        console.error('Error en verificación final:', error);
         delete global.adminRequests[groupId];
       }
     }, request.finalWarning);
@@ -224,18 +228,17 @@ async function executeAdminRequest(conn, groupId) {
     } else {
       await conn.sendMessage(groupId, { text: message });
     }
+    
+    console.log('✅ Mensaje enviado correctamente');
   } catch (error) {
-    console.error('Error enviando mensaje:', error);
+    console.error('❌ Error enviando mensaje:', error);
   }
   
   // Programar siguiente intento
   if (request.attempts < request.maxAttempts) {
+    console.log(`⏰ Programando siguiente intento en ${request.interval / 60000} minutos`);
     setTimeout(() => {
-      executeAdminRequest(conn, groupId);
+      sendAdminRequest(conn, groupId);
     }, request.interval);
   }
 }
-
-handler.before = true;
-
-export default handler;
