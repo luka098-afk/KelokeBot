@@ -3,8 +3,9 @@ import path from 'path'
 
 const handler = async (m, { conn, text }) => {
   try {
-    const senderRaw = m.sender.split('@')[0]
-    const sender = `${senderRaw}@s.whatsapp.net`
+    // Obtener el JID completo del remitente
+    const sender = m.sender // Ya viene en formato correcto con @s.whatsapp.net
+    const senderRaw = sender.split('@')[0] // Solo el número
 
     // Leer solicitudes
     const solicitudesPath = path.join('./database', 'solicitudes.json')
@@ -20,39 +21,48 @@ const handler = async (m, { conn, text }) => {
     }
 
     const solicitud = solicitudes[senderRaw][0]
-    const target = solicitud.jid || solicitud
+    // Asegurar que target tenga el formato JID correcto
+    let target = solicitud.jid || solicitud
+    
+    // Si target no tiene @, agregar el dominio de WhatsApp
+    if (!target.includes('@')) {
+      target = `${target}@s.whatsapp.net`
+    }
+    
     const targetRaw = target.split('@')[0]
 
     // Eliminar solicitud
-    solicitudes[senderRaw] = solicitudes[senderRaw].filter(s =>
-      (s.jid || s) !== target
-    )
+    solicitudes[senderRaw] = solicitudes[senderRaw].filter(s => {
+      const compareTarget = s.jid || s
+      const normalizedCompare = compareTarget.includes('@') ? compareTarget : `${compareTarget}@s.whatsapp.net`
+      return normalizedCompare !== target
+    })
+    
     if (solicitudes[senderRaw].length === 0) {
       delete solicitudes[senderRaw]
     }
 
     fs.writeFileSync(solicitudesPath, JSON.stringify(solicitudes, null, 2))
 
-    const senderClean = m.sender.includes('@') ? m.sender : `${m.sender}@s.whatsapp.net`
-    const targetClean = target.includes('@') ? target : `${target}@s.whatsapp.net`
-
-    const senderNum = senderClean.split('@')[0]
-    const targetNum = targetClean.split('@')[0]
-
-    const mensaje = `💔 *Parece que @${senderNum} ha rechazado la solicitud de @${targetNum}...*
+    // Crear el mensaje con ambas menciones
+    const mensaje = `💔 *Parece que @${senderRaw} ha rechazado la solicitud de @${targetRaw}...*
 
 📜 *Poema del desamor* 📜
-_"Te vi llegar con ojos brillantes,_  
-y yo soñaba con instantes vibrantes._  
-Pero el amor no siempre se logra alcanzar,_  
-y a veces solo queda dejarlo pasar."_ 💔
+_"Te vi llegar con ojos brillantes,_
+_y yo soñaba con instantes vibrantes._
+_Pero el amor no siempre se logra alcanzar,_
+_y a veces solo queda dejarlo pasar."_ 💔
 
 😔 No te desanimes, el verdadero amor llega cuando menos lo esperas.`
 
+    // Enviar mensaje con menciones correctas
     await conn.sendMessage(m.chat, {
       text: mensaje,
-      mentions: [senderClean, targetClean]
+      mentions: [sender, target] // Ambos JIDs en formato completo
     })
+
+    console.log(`Rechazado: ${senderRaw} rechazó a ${targetRaw}`)
+    console.log(`Menciones enviadas a: [${sender}, ${target}]`)
 
   } catch (error) {
     console.error('Error en .rechazar:', error)
