@@ -66,7 +66,7 @@ export async function before(m, { conn }) {
           description: null,
           previewType: "PHOTO",
           thumbnailUrl: 'http://imgfz.com/i/ysZD3vi.jpeg',
-          sourceUrl: '-',
+          sourceUrl: 'https://whatsapp.com/channel/0029VawwvsW7j6g1upS0i531',
           mediaType: 1,
           renderLargerThumbnail: true
         }

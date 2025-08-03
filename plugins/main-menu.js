@@ -120,6 +120,7 @@ ${saludo}, ${taguser}!
 ◈───≼ 🧟‍♀️ DESCARGAS 🧟‍♀️ ≽──⊚
 🕷️┝⎆ [ ${usedPrefix}tiktok <link> - Descargar video TT
 🕷️┝⎆ [ ${usedPrefix}play <nombre> - Descargar canción
+🕷️┝⎆ [ ${usedPrefix}ytmp4 <nombre> - Descargar video
 🕸️┝⎆ [ ${usedPrefix}pindl <link> - Descargar imagen Pinterest
 🕷️┝⎆ [ ${usedPrefix}instagram <link> - Descargar de IG
 🕷️┝⎆ [ ${usedPrefix}facebook <link> - Descargar video FB
