@@ -116,23 +116,6 @@ ${saludo}, ${taguser}!
 【𝕷 𝖎 𝖘 𝖙 𝖆 - 𝕯𝖊 - 𝕮 𝖔 𝖒 𝖆 𝖓 𝖉 𝖔 𝖘】
 
 ┝🩸 ${usedPrefix}idea <texto> - Envía tu idea a los Owners ☠️🧠
-
-◈───≼ 🧟‍♀️ DESCARGAS 🧟‍♀️ ≽──⊚
-🕷️┝⎆ [ ${usedPrefix}tiktok <link> - Descargar video TT
-🕷️┝⎆ [ ${usedPrefix}play <nombre> - Descargar canción
-🕷️┝⎆ [ ${usedPrefix}ytmp4 <nombre> - Descargar video
-🕸️┝⎆ [ ${usedPrefix}pindl <link> - Descargar imagen Pinterest
-🕷️┝⎆ [ ${usedPrefix}instagram <link> - Descargar de IG
-🕷️┝⎆ [ ${usedPrefix}facebook <link> - Descargar video FB
-🕷️┝⎆ [ ${usedPrefix}spotify <canción> - Descargar en Spotify
-◈┄──━━┉─࿂
-
-◈───≼ 🕸️ BUSCADORES 🕸️ ≽──⊚
-🕷️┝⎆ [ ${usedPrefix}pinterest <texto> - Buscar imágenes
-🕷️┝⎆ [ ${usedPrefix}aptoide <app> - Buscar APK
-🕷️┝⎆ [ ${usedPrefix}ssweb <texto> - Buscar páginas
-◈┄──━━┉─࿂
-
 ◈───≼ ⚰️ ADMINS ⚰️ ≽──⊚
 🩸┝⎆ [ ${usedPrefix}ht <texto> - Mención masiva
 🩸┝⎆ [ ${usedPrefix}advertencia <@tag> <texto> - Advertencia
@@ -152,23 +135,14 @@ ${saludo}, ${taguser}!
 🩸┝⎆ [ ${usedPrefix}link - Obtiene el link del grupo
 ◈┄──━━┉─࿂
 
-◈───≼ 🧟‍♂️ OWNER 🧟‍♂️ ≽──⊚
-🕷️┝⎆ [ ${usedPrefix}reiniciar - Reiniciar bot
-🕸️┝⎆ [ ${usedPrefix}setname <nombre> - Cambiar nombre bot
-🕸️┝⎆ [ ${usedPrefix}setpp <img> - Cambiar foto bot
-🕷️┝⎆ [ ${usedPrefix}restart - Reinicio manual
-🕷️┝⎆ [ ${usedPrefix}update - Actualizar bot
-◈┄──━━┉─࿂
-
-◈───≼ 🕸️ HERRAMIENTAS 🕸️ ≽──⊚
-🩸┝⎆ [ ${usedPrefix}s <img> - Crear sticker
-🩸┝⎆ [ ${usedPrefix}brat <texto> - Sticker brat style
-🕷️┝⎆ [ ${usedPrefix}rvocal <audio> - Cambiar voz
-🕷️┝⎆ [ ${usedPrefix}tourl2 <img> - Convertir en URL
-🕷️┝⎆ [ ${usedPrefix}hd <imagen> - Mejorar calidad
-🕷️┝⎆ [ ${usedPrefix}tourl <imagen> - Imagen a enlace
-┝⎆ [ ${usedPrefix}reportar <texto> - 🕷️ Invoca a los 𝔄𝔡𝔪𝔦𝔫𝔰 del más allá 🩸
-🧟┝⎆ [ ${usedPrefix}perfil - Ver perfil grupo
+◈───≼ 🧟‍♀️ DESCARGAS 🧟‍♀️ ≽──⊚
+🕷️┝⎆ [ ${usedPrefix}tiktok <link> - Descargar video TT
+🕷️┝⎆ [ ${usedPrefix}play <nombre> - Descargar canción
+🕷️┝⎆ [ ${usedPrefix}ytmp4 <nombre> - Descargar video
+🕸️┝⎆ [ ${usedPrefix}pindl <link> - Descargar imagen Pinterest
+🕷️┝⎆ [ ${usedPrefix}instagram <link> - Descargar de IG
+🕷️┝⎆ [ ${usedPrefix}facebook <link> - Descargar video FB
+🕷️┝⎆ [ ${usedPrefix}spotify <canción> - Descargar en Spotify
 ◈┄──━━┉─࿂
 
 ◈───≼ 🧟 FUN 🧟 ≽──⊚
@@ -182,13 +156,24 @@ ${saludo}, ${taguser}!
 🕸️┝⎆ [ ${usedPrefix}formarpareja5 - Crea pareja 5.0
 🎃┝⎆ [ ${usedPrefix}sortear - Sorteo al azar entre mortales
 🩸┝⎆ [ ${usedPrefix}sorpresa - ¿quieres saber el secreto?☠️
+🕷️┝⎆ [ ${usedPrefix}pareja - Mándale pareja a alguien
+🕷️┝⎆ [ ${usedPrefix}aceptar - Aceptale a tu futura pareja
+🕷️┝⎆ [ ${usedPrefix}rechazar - Rechaza la solicitud de pareja
+🕷️┝⎆ [ ${usedPrefix}terminar - Terminale a tu pareja
+🕷️┝⎆ [ ${usedPrefix}mipareja - Ver tu pareja actual
+🕷️┝⎆ [ ${usedPrefix}listparejas - Ver lista de parejas actuales
+🕷️┝⎆ [ ${usedPrefix}ex - Ver todos los ex que tuviste
 ◈┄──━━┉─࿂
 
-◈───≼ 🕷️ MAIN & RPG 🕷️ ≽──⊚
-🕷️┝⎆ [ ${usedPrefix}juegos - Juegos disponibles
-🕸️┝⎆ [ ${usedPrefix}ping - Velocidad del bot
-🕷️┝⎆ [ ${usedPrefix}grupos - Lista de grupos
-🕷️┝⎆ [ ${usedPrefix}owner - Info del owner
+◈───≼ 🕸️ HERRAMIENTAS 🕸️ ≽──⊚
+🩸┝⎆ [ ${usedPrefix}s <img> - Crear sticker
+🩸┝⎆ [ ${usedPrefix}brat <texto> - Sticker brat style
+🕷️┝⎆ [ ${usedPrefix}rvocal <audio> - Cambiar voz
+🕷️┝⎆ [ ${usedPrefix}tourl2 <img> - Convertir en URL
+🕷️┝⎆ [ ${usedPrefix}hd <imagen> - Mejorar calidad
+🕷️┝⎆ [ ${usedPrefix}tourl <imagen> - Imagen a enlace
+┝⎆ [ ${usedPrefix}reportar <texto> - 🕷️ Invoca a los 𝔄𝔡𝔪𝔦𝔫𝔰 del más allá 🩸
+🧟┝⎆ [ ${usedPrefix}perfil - Ver perfil grupo
 ◈┄──━━┉─࿂
 
 ◈───≼ 🧟‍♂️ IA & ARTE 🧟‍♂️ ≽──⊚
@@ -200,12 +185,25 @@ ${saludo}, ${taguser}!
 🕷️┝⎆ [ ${usedPrefix}bgremover <img> - Quitar fondo
 ◈┄──━━┉─࿂
 
-◈───≼ ☠️ NSFW ☠️ ≽──⊚
-🩸┝⎆ [ ${usedPrefix}penetrar - Acción explícita
-🕸️┝⎆ [ ${usedPrefix}huevo - Agarrarle el huevo a alguien
-🕷️┝⎆ [ ${usedPrefix}sexo - Acción sexual
-🕷️┝⎆ [ ${usedPrefix}violar - Contenido fuerte
-🕷️┝⎆ [ ${usedPrefix}follar - Simulación sexual
+◈───≼ 🕸️ BUSCADORES 🕸️ ≽──⊚
+🕷️┝⎆ [ ${usedPrefix}pinterest <texto> - Buscar imágenes
+🕷️┝⎆ [ ${usedPrefix}aptoide <app> - Buscar APK
+🕷️┝⎆ [ ${usedPrefix}ssweb <texto> - Buscar páginas
+◈┄──━━┉─࿂
+
+◈───≼ 🕷️ MAIN & RPG 🕷️ ≽──⊚
+🕷️┝⎆ [ ${usedPrefix}juegos - Juegos disponibles
+🕸️┝⎆ [ ${usedPrefix}ping - Velocidad del bot
+🕷️┝⎆ [ ${usedPrefix}grupos - Lista de grupos
+🕷️┝⎆ [ ${usedPrefix}owner - Info del owner
+◈┄──━━┉─࿂
+
+◈───≼ 🧟‍♂️ OWNER 🧟‍♂️ ≽──⊚
+🕷️┝⎆ [ ${usedPrefix}reiniciar - Reiniciar bot
+🕸️┝⎆ [ ${usedPrefix}setname <nombre> - Cambiar nombre bot
+🕸️┝⎆ [ ${usedPrefix}setpp <img> - Cambiar foto bot
+🕷️┝⎆ [ ${usedPrefix}restart - Reinicio manual
+🕷️┝⎆ [ ${usedPrefix}update - Actualizar bot
 ◈┄──━━┉─࿂
 `.trim()
 
