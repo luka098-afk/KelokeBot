@@ -1,5 +1,6 @@
 import { spawn } from 'child_process'
-import { writeFile, unlink, readFile } from 'fs/promises'
+import { writeFile, unlink, readFile, access } from 'fs/promises'
+import { existsSync, mkdirSync } from 'fs'
 import { join } from 'path'
 import { tmpdir } from 'os'
 
@@ -7,7 +8,7 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
     try {
         let q = m.quoted ? m.quoted : m
         let mime = (q.msg || q).mimetype || q.mediaType || ''
-        
+
         if (!mime) {
             throw '🖼️ *Responde a una imagen, video, gif o sticker*\n\n*Ejemplo:*\n• Envía una imagen y responde con ' + usedPrefix + command
         }
@@ -16,22 +17,42 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
             if (/video/.test(mime) && (q.msg || q).seconds > 10) {
                 throw '⏰ *El video no puede durar más de 10 segundos*'
             }
-            
+
             let img = await q.download?.()
             if (!img) throw '❌ No se pudo descargar el archivo'
+
+            console.log('Descarga exitosa, creando sticker...')
             
             // Usar nuestra función corregida
             let stiker = await createSticker(img)
-            
+
             if (stiker) {
-                await conn.sendFile(m.chat, stiker, 'sticker.webp', '', m)
+                // Método alternativo de envío
+                try {
+                    await conn.sendMessage(m.chat, {
+                        sticker: stiker
+                    }, {
+                        quoted: m
+                    })
+                    console.log('Sticker enviado exitosamente')
+                } catch (sendError) {
+                    console.error('Error enviando con sendMessage:', sendError)
+                    // Fallback: intentar con sendFile
+                    try {
+                        await conn.sendFile(m.chat, stiker, 'sticker.webp', '', m)
+                        console.log('Sticker enviado con sendFile')
+                    } catch (sendFileError) {
+                        console.error('Error enviando con sendFile:', sendFileError)
+                        throw '❌ Error al enviar el sticker'
+                    }
+                }
             } else {
                 throw '❌ Error al crear el sticker'
             }
         } else {
             throw '🚫 *Formato no soportado*\n\n*Formatos válidos:* JPG, PNG, GIF, MP4, WEBP'
         }
-        
+
     } catch (e) {
         console.error('Error en sticker:', e)
         let errorMsg = typeof e === 'string' ? e : '🔧 Error de conversión. Verifica que el archivo sea válido.'
@@ -45,74 +66,100 @@ handler.command = /^s(tic?ker)?(gif)?$/i
 
 export default handler
 
-// Función para crear stickers sin el error de transparent
+// Función para crear stickers sin errores
 async function createSticker(buffer) {
-    const tmp = join(tmpdir(), `sticker_${Date.now()}_${Math.random().toString(36).substring(7)}`)
+    // Asegurar que el directorio tmp existe
+    const tempDir = tmpdir()
+    if (!existsSync(tempDir)) {
+        try {
+            mkdirSync(tempDir, { recursive: true })
+        } catch (error) {
+            console.error('Error creando directorio tmp:', error)
+        }
+    }
+
+    const timestamp = Date.now()
+    const random = Math.random().toString(36).substring(7)
+    const tmp = join(tempDir, `sticker_${timestamp}_${random}`)
     const input = `${tmp}_input`
     const output = `${tmp}_output.webp`
-    
+
+    try {
+        console.log('Escribiendo archivo temporal:', input)
+        await writeFile(input, buffer)
+        
+        // Verificar que el archivo se creó correctamente
+        await access(input)
+        console.log('Archivo temporal creado exitosamente')
+
+        // Configuración simple y efectiva
+        const ffmpegArgs = [
+            '-i', input,
+            '-vf', 'scale=512:512:force_original_aspect_ratio=decrease,pad=512:512:(ow-iw)/2:(oh-ih)/2:color=white@0.0',
+            '-c:v', 'libwebp',
+            '-quality', '75',
+            '-method', '4',
+            '-f', 'webp',
+            '-y', // Sobrescribir archivo de salida si existe
+            output
+        ]
+
+        console.log('Ejecutando FFmpeg...')
+        await runFFmpeg(ffmpegArgs)
+        
+        // Verificar que el archivo de salida existe
+        await access(output)
+        console.log('Sticker creado exitosamente')
+        
+        const stickerBuffer = await readFile(output)
+        
+        // Limpiar archivos temporales
+        await cleanup(input, output)
+        
+        return stickerBuffer
+
+    } catch (error) {
+        console.error('Error en createSticker:', error)
+        await cleanup(input, output)
+        
+        // Fallback: intentar con configuración más simple
+        try {
+            console.log('Intentando con configuración básica...')
+            return await createStickerSimple(buffer)
+        } catch (fallbackError) {
+            console.error('Error en fallback:', fallbackError)
+            throw new Error('No se pudo crear el sticker: ' + error.message)
+        }
+    }
+}
+
+// Función de respaldo más simple
+async function createStickerSimple(buffer) {
+    const tempDir = tmpdir()
+    const timestamp = Date.now()
+    const random = Math.random().toString(36).substring(7)
+    const tmp = join(tempDir, `simple_${timestamp}_${random}`)
+    const input = `${tmp}_input`
+    const output = `${tmp}_output.webp`
+
     try {
         await writeFile(input, buffer)
         
-        // Opción 1: Sin padding (más simple)
-        const ffmpegArgs1 = [
-            '-i', input,
-            '-vf', 'scale=512:512:force_original_aspect_ratio=decrease',
-            '-vcodec', 'libwebp',
-            '-q:v', '50',
-            '-preset', 'default',
-            '-loop', '0',
-            '-an',
-            '-f', 'webp',
-            output
-        ]
-        
-        // Opción 2: Con padding usando color válido
-        const ffmpegArgs2 = [
-            '-i', input,
-            '-vf', 'scale=512:512:force_original_aspect_ratio=decrease,pad=512:512:(ow-iw)/2:(oh-ih)/2:white',
-            '-vcodec', 'libwebp',
-            '-q:v', '50',
-            '-preset', 'default',
-            '-loop', '0',
-            '-an',
-            '-f', 'webp',
-            output
-        ]
-        
-        // Opción 3: Más básica
-        const ffmpegArgs3 = [
+        const simpleArgs = [
             '-i', input,
             '-vf', 'scale=512:512',
             '-c:v', 'libwebp',
-            '-quality', '50',
-            '-method', '4',
             '-f', 'webp',
+            '-y',
             output
         ]
+
+        await runFFmpeg(simpleArgs)
+        const stickerBuffer = await readFile(output)
         
-        // Intentar diferentes configuraciones
-        const configs = [ffmpegArgs1, ffmpegArgs3, ffmpegArgs2]
-        
-        for (let i = 0; i < configs.length; i++) {
-            try {
-                const result = await runFFmpeg(configs[i])
-                if (result) {
-                    const stickerBuffer = await readFile(output)
-                    
-                    // Limpiar archivos
-                    await cleanup(input, output)
-                    
-                    return stickerBuffer
-                }
-            } catch (error) {
-                console.log(`Intento ${i + 1} falló:`, error.message)
-                if (i === configs.length - 1) {
-                    throw error
-                }
-            }
-        }
-        
+        await cleanup(input, output)
+        return stickerBuffer
+
     } catch (error) {
         await cleanup(input, output)
         throw error
@@ -121,36 +168,57 @@ async function createSticker(buffer) {
 
 function runFFmpeg(args) {
     return new Promise((resolve, reject) => {
-        const ffmpeg = spawn('ffmpeg', ['-y', ...args], {
+        console.log('FFmpeg args:', args.join(' '))
+        
+        const ffmpeg = spawn('ffmpeg', args, {
             stdio: ['pipe', 'pipe', 'pipe']
         })
-        
+
         let stderr = ''
-        
+        let stdout = ''
+
+        ffmpeg.stdout.on('data', (data) => {
+            stdout += data.toString()
+        })
+
         ffmpeg.stderr.on('data', (data) => {
             stderr += data.toString()
         })
-        
+
         ffmpeg.on('close', (code) => {
             if (code === 0) {
+                console.log('FFmpeg completado exitosamente')
                 resolve(true)
             } else {
-                reject(new Error(`FFmpeg error: ${stderr}`))
+                console.error('FFmpeg error code:', code)
+                console.error('FFmpeg stderr:', stderr)
+                reject(new Error(`FFmpeg falló con código ${code}: ${stderr}`))
             }
         })
-        
+
         ffmpeg.on('error', (error) => {
-            reject(error)
+            console.error('FFmpeg spawn error:', error)
+            reject(new Error(`Error ejecutando FFmpeg: ${error.message}`))
         })
+
+        // Timeout de seguridad (30 segundos)
+        setTimeout(() => {
+            ffmpeg.kill('SIGTERM')
+            reject(new Error('FFmpeg timeout - proceso terminado'))
+        }, 30000)
     })
 }
 
 async function cleanup(input, output) {
-    try {
-        await unlink(input)
-    } catch {}
+    const files = [input, output]
     
-    try {
-        await unlink(output)
-    } catch {}
+    for (const file of files) {
+        try {
+            await access(file)
+            await unlink(file)
+            console.log('Archivo limpiado:', file)
+        } catch (error) {
+            // Archivo no existe o ya fue eliminado
+        }
+    }
 }
