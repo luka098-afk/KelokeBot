@@ -23,11 +23,17 @@ const handler = async (m, { conn, usedPrefix, command, groupMetadata, isAdmin })
   let contador = 1
   for (const userJid of warnedUsers) {
     const warnData = warns[userJid]
+    
+    // Verificar que warnData existe y tiene la estructura correcta
+    if (!warnData || typeof warnData !== 'object') continue
+    
     const userName = await conn.getName(userJid)
+    const count = warnData.count || 0
+    const lastDate = warnData.date || 'Sin fecha'
     
     listaTexto += `${contador}. @${userJid.split('@')[0]}\n`
-    listaTexto += `   ⚠️ *Advertencias:* ${warnData.count}/3\n`
-    listaTexto += `   📅 *Última fecha:* ${warnData.date}\n\n`
+    listaTexto += `   ⚠️ *Advertencias:* ${count}/3\n`
+    listaTexto += `   📅 *Última fecha:* ${lastDate}\n\n`
     
     mentionedUsers.push(userJid)
     contador++

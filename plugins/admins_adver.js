@@ -9,6 +9,8 @@ const handler = async (m, { conn, text, usedPrefix, command, participants, group
   if (!user) return m.reply(`✦ Debes mencionar a alguien.\nEjemplo: *${usedPrefix}${command} @usuario razón*`)
   if (!mensaje) return m.reply('✦ Debes escribir el motivo de la advertencia.')
 
+  const date = new Date().toLocaleDateString('es-ES')
+
   // Inicializar el sistema de advertencias si no existe
   if (!global.db.data.chats[m.chat].warns) {
     global.db.data.chats[m.chat].warns = {}
@@ -24,8 +26,6 @@ const handler = async (m, { conn, text, usedPrefix, command, participants, group
     date: date,
     jid: user
   }
-
-  const date = new Date().toLocaleDateString('es-ES')
   const groupName = groupMetadata.subject
   const senderName = await conn.getName(m.sender)
   const userName = await conn.getName(user)
