@@ -27,8 +27,12 @@ const handler = async (m, { conn, usedPrefix, command, groupMetadata, isAdmin })
     // Verificar que warnData existe y tiene la estructura correcta
     if (!warnData || typeof warnData !== 'object') continue
     
-    const userName = await conn.getName(userJid)
     const count = warnData.count || 0
+    
+    // NO mostrar usuarios con 0 advertencias
+    if (count <= 0) continue
+    
+    const userName = await conn.getName(userJid)
     const lastDate = warnData.date || 'Sin fecha'
     
     listaTexto += `${contador}. @${userJid.split('@')[0]}\n`
