@@ -116,9 +116,12 @@ ${saludo}, ${taguser}!
 【𝕷 𝖎 𝖘 𝖙 𝖆 - 𝕯𝖊 - 𝕮 𝖔 𝖒 𝖆 𝖓 𝖉 𝖔 𝖘】
 
 ┝🩸 ${usedPrefix}idea <texto> - Envía tu idea a los Owners ☠️🧠
+
 ◈───≼ ⚰️ ADMINS ⚰️ ≽──⊚
+🩸┝⎆ [ ${usedPrefix}warn <@tag> - Advertir a alguien
+🩸┝⎆ [ ${usedPrefix}unwarn <@tag> - Sacarle la advertencia
+🩸┝⎆ [ ${usedPrefix}listadv - Ver advertencias
 🩸┝⎆ [ ${usedPrefix}ht <texto> - Mención masiva
-🩸┝⎆ [ ${usedPrefix}advertencia <@tag> <texto> - Advertencia
 🕸️┝⎆ [ ${usedPrefix}g - Abrir/Cerrar grupo
 🕷️┝⎆ [ ${usedPrefix}tagall - Mencionar a todos
 🕷️┝⎆ [ ${usedPrefix}setppgrupo <img> - Cambiar foto grupo
