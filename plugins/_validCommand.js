@@ -56,17 +56,6 @@ export async function before(m, { conn }) {
           newsletterJid: channelRD.id,
           serverMessageId: 100,
           newsletterName: channelRD.name
-        },
-        externalAdReply: {
-          title: 'Bot',
-          body: 'Sistema de comandos',
-          mediaUrl: null,
-          description: null,
-          previewType: "PHOTO",
-          thumbnailUrl: 'http://imgfz.com/i/ysZD3vi.jpeg',
-          sourceUrl: '-',
-          mediaType: 1,
-          renderLargerThumbnail: true
         }
       }
     };
@@ -95,7 +84,13 @@ export async function before(m, { conn }) {
         const msg = {
           text: `《✦》El bot está desactivado en este grupo.\n\n> ✦ Un *administrador* puede activarlo con:\n» *${usedPrefix}bot on*`,
           contextInfo: {
-            mentionedJid: [m.sender]
+            mentionedJid: [m.sender],
+            isForwarded: true,
+            forwardedNewsletterMessageInfo: {
+              newsletterJid: channelRD.id,
+              serverMessageId: 100,
+              newsletterName: channelRD.name
+            }
           }
         };
         await conn.sendMessage(m.chat, msg, { quoted: global.fakeMetaMsg });
@@ -110,13 +105,11 @@ export async function before(m, { conn }) {
         text: `《✦》El comando *${comando}* no existe.\nPara ver la lista de comandos usa:\n» *${usedPrefix}help*`,
         contextInfo: {
           mentionedJid: [m.sender],
-          externalAdReply: {
-            title: 'Comando no encontrado',
-            body: 'Bot de comandos',
-            thumbnailUrl: 'http://imgfz.com/i/ysZD3vi.jpeg',
-            sourceUrl: '-',
-            mediaType: 1,
-            renderLargerThumbnail: true
+          isForwarded: true,
+          forwardedNewsletterMessageInfo: {
+            newsletterJid: channelRD.id,
+            serverMessageId: 100,
+            newsletterName: channelRD.name
           }
         }
       };
