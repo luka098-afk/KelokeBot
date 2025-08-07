@@ -1,31 +1,38 @@
-const handler = async (m, { conn }) => {
-  const chat = global.db.data.chats[m.chat] || {};
-  
-  // Solo claves que existen explícitamente y son booleanas
-  const claves = Object.keys(chat).filter(k => typeof chat[k] === 'boolean' && k in chat);
-
-  if (!claves.length) {
-    return conn.reply(m.chat, '*⚠️ No hay configuraciones activadas en este grupo.*', m);
-  }
-
-  let texto = '╭━━🎛️ *CONFIGURACIÓN DEL GRUPO* ━━╮\n';
-  for (const clave of claves) {
-    texto += `┃ *${formatear(clave)}:* ${chat[clave] ? '✅ Activado' : '❌ Desactivado'}\n`;
-  }
-  texto += '╰━━━━━━━━━━━━━━━━━━━━━━━━━━╯';
-
-  await conn.reply(m.chat, texto, m);
+const options = {
+  nsfw: 'nsfw',
+  reaction: 'reaction',
+  antilink: 'antilink',
+  modoadmin: 'modoadmin',
+  detect: 'detect',
+  welcome: 'welcome',
+  isbanned: 'isbanned'
 };
 
-function formatear(texto) {
-  return texto
-    .replace(/([A-Z])/g, ' $1') // separa camelCase en palabras
-    .replace(/^./, s => s.toUpperCase()); // primera letra en mayúscula
-}
+const handler = async (m, { conn, command }) => {
+  const chat = global.db.data.chats[m.chat] || {};
+  const cmd = command.toLowerCase();
 
-handler.command = ['config'];
-handler.tags = ['group'];
-handler.help = ['config'];
+  if (cmd === 'config') {
+    // Mostrar el estado de todas las opciones
+    let text = '╭━━🎛️ *GROUP CONFIGURATION* ━━╮\n';
+    for (const key in options) {
+      const state = chat[key] ? '✅ ON' : '❌ OFF';
+      text += `┃ *${options[key]}:* ${state}\n`;
+    }
+    text += '╰━━━━━━━━━━━━━━━━━━━━━━━━━━╯';
+    return conn.reply(m.chat, text, m);
+  }
+
+  if (options[cmd]) {
+    chat[cmd] = !chat[cmd];
+    const state = chat[cmd] ? 'enabled ✅' : 'disabled ❌';
+    return conn.reply(m.chat, `*${cmd}* has been ${state}.`, m);
+  }
+};
+
+handler.command = /^(config|nsfw|reaction|antilink|modoadmin|detect|welcome|isbanned)$/i;
 handler.group = true;
+handler.tags = ['group'];
+handler.help = ['config', 'nsfw', 'reaction', 'antilink', 'modoadmin', 'detect', 'welcome', 'isbanned'].map(c => `.${c}`);
 
 export default handler;
