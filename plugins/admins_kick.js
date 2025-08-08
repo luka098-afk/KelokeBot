@@ -53,7 +53,7 @@ const handler = async (m, { conn, participants, usedPrefix, command }) => {
 handler.help = ['k'];
 handler.tags = ['grupo'];
 handler.command = ['k','echar','hechar','sacar','ban'];
-handler.admin = true;
+handler.admin = false;
 handler.group = true;
 handler.register = true;
 handler.botAdmin = true;

@@ -20,7 +20,7 @@ let handler = async (m, { conn, usedPrefix, command, isAdmin, isBotAdmin }) => {
 handler.command = ['setppgrupo', 'setppgroup']
 handler.group = true
 handler.admin = true
-handler.botAdmin = true
+handler.botAdmin = false
 handler.tags = ['group']
 handler.help = ['setppgrupo (responde a imagen)']
 

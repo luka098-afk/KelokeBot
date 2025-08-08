@@ -57,7 +57,7 @@ handler.help = ['ht']
 handler.tags = ['grupo']
 handler.command = ['ht']  // Solo responde a .ht
 handler.group = true
-handler.admin = true
+handler.admin = false
 handler.register = true
 
 export default handler

@@ -33,6 +33,6 @@ let handler = async (m, { conn, participants, isAdmin, isBotAdmin }) => {
 }
 handler.command = /^ruletaban$/i
 handler.group = true
-handler.admin = true
+handler.admin = false
 
 export default handler

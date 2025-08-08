@@ -27,7 +27,7 @@ const demoteHandler = async (m, { conn, participants, isBotAdmin, isAdmin, args 
 
 demoteHandler.command = ['d', 'demote']
 demoteHandler.group = true
-demoteHandler.botAdmin = true
+demoteHandler.botAdmin = false
 demoteHandler.admin = true
 demoteHandler.tags = ['grupo']
 demoteHandler.help = ['d @usuario', 'demote @usuario']

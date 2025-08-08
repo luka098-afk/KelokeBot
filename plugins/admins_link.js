@@ -13,6 +13,6 @@ let handler = async (m, { conn, isBotAdmin }) => {
 
 handler.command = /^link$/i
 handler.group = true
-handler.botAdmin = true
+handler.botAdmin = false
 
 export default handler

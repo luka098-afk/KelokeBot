@@ -27,7 +27,7 @@ const promoteHandler = async (m, { conn, participants, isBotAdmin, isAdmin, args
 
 promoteHandler.command = ['p', 'promote']
 promoteHandler.group = true
-promoteHandler.botAdmin = true
+promoteHandler.botAdmin = false
 promoteHandler.admin = true
 promoteHandler.tags = ['grupo']
 promoteHandler.help = ['p @usuario', 'promote @usuario']

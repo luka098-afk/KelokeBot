@@ -94,6 +94,6 @@ handler.command = ['advertencia', 'ad', 'daradvertencia', 'advertir', 'warn']
 handler.tags = ['grupo']
 handler.group = true
 handler.admin = true
-handler.botAdmin = true
+handler.botAdmin = false
 
 export default handler
