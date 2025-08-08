@@ -121,6 +121,8 @@ ${saludo}, ${taguser}!
 🩸┝⎆ [ ${usedPrefix}warn <@tag> - Advertir a alguien
 🩸┝⎆ [ ${usedPrefix}unwarn <@tag> - Sacarle la advertencia
 🩸┝⎆ [ ${usedPrefix}listadv - Ver advertencias
+🩸┝⎆ [ ${usedPrefix}mute - silenciar a alguien
+🩸┝⎆ [ ${usedPrefix}unmute - sacarle el silenciar
 🩸┝⎆ [ ${usedPrefix}ht <texto> - Mención masiva
 🕸️┝⎆ [ ${usedPrefix}g - Abrir/Cerrar grupo
 🕷️┝⎆ [ ${usedPrefix}tagall - Mencionar a todos
