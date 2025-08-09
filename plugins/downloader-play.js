@@ -4,7 +4,12 @@ import axios from "axios"
 
 const youtubeRegexID = /(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([a-zA-Z0-9_-]{11})/
 
-const handler = async (m, { conn, text, usedPrefix, command }) => {
+const handler = async (m, { conn, text, usedPrefix, command, isBotAdmin }) => {
+  // Verificar admin de forma simple
+  if (m.isGroup && !isBotAdmin) {
+    return conn.reply(m.chat, `🔒 *Necesito ser administrador del grupo para enviar música.*\n\n💡 *Solución:* Hazme administrador y vuelve a intentarlo.`, m)
+  }
+
   const fake = {
     quoted: m,
     contextInfo: {
