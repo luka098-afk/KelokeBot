@@ -58,7 +58,12 @@ async function descargarDeTikTok(urlTikTok) {
   throw new Error('No se encontró respuesta, puede que el enlace esté mal')
 }
 
-let yeon = async (m, { conn, text, usedPrefix, command }) => {
+let yeon = async (m, { conn, text, usedPrefix, command, isBotAdmin }) => {
+  // Verificar admin - solo funciona si el bot es admin en grupos
+  if (m.isGroup && !isBotAdmin) {
+    return conn.reply(m.chat, `🔒 *Necesito ser administrador del grupo para descargar de TikTok.*\n\n💡 *Solución:* Hazme administrador y vuelve a intentarlo.`, m)
+  }
+
   if (!text) {
     await conn.sendMessage(m.chat, { react: { text: "❌", key: m.key } })
     return conn.sendMessage(m.chat, {
@@ -109,9 +114,9 @@ Ejemplo: *${usedPrefix + command}* https://vt.tiktok.com/abcd/`
   }
 }
 
-yeon.help = ['tiktokdl <url>']
+yeon.help = ['tiktok <url>']
 yeon.tags = ['downloader']
-yeon.command = ['tiktok', 'ttdl', 'tt']
+yeon.command = ['tiktok']
 yeon.register = true
 yeon.limit = true
 

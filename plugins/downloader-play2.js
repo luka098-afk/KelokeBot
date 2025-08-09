@@ -2,7 +2,12 @@ import fetch from "node-fetch";
 import axios from 'axios';
 import yts from 'yt-search';
 
-const handler = async (m, { conn, text, usedPrefix, command, args }) => {
+const handler = async (m, { conn, text, usedPrefix, command, args, isBotAdmin }) => {
+  // Verificar admin de forma simple - solo funciona si el bot es admin en grupos
+  if (m.isGroup && !isBotAdmin) {
+    return conn.reply(m.chat, `🔒 *Necesito ser administrador del grupo para enviar videos.*\n\n💡 *Solución:* Hazme administrador y vuelve a intentarlo.`, m)
+  }
+
   try {
     if (!text) {
       return conn.reply(m.chat, `🌾 *Ingresa un link de YouTube o el nombre del video*\n\n*Ejemplo:*\n${usedPrefix + command} https://youtu.be/abc123\n${usedPrefix + command} linkin park somewhere i belong`, m);
@@ -63,7 +68,7 @@ const handler = async (m, { conn, text, usedPrefix, command, args }) => {
 
     // API key corregida (sin espacios)
     const apiUrl = `https://api.stellarwa.xyz/dow/ytmp4?url=${encodeURIComponent(url)}&apikey=stellar-nzBMWh9P`;
-    
+
     let data;
     try {
       const response = await axios.get(apiUrl, {
@@ -84,7 +89,7 @@ const handler = async (m, { conn, text, usedPrefix, command, args }) => {
     }
 
     const videoUrl = data.data.dl;
-    
+
     // Obtener tamaño del archivo
     const size = await getSize(videoUrl);
     const sizeStr = size ? await formatSize(size) : 'Desconocido';
@@ -130,7 +135,7 @@ const handler = async (m, { conn, text, usedPrefix, command, args }) => {
       }
 
       const videoBuffer = await videoResponse.buffer();
-      
+
       // Sanitizar el nombre del archivo
       const cleanTitle = title.replace(/[^\w\s-]/g, '').trim().substring(0, 50);
       const fileName = `${cleanTitle}.mp4`;
@@ -152,9 +157,9 @@ const handler = async (m, { conn, text, usedPrefix, command, args }) => {
   }
 };
 
-handler.help = ['ytmp4 <link o nombre>'];
+handler.help = ['play2 <link o nombre>'];
 handler.tags = ['descargas'];
-handler.command = ['ytmp4', 'ytvideo', 'ytv'];
+handler.command = ['play2'];
 handler.register = true;
 
 export default handler;
@@ -163,15 +168,15 @@ export default handler;
 async function formatSize(bytes) {
   const units = ['B', 'KB', 'MB', 'GB', 'TB'];
   let i = 0;
-  
+
   if (!bytes || isNaN(bytes) || bytes <= 0) return 'Desconocido';
-  
+
   let size = bytes;
   while (size >= 1024 && i < units.length - 1) {
     size /= 1024;
     i++;
   }
-  
+
   return `${size.toFixed(2)} ${units[i]}`;
 }
 
@@ -184,7 +189,7 @@ async function getSize(url) {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
       }
     });
-    
+
     const contentLength = response.headers['content-length'];
     return contentLength ? parseInt(contentLength, 10) : null;
   } catch (error) {
