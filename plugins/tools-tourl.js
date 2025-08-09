@@ -1,33 +1,56 @@
-import { writeFile, unlink, readFile } from 'fs/promises'
+import { writeFileSync, unlinkSync, readFileSync, existsSync, mkdirSync } from 'fs'
 import { join } from 'path'
 import { fileTypeFromBuffer } from 'file-type'
-import { FormData } from 'formdata-node'
-import { File } from 'formdata-node/file-from-path'
 import fetch from 'node-fetch'
 
-let handler = async (m, { conn }) => {
+const handler = async (m, { conn }) => {
+  // Log para verificar que el comando se está ejecutando
+  console.log('🔧 Comando tourl ejecutado')
+  
   await conn.sendMessage(m.chat, { react: { text: '☁️', key: m.key } })
 
   try {
+    // Crear directorio tmp si no existe
+    if (!existsSync('./tmp')) {
+      mkdirSync('./tmp', { recursive: true })
+    }
+
     const q = m.quoted ? m.quoted : m
     const mime = (q.msg || q).mimetype || ''
-    if (!mime) return m.reply('🌧️ *Responde a un archivo o media para subirlo.*')
+    
+    if (!mime) {
+      return conn.reply(m.chat, '🌧️ *Responde a un archivo o media para subirlo.*', m)
+    }
 
+    console.log('📁 Descargando archivo con mime:', mime)
     const media = await q.download()
-    if (!media) return m.reply('⛅ *Error al descargar el archivo.*')
+    
+    if (!media || media.length === 0) {
+      return conn.reply(m.chat, '⛅ *Error al descargar el archivo.*', m)
+    }
 
+    console.log('📤 Archivo descargado, tamaño:', media.length, 'bytes')
     const uploads = []
 
-    const up1 = await uploaderCloudStack(media).catch(() => null)
-    if (up1) uploads.push({ name: '☁️ CloudStack', url: up1 })
+    // Intentar subir a los servidores
+    try {
+      const up1 = await uploaderCloudStack(media)
+      if (up1) uploads.push({ name: '☁️ CloudStack', url: up1 })
+    } catch (e) { console.log('CloudStack falló:', e.message) }
 
-    const up2 = await uploaderCloudGuru(media).catch(() => null)
-    if (up2) uploads.push({ name: '🌀 CloudGuru', url: up2 })
+    try {
+      const up2 = await uploaderCloudGuru(media)
+      if (up2) uploads.push({ name: '🌀 CloudGuru', url: up2 })
+    } catch (e) { console.log('CloudGuru falló:', e.message) }
 
-    const up3 = await uploaderCloudCom(media).catch(() => null)
-    if (up3) uploads.push({ name: '🌐 CloudImages', url: up3 })
+    try {
+      const up3 = await uploaderCloudCom(media)
+      if (up3) uploads.push({ name: '🌐 CloudImages', url: up3 })
+    } catch (e) { console.log('CloudCom falló:', e.message) }
 
-    if (uploads.length === 0) throw '⛈️ *No se pudo subir a ningún servidor. Intenta de nuevo más tarde.*'
+    if (uploads.length === 0) {
+      throw '⛈️ *No se pudo subir a ningún servidor. Intenta de nuevo más tarde.*'
+    }
 
     let texto = `☁️ *Resultado de la Subida*\n*━━━━━━━━━━━━━━━━━━━━*\n\n`
     for (const up of uploads) {
@@ -48,55 +71,87 @@ let handler = async (m, { conn }) => {
     }, { quoted: m })
 
   } catch (e) {
-    await conn.sendMessage(m.chat, {
-      text: typeof e === 'string' ? e : '⛈️ *Ocurrió un error inesperado durante la subida.*',
-      quoted: m
-    })
+    console.error('❌ Error en handler:', e)
+    await conn.reply(m.chat, typeof e === 'string' ? e : '⛈️ *Ocurrió un error inesperado durante la subida.*', m)
   } finally {
     await conn.sendMessage(m.chat, { react: { text: '', key: m.key } })
   }
 }
 
+// CONFIGURACIÓN DEL COMANDO - SOLO TOURL
 handler.help = ['tourl']
 handler.tags = ['tools']
-handler.command = ['tóurl', 'url', 'tourl']
+handler.command = ['tourl']
 handler.limit = true
 handler.register = true
 
 export default handler
 
-// Función genérica para subir el buffer a un servidor
+// Función para subir archivo usando FormData nativo de Node.js
 async function uploadTo(url, buffer) {
-  const { ext, mime } = await fileTypeFromBuffer(buffer) || {}
-  if (!ext || !mime) throw new Error('Formato de archivo no reconocido.')
-
-  const tempPath = join('./tmp', `upload.${ext}`)
-  await writeFile(tempPath, buffer)
-  const file = new File([await readFile(tempPath)], `upload.${ext}`, { type: mime })
-
-  const form = new FormData()
-  form.append('file', file)
-
   try {
-    const res = await fetch(url, { method: 'POST', body: form })
-    const json = await res.json()
-    await unlink(tempPath).catch(() => null)
+    const fileType = await fileTypeFromBuffer(buffer)
+    const ext = fileType?.ext || 'bin'
+    const mime = fileType?.mime || 'application/octet-stream'
+    
+    console.log(`📄 Detectado: .${ext} (${mime})`)
+    
+    // Crear boundary para FormData manual
+    const boundary = '----formdata-' + Math.random().toString(36)
+    const filename = `upload_${Date.now()}.${ext}`
+    
+    // Construir FormData manualmente
+    let formData = ''
+    formData += `--${boundary}\r\n`
+    formData += `Content-Disposition: form-data; name="file"; filename="${filename}"\r\n`
+    formData += `Content-Type: ${mime}\r\n\r\n`
+    
+    const formDataBuffer = Buffer.concat([
+      Buffer.from(formData, 'utf8'),
+      buffer,
+      Buffer.from(`\r\n--${boundary}--\r\n`, 'utf8')
+    ])
 
-    if (json?.status !== 'success' || !json?.data?.url) throw new Error('Error al subir el archivo.')
-    return json.data.url
-  } catch (err) {
-    console.error(`Error subiendo a (${url}):`, err)
-    await unlink(tempPath).catch(() => null)
-    return null
+    console.log(`📡 Subiendo ${formDataBuffer.length} bytes a: ${url}`)
+    
+    const response = await fetch(url, {
+      method: 'POST',
+      body: formDataBuffer,
+      headers: {
+        'Content-Type': `multipart/form-data; boundary=${boundary}`,
+        'Content-Length': formDataBuffer.length
+      },
+      timeout: 30000
+    })
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+    }
+
+    const result = await response.json()
+    console.log('📨 Respuesta:', result)
+
+    if (result.status === 'success' && result.data?.url) {
+      return result.data.url
+    }
+    
+    throw new Error('Respuesta del servidor inválida')
+    
+  } catch (error) {
+    console.error(`❌ Error en ${url}:`, error.message)
+    throw error
   }
 }
 
-// URLs de los servicios de subida
-const uploaderCloudStack = buffer =>
-  uploadTo('https://phpstack-1487948-5667813.cloudwaysapps.com/upload.php', buffer)
+// Servicios de upload
+const uploaderCloudStack = async (buffer) => {
+  return await uploadTo('https://phpstack-1487948-5667813.cloudwaysapps.com/upload.php', buffer)
+}
 
-const uploaderCloudGuru = buffer =>
-  uploadTo('https://cloudkuimages.guru/upload.php', buffer)
+const uploaderCloudGuru = async (buffer) => {
+  return await uploadTo('https://cloudkuimages.guru/upload.php', buffer)
+}
 
-const uploaderCloudCom = buffer =>
-  uploadTo('https://cloudkuimages.com/upload.php', buffer)
+const uploaderCloudCom = async (buffer) => {
+  return await uploadTo('https://cloudkuimages.com/upload.php', buffer)
+}
