@@ -45,12 +45,6 @@ let handler = async (m, { conn, usedPrefix, __dirname, participants }) => {
     ]
     let videoUrl = vids[Math.floor(Math.random() * vids.length)]
 
-    const header = [
-      `╔═━★•°*"'*°•★━═╗`,
-      `    ✦ ꧁𝐖𝐞𝐥𝐜𝐨𝐦𝐞꧂ ✦`,
-      `╚═━★•°*"'*°•★━═╝`
-    ].join('\n')
-
     const user = global.db.data.users[m.sender] || {};
     const country = user.country || '';
     const isPremium = user.premium || false;
@@ -79,33 +73,15 @@ let handler = async (m, { conn, usedPrefix, __dirname, participants }) => {
       }
     }
 
-    // Calcular saludo según hora (ajustado para Uruguay UTC-3)
-    let saludo
-    let hora = new Date().getUTCHours() - 3 // Zona horaria de Uruguay
-    if (hora < 0) hora += 24
-    if (hora >= 24) hora -= 24
-
-    if (hora >= 5 && hora < 13) {
-      saludo = 'Hola que tengas un lindo día'
-    } else if (hora >= 13 && hora < 18) {
-      saludo = 'Buenas tardes, ¿qué se te ofrece?'
-    } else {
-      saludo = '¿Por qué aún no duermes? 🥱'
-    }
-
-    // Fecha formateada para Uruguay
+    // Fecha simplificada
     const date = new Date().toLocaleDateString('es-UY', {
       weekday: 'long',
-      year: 'numeric',
-      month: 'long',
       day: 'numeric',
-      timeZone: 'America/Montevideo'
+      month: 'numeric',
+      year: 'numeric'
     })
 
-    const body = `
-Bienvenido a 𝗞𝗲𝗹𝗼𝗸𝗲𝗕𝗼𝘁
-${saludo}, ${taguser}!
-╔═══════𝐊𝐞𝐥𝐨𝐤𝐞𝐁𝐨𝐭═══════╗
+    const body = `╔═══════𝐊𝐞𝐥𝐨𝐤𝐞𝐁𝐨𝐭═══════╗
 ┃    𝙷𝚘𝚕𝚊, 𝚜𝚘𝚢 𝚝𝚞 𝚊𝚜𝚒𝚜𝚝𝚎𝚗𝚝𝚎 𝚣𝚘𝚖𝚋𝚒𝚎 🧟‍♂️    ┃
 ┃        Usuario: ${taguser}         ┃
 ┃         Fecha: ${date}          ┃
@@ -212,9 +188,6 @@ ${saludo}, ${taguser}!
 ◈┄──━━┉─࿂
 `.trim()
 
-    // Unir header + body
-    const menu = `${header}\n${body}`
-
     // Enviar el menú con video (si hay URL) o solo texto
     if (videoUrl && videoUrl.trim() !== '') {
       await conn.sendMessage(m.chat, {
@@ -234,14 +207,14 @@ ${saludo}, ${taguser}!
 
   } catch (e) {
     console.error(e)
-    
+
     // Crear un body básico en caso de error
     const errorBody = `
 Bienvenido a 𝗞𝗲𝗹𝗼𝗸𝗲𝗕𝗼𝘁
 ¡Hola! Hubo un error al cargar el menú completo.
 Usa ${usedPrefix}help para ver los comandos disponibles.
     `.trim()
-    
+
     // Si hay error, enviar menú básico
     await conn.sendMessage(m.chat, {
       text: errorBody,
