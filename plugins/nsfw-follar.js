@@ -17,21 +17,27 @@ let handler = async (m, { conn, usedPrefix }) => {
     who = m.sender;
   }
 
+  let sender = m.sender;
   let name = await conn.getName(who);
-  let name2 = await conn.getName(m.sender);
+  let name2 = await conn.getName(sender);
+
   await m.react('🥵');
 
   let str;
+  let mentions;
+
   if (m.mentionedJid && m.mentionedJid.length > 0) {
-    str = `\`${name2}\` *🔥 se descontroló y follo muy duro a* \`${name || who}\`.`;
+    str = `@${sender.split('@')[0]} *🔥 se descontroló y follo muy duro a* @${who.split('@')[0]}.`;
+    mentions = [sender, who];
   } else if (m.quoted) {
-    str = `\`${name2}\` *😈 hizo travesuras con* \`${name || who}\`.`;
+    str = `@${sender.split('@')[0]} *😈 hizo travesuras con* @${who.split('@')[0]}.`;
+    mentions = [sender, who];
   } else {
-    str = `\`${name2}\` *😏 está en modo caliente.*`;
+    str = `@${sender.split('@')[0]} *😏 está en modo caliente.*`;
+    mentions = [sender];
   }
 
   if (m.isGroup) {
-    let mentions = [who];
     await conn.sendMessage(
       m.chat,
       { text: str, mentions },

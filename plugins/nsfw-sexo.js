@@ -15,21 +15,29 @@ let handler = async (m, { conn, usedPrefix }) => {
     who = m.sender;
   }
 
-  let name = conn.getName(who);
-  let name2 = conn.getName(m.sender);
+  let sender = m.sender;
+  let nameWho = await conn.getName(who);
+  let nameSender = await conn.getName(sender);
+
   m.react('🥵');
 
-  let str;
+  let text;
+  let mentions;
+
   if (m.mentionedJid.length > 0) {
-    str = `\`${name2}\` *tiene sexo fuertemente con* \`${name || who}\`.`;
+    // Mencionar a los dos: sender y quien fue mencionado
+    text = `@${sender.split('@')[0]} *tiene sexo fuertemente con* @${who.split('@')[0]}.`;
+    mentions = [sender, who];
   } else if (m.quoted) {
-    str = `\`${name2}\` *tiene sexo con* \`${name || who}\`.`;
+    text = `@${sender.split('@')[0]} *tiene sexo con* @${who.split('@')[0]}.`;
+    mentions = [sender, who];
   } else {
-    str = `\`${name2}\` *tiene sexo apasionadamente.*`.trim();
+    // Solo menciona al sender porque no hay otro
+    text = `@${sender.split('@')[0]} *tiene sexo apasionadamente.*`;
+    mentions = [sender];
   }
 
-  let mentions = [who];
-  await conn.sendMessage(m.chat, { text: str, mentions }, { quoted: m });
+  await conn.sendMessage(m.chat, { text, mentions }, { quoted: m });
 };
 
 handler.help = ['sexo/sex @tag'];

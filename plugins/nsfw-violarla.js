@@ -15,20 +15,26 @@ let handler = async (m, { conn, usedPrefix }) => {
     who = m.sender;
   }
 
-  let name = conn.getName(who);
-  let name2 = conn.getName(m.sender);
-  m.react('🥵');
+  let sender = m.sender;
+  let name = await conn.getName(who);
+  let name2 = await conn.getName(sender);
+
+  await m.react('🥵');
 
   let str;
+  let mentions;
+
   if (m.mentionedJid.length > 0) {
-    str = `\`${name2}\` *acabás de violar a la putita de* \`${name || who}\` *mientras te decía "metemela durooo más durooo que rico pitote"...*\n*Tenemos que volver a sudar juntos!!.*`;
+    str = `@${sender.split('@')[0]} *acabás de violar a la putita de* @${who.split('@')[0]} *mientras te decía "metemela durooo más durooo que rico pitote"...*\n*Tenemos que volver a sudar juntos!!.*`;
+    mentions = [sender, who];
   } else if (m.quoted) {
-    str = `\`${name2}\` *violaste a la zorra mal parida de* \`${name || who}\` *mientras te decía "metemela durooo más durooo que rico pitote"...*\n*Tenemos que volver a sudar juntos!!.*`;
+    str = `@${sender.split('@')[0]} *violaste a la zorra mal parida de* @${who.split('@')[0]} *mientras te decía "metemela durooo más durooo que rico pitote"...*\n*Tenemos que volver a sudar juntos!!.*`;
+    mentions = [sender, who];
   } else {
-    str = `\`${name2}\` *violó a alguien random del grupo por puta.*`.trim();
+    str = `@${sender.split('@')[0]} *violó a alguien random del grupo por puta.*`.trim();
+    mentions = [sender];
   }
 
-  let mentions = [who];
   await conn.sendMessage(m.chat, { text: str, mentions }, { quoted: m });
 };
 
