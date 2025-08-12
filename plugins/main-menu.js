@@ -145,9 +145,10 @@ let handler = async (m, { conn, usedPrefix, __dirname, participants }) => {
 🕷️┝⎆ [ ${usedPrefix}mipareja - Ver tu pareja actual
 🕷️┝⎆ [ ${usedPrefix}listparejas - Ver lista de parejas actuales
 🕷️┝⎆ [ ${usedPrefix}ex - Ver todos los ex que tuviste
+🕷️ [ ${usedPrefix}juegos - Juegos disponibles
 ◈┄──━━┉─࿂
 
-◈───≼ 🕸️ HERRAMIENTAS 🕸️ ≽──⊚
+◈───≼🕷️HERRAMIENTAS🕸≽──⊚
 🩸┝⎆ [ ${usedPrefix}s <img> - Crear sticker
 🩸┝⎆ [ ${usedPrefix}brat <texto> - Sticker brat style
 🕷️┝⎆ [ ${usedPrefix}rvocal <audio> - Cambiar voz
@@ -156,6 +157,9 @@ let handler = async (m, { conn, usedPrefix, __dirname, participants }) => {
 🕷️┝⎆ [ ${usedPrefix}tourl <imagen> - Imagen a enlace
 ┝⎆ [ ${usedPrefix}reportar <texto> - 🕷️ Invoca a los 𝔄𝔡𝔪𝔦𝔫𝔰 del más allá 🩸
 🧟┝⎆ [ ${usedPrefix}perfil - Ver perfil grupo
+┝⎆ [ ${usedPrefix}grupos - Lista de grupos
+🕷️┝⎆ [ ${usedPrefix}owner - Info del owner
+🕸️┝⎆ [ ${usedPrefix}ping - Velocidad del bot
 ◈┄──━━┉─࿂
 
 ◈───≼ 🧟‍♂️ IA & ARTE 🧟‍♂️ ≽──⊚
@@ -165,19 +169,8 @@ let handler = async (m, { conn, usedPrefix, __dirname, participants }) => {
 🕷️┝⎆ [ ${usedPrefix}wpw - Wallpaper random
 🕷️┝⎆ [ ${usedPrefix}gemini <texto> - Gemini IA
 🕷️┝⎆ [ ${usedPrefix}bgremover <img> - Quitar fondo
-◈┄──━━┉─࿂
-
-◈───≼ 🕸️ BUSCADORES 🕸️ ≽──⊚
-🕷️┝⎆ [ ${usedPrefix}pinterest <texto> - Buscar imágenes
-🕷️┝⎆ [ ${usedPrefix}aptoide <app> - Buscar APK
-🕷️┝⎆ [ ${usedPrefix}ssweb <texto> - Buscar páginas
-◈┄──━━┉─࿂
-
-◈───≼ 🕷️ MAIN & RPG 🕷️ ≽──⊚
-🕷️┝⎆ [ ${usedPrefix}juegos - Juegos disponibles
-🕸️┝⎆ [ ${usedPrefix}ping - Velocidad del bot
-🕷️┝⎆ [ ${usedPrefix}grupos - Lista de grupos
-🕷️┝⎆ [ ${usedPrefix}owner - Info del owner
+┝⎆ [ ${usedPrefix}pinterest <texto> - Buscar imágenes
+┝⎆ [ ${usedPrefix}ssweb <texto> - Buscar páginas
 ◈┄──━━┉─࿂
 
 ◈───≼ 🧟‍♂️ OWNER 🧟‍♂️ ≽──⊚
@@ -186,6 +179,7 @@ let handler = async (m, { conn, usedPrefix, __dirname, participants }) => {
 🕸️┝⎆ [ ${usedPrefix}setpp <img> - Cambiar foto bot
 🕷️┝⎆ [ ${usedPrefix}restart - Reinicio manual
 🕷️┝⎆ [ ${usedPrefix}update - Actualizar bot
+🕷️┝⎆ [ ${usedPrefix}ping - Velocidad del bot
 ◈┄──━━┉─࿂
 `.trim()
 
