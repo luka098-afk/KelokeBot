@@ -7,14 +7,14 @@ const handler = async (m, { conn }) => {
     const yoRaw = yoJid.split('@')[0]
 
     const parejasPath = path.join('./database', 'parejas.json')
+    const exparejasPath = path.join('./database', 'exparejas.json')
+
     if (!fs.existsSync(parejasPath)) return m.reply('❌ No tienes pareja actualmente.')
 
     const parejas = JSON.parse(fs.readFileSync(parejasPath))
-    if (!parejas[yoJid] && !parejas[yoRaw]) {
-      return m.reply('❌ No tienes pareja actualmente.')
-    }
+    const exparejas = fs.existsSync(exparejasPath) ? JSON.parse(fs.readFileSync(exparejasPath)) : {}
 
-    // Buscar datos usando la clave correcta
+    // Pareja actual
     const parejaData = parejas[yoJid] || parejas[yoRaw]
     if (!parejaData || !parejaData.pareja) {
       return m.reply('❌ No tienes pareja actualmente.')
@@ -24,7 +24,6 @@ const handler = async (m, { conn }) => {
     const parejaRaw = parejaJid.split('@')[0]
     const fechaInicio = new Date(parejaData.desde)
     const casados = parejaData.casados || false
-    const parejasAnteriores = parejaData.parejasAnteriores || 0
 
     // Calcular tiempo juntos
     const ahora = new Date()
@@ -33,7 +32,20 @@ const handler = async (m, { conn }) => {
     const horas = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
     const minutos = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
 
-    // Normalizar JIDs (por si hay formatos @c.us o @lid)
+    // Contar exs correctamente sin duplicados
+    const exSet = new Set()
+    for (const key in exparejas) {
+      const registro = exparejas[key]
+      if (key === yoJid) {
+        exSet.add(registro.ex) // tu ex
+      } else if (registro.ex === yoJid) {
+        exSet.add(key) // tu ex también registrado al revés
+      }
+    }
+
+    const exCount = exSet.size
+
+    // Normalizar JIDs
     const userClean = yoJid.includes('@') ? yoJid : `${yoRaw}@s.whatsapp.net`
     const parejaClean = parejaJid.includes('@') ? parejaJid : `${parejaRaw}@s.whatsapp.net`
 
@@ -53,7 +65,7 @@ ${dias} días, ${horas} horas, ${minutos} minutos
 
 *💍 Casados:* ${casados ? '✅ Sí' : '❌ No'}
 
-*💔 Amores pasados:* ${parejasAnteriores}`
+*💔 Amores pasados:* ${exCount}`
 
     await conn.sendMessage(m.chat, {
       text: mensaje,
