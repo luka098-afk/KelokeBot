@@ -3,36 +3,43 @@ import path from 'path'
 
 const handler = async (m, { conn }) => {
   try {
-    const userRaw = m.sender.split('@')[0]
-    const userJid = m.sender.includes('@') ? m.sender : `${m.sender}@s.whatsapp.net`
+    const yoJid = m.sender
+    const yoRaw = yoJid.split('@')[0]
 
     const parejasPath = path.join('./database', 'parejas.json')
     if (!fs.existsSync(parejasPath)) return m.reply('❌ No tienes pareja actualmente.')
 
     const parejas = JSON.parse(fs.readFileSync(parejasPath))
-    if (!parejas[userRaw]) return m.reply('❌ No tienes pareja actualmente.')
+    if (!parejas[yoJid] && !parejas[yoRaw]) {
+      return m.reply('❌ No tienes pareja actualmente.')
+    }
 
-    const parejaData = parejas[userRaw]
+    // Buscar datos usando la clave correcta
+    const parejaData = parejas[yoJid] || parejas[yoRaw]
+    if (!parejaData || !parejaData.pareja) {
+      return m.reply('❌ No tienes pareja actualmente.')
+    }
+
     const parejaJid = parejaData.pareja
     const parejaRaw = parejaJid.split('@')[0]
     const fechaInicio = new Date(parejaData.desde)
     const casados = parejaData.casados || false
     const parejasAnteriores = parejaData.parejasAnteriores || 0
 
+    // Calcular tiempo juntos
     const ahora = new Date()
     const diff = ahora - fechaInicio
-
     const dias = Math.floor(diff / (1000 * 60 * 60 * 24))
     const horas = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
     const minutos = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
 
-    // Limpiar y normalizar JIDs usando la lógica de pareja.js
-    const userClean = userJid.includes('@') ? userJid : `${userJid}@s.whatsapp.net`
-    const parejaClean = parejaJid.includes('@') ? parejaJid : `${parejaJid}@s.whatsapp.net`
+    // Normalizar JIDs (por si hay formatos @c.us o @lid)
+    const userClean = yoJid.includes('@') ? yoJid : `${yoRaw}@s.whatsapp.net`
+    const parejaClean = parejaJid.includes('@') ? parejaJid : `${parejaRaw}@s.whatsapp.net`
 
     const mensaje = `💌 *Declaración Oficial del Amor* 💌
 
-@${userRaw} está en pareja con @${parejaRaw} ✨
+@${yoRaw} está en pareja con @${parejaRaw} ✨
 
 📅 *Día ${dias + 1} de esta bella unión...*
 
@@ -48,16 +55,13 @@ ${dias} días, ${horas} horas, ${minutos} minutos
 
 *💔 Amores pasados:* ${parejasAnteriores}`
 
-    // Asegurar que usamos los JIDs correctos para las menciones
-    const mentionsArray = [userClean, parejaClean]
-
     await conn.sendMessage(m.chat, {
       text: mensaje,
-      mentions: mentionsArray
+      mentions: [userClean, parejaClean]
     })
 
   } catch (error) {
-    console.error('Error en .mipareja:', error)
+    console.error('❌ Error en .mipareja:', error)
     m.reply('❌ Ocurrió un error al consultar tu pareja.')
   }
 }
