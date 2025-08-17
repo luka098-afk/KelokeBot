@@ -37,24 +37,12 @@ if (typeof user !== 'object')
 
 global.db.data.users[m.sender] = {}
 if (user) {
-if (!isNumber(user.lastcode))
-user.lastcode = 0
-if (!isNumber(user.lastcodereg))
-user.lastcodereg = 0
 if (!('muto' in user))
 user.muto = false
 if (!('registered' in user))
 user.registered = false
-if (!('genre' in user))
-user.genre = ''
-if (!('birth' in user))
-user.birth = ''
 if (!('marry' in user))
 user.marry = ''
-if (!('description' in user))
-user.description = ''
-if (!('packstickers' in user))
-user.packstickers = null
 if (!user.registered) {
 if (!('name' in user))
 user.name = m.name
@@ -67,27 +55,17 @@ if (!('afkReason' in user))
 user.afkReason = ''
 if (!('banned' in user))
 user.banned = false
-if (!('useDocument' in user))
-user.useDocument = false
 if (!isNumber(user.warn))
 user.warn = 0
 } else
                 global.db.data.users[m.sender] = {
-lastcodereg: 0,
 muto: false,
 registered: false,
-genre: '',
-birth: '',
 marry: '',
-description: '',
-packstickers: null,
 name: m.name,
-age: -1,
-regTime: -1,
 afk: -1,
 afkReason: '',
 banned: false,
-useDocument: false,
 }
 let chat = global.db.data.chats[m.chat]
 if (typeof chat !== 'object')
@@ -291,8 +269,8 @@ return
 }
 
 if (user.antispam2 && isROwner) return
-let time = global.db.data.users[m.sender].spam + 3000
-if (new Date - global.db.data.users[m.sender].spam < 3000) return console.log(`[ SPAM ]`) 
+let time = global.db.data.users[m.sender].spam + 1000
+if (new Date - global.db.data.users[m.sender].spam < 1000) return console.log(`[ SPAM ]`) 
 global.db.data.users[m.sender].spam = new Date * 1
 
 if (m.chat in global.db.data.chats || m.sender in global.db.data.users) {
@@ -343,7 +321,7 @@ fail('private', m, this)
 continue
 }
 m.isCommand = true
-let xp = 'exp' in plugin ? parseInt(plugin.exp) : 17 
+let xp = 'exp' in plugin ? parseInt(plugin.exp) : 17
 if (xp > 200)
 m.reply('chirrido -_-')
 else

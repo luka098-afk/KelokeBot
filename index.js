@@ -77,13 +77,13 @@ async function showBanner() {
                 borderStyle: 'double',
                 borderColor: 'whiteBright',
                 backgroundColor: 'black',
-                title: 'Roxy AI',
+                title: 'Keloke',
                 titleAlignment: 'center'
             }
         )
     )
 
-    say('RoxyAi', {
+    say('Keloke', {
         font: 'block',
         align: 'center',
         colors: ['blue', 'cyan'],
