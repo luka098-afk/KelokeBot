@@ -37,40 +37,12 @@ if (typeof user !== 'object')
 
 global.db.data.users[m.sender] = {}
 if (user) {
-if (!isNumber(user.exp))
-user.exp = 0
-if (!isNumber(user.joincount))
-user.joincount = 1
-if (!isNumber(user.diamond))
-user.diamond = 3
-if (!isNumber(user.lastadventure))
-user.lastadventure = 0
-if (!isNumber(user.lastclaim))
-user.lastclaim = 0
-if (!isNumber(user.health))
-user.health = 100
-if (!isNumber(user.crime))
-user.crime = 0
-if (!isNumber(user.lastcofre))
-user.lastcofre = 0
-if (!isNumber(user.lastdiamantes))
-user.lastdiamantes = 0
-if (!isNumber(user.lastpago))
-user.lastpago = 0
 if (!isNumber(user.lastcode))
 user.lastcode = 0
 if (!isNumber(user.lastcodereg))
 user.lastcodereg = 0
-if (!isNumber(user.lastduel))
-user.lastduel = 0
-if (!isNumber(user.lastmining))
-user.lastmining = 0
 if (!('muto' in user))
 user.muto = false
-if (!('premium' in user))
-user.premium = false
-if (!user.premium)
-user.premiumTime = 0
 if (!('registered' in user))
 user.registered = false
 if (!('genre' in user))
@@ -86,8 +58,6 @@ user.packstickers = null
 if (!user.registered) {
 if (!('name' in user))
 user.name = m.name
-if (!isNumber(user.age))
-user.age = -1
 if (!isNumber(user.regTime))
 user.regTime = -1
 }
@@ -95,30 +65,14 @@ if (!isNumber(user.afk))
 user.afk = -1
 if (!('afkReason' in user))
 user.afkReason = ''
-if (!('role' in user))
-user.role = 'Nuv'
 if (!('banned' in user))
 user.banned = false
 if (!('useDocument' in user))
 user.useDocument = false
-if (!isNumber(user.bank))
-user.bank = 0
 if (!isNumber(user.warn))
 user.warn = 0
 } else
                 global.db.data.users[m.sender] = {
-exp: 0,
-joincount: 1,
-diamond: 3,
-lastadventure: 0,
-health: 100,
-lastclaim: 0,
-lastcofre: 0,
-lastdiamantes: 0,
-lastcode: 0,
-lastduel: 0,
-lastpago: 0,
-lastmining: 0,
 lastcodereg: 0,
 muto: false,
 registered: false,
@@ -134,10 +88,6 @@ afk: -1,
 afkReason: '',
 banned: false,
 useDocument: false,
-bank: 0,
-role: 'Nuv',
-premium: false,
-premiumTime: 0,                 
 }
 let chat = global.db.data.chats[m.chat]
 if (typeof chat !== 'object')
@@ -145,28 +95,10 @@ global.db.data.chats[m.chat] = {}
 if (chat) {
 if (!('isBanned' in chat))
 chat.isBanned = false
-if (!('sAutoresponder' in chat))
-chat.sAutoresponder = ''
 if (!('welcome' in chat))
 chat.welcome = false
-if (!('autoAceptar' in chat))
-chat.autoAceptar = false
-if (!('autosticker' in chat))
-chat.autosticker = false
-if (!('autoRechazar' in chat))
-chat.autoRechazar = false
-if (!('autoresponder' in chat))
-chat.autoresponder = false
 if (!('detect' in chat))
 chat.detect = true
-if (!('economy' in chat))
-chat.economy = true
-if (!('gacha' in chat))
-chat.gacha = true
-if (!('antiBot' in chat))    
-chat.antiBot = false
-if (!('antiBot2' in chat))
-chat.antiBot2 = false
 if (!('modoadmin' in chat))                     
 chat.modoadmin = false   
 if (!('antiLink' in chat))
@@ -175,32 +107,18 @@ if (!('reaction' in chat))
 chat.reaction = false
 if (!('nsfw' in chat))
 chat.nsfw = false
-if (!('antifake' in chat))
-chat.antifake = false
 if (!('delete' in chat))
 chat.delete = false
-if (!('antiarabes' in chat))
-chat.antiarabes = false
 if (!isNumber(chat.expired))
 chat.expired = 0
 } else
 global.db.data.chats[m.chat] = {
 isBanned: false,
-sAutoresponder: '',
 welcome: false,
-autoresponder: false,
 delete: false,
-autoAceptar: false,
-autoRechazar: false,
 detect: true,
-economy: true,
-gacha: true,
-antiBot: false,
-antiBot2: false,
 modoadmin: false,
 antiLink: true,
-antifake: false,
-antiarabes: false,
 reaction: false,
 nsfw: false,
 expired: 0,
