@@ -1,4 +1,3 @@
-//code traído por Xi_Crew
 import { generateWAMessageFromContent } from '@whiskeysockets/baileys'
 import * as fs from 'fs'
 

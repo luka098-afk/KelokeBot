@@ -108,8 +108,10 @@ let handler = async (m, { conn, usedPrefix, __dirname, participants }) => {
 🕷️➤ ${usedPrefix}mute *- Silenciar*
 🕷️➤ ${usedPrefix}unmute *- Quitar silencio*
 🕷️➤ ${usedPrefix}ht *<txt> - Mención masiva*
+🕷️➤ ${usedPrefix}ht2 *<txt> - Mencion masiva x5*
 🕷️➤ ${usedPrefix}g *- Abrir/Cerrar grupo*
 🕸️➤ ${usedPrefix}tagall *- Llamar a todos*
+🕷️➤ ${usedPrefix}tagall2 *- Llamar a todos x5*
 🕷️➤ ${usedPrefix}setppgrupo *<img> - Foto grupo*
 🕷️➤ ${usedPrefix}k *<@tag> - Expulsar*
 🕷️➤ ${usedPrefix}del *- Borrar mensaje*
@@ -122,7 +124,8 @@ let handler = async (m, { conn, usedPrefix, __dirname, participants }) => {
 🕷️➤ ${usedPrefix}detect *on/off - Detección*
 🕷️➤ ${usedPrefix}ruletaban *<@tag> - Ruleta Mortal*
 🕷️➤ ${usedPrefix}link *- Link del grupo*
-
+🕷️➤ ${usedPrefix}gpu *<tag> - obtener foto de alguien*
+🕷️➤ ${usedPrefix}llamar *<tag> - etiqueta 5 veces*
 ༺═──────────────═༻
 ⛧ 𝕯𝖊𝖘𝖈𝖆𝖗𝖌𝖆𝖘 🔥
 ༺═──────────────═༻
