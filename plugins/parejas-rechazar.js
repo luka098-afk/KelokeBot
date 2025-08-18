@@ -17,18 +17,18 @@ const handler = async (m, { conn, args }) => {
   const yoRaw = yoJid.split('@')[0]
   const isGroup = m.isGroup || m.chat.endsWith('@g.us')
 
-  if (!args[0] && !(m.mentionedJid && m.mentionedJid.length > 0)) {
-    return m.reply('❌ Debes escribir o mencionar a la persona cuya solicitud quieres rechazar.\n\nEjemplo:\n*.rechazar @123456789*')
-  }
-
   let otro, otroRaw
 
-  // Método 1: mención directa
-  if (m.mentionedJid && m.mentionedJid.length > 0) {
+  // Si se está citando un mensaje, tomar sender del mensaje citado
+  if (m.quoted) {
+    otro = m.quoted.sender
+    otroRaw = otro.split('@')[0]
+  } else if (m.mentionedJid && m.mentionedJid.length > 0) {
+    // Mención directa
     otro = m.mentionedJid[0]
     otroRaw = otro.split('@')[0]
-  } else {
-    // Método 2: número en texto
+  } else if (args[0]) {
+    // Número en texto
     const numMatch = args[0].match(/\d{5,15}/)
     if (!numMatch) return m.reply('⚠️ Formato inválido. Usa un número o mención.')
     otroRaw = numMatch[0]
@@ -39,6 +39,8 @@ const handler = async (m, { conn, args }) => {
     } else {
       otro = `${otroRaw}@s.whatsapp.net`
     }
+  } else {
+    return m.reply('❌ Debes escribir o mencionar a la persona cuya solicitud quieres rechazar.\n\nEjemplo:\n*.rechazar @123456789*')
   }
 
   // Buscar la solicitud enviada a mí por esa persona
@@ -72,7 +74,8 @@ _y a veces solo queda dejarlo pasar."_ 💔
 
   await conn.sendMessage(m.chat, {
     text: mensaje,
-    mentions: [yoJid, otro]
+    mentions: [yoJid, otro],
+    quoted: m.quoted ? m.quoted : null
   })
 }
 

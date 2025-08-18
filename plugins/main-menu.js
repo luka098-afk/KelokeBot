@@ -150,6 +150,11 @@ let handler = async (m, { conn, usedPrefix, __dirname, participants }) => {
 🕷️➤ ${usedPrefix}formarpareja5 *- Pareja x5*
 🕷️➤ ${usedPrefix}sortear *- Sorteo*
 🕷️➤ ${usedPrefix}sorpresa *- Random sorpresa*
+🕷️➤ ${usedPrefix}juegos *- Menú de juegos*
+
+༺═──────────────═༻
+⛧ 𝕻𝖆𝖗𝖊𝖏𝖆𝖘 💞
+༺═──────────────═༻
 🕷️➤ ${usedPrefix}pareja *- Proponer pareja*
 🕷️➤ ${usedPrefix}aceptar *- Aceptar pareja*
 🕷️➤ ${usedPrefix}rechazar *- Rechazar pareja*
@@ -157,7 +162,10 @@ let handler = async (m, { conn, usedPrefix, __dirname, participants }) => {
 🕷️➤ ${usedPrefix}mipareja *- Ver pareja*
 🕷️➤ ${usedPrefix}listparejas *- Lista de parejas*
 🕷️➤ ${usedPrefix}ex *- Ex parejas*
-🕷️➤ ${usedPrefix}juegos *- Menú de juegos*
+🕷️➤ ${usedPrefix}casarse - *Casate con tu pareja*
+🕷️➤ ${usedPrefix}si - *aceptarle casamiento*
+🕷️➤ ${usedPrefix}no - *rechaza el casamiento*
+🕷️➤ ${usedPrefix}ex <tag> *ver los ex de alguien*
 
 ༺═──────────────═༻
 ⛧ 𝕳𝖊𝖗𝖗𝖆𝖒𝖎𝖊𝖓𝖙𝖆𝖘 🔧

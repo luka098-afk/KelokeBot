@@ -8,22 +8,29 @@ const handler = async (m, { conn }) => {
 
     const parejasPath = path.join('./database', 'parejas.json')
     const exparejasPath = path.join('./database', 'exparejas.json')
+    const casadosPath = path.join('./database', 'casados.json') // agregado
 
     if (!fs.existsSync(parejasPath)) return m.reply('❌ No tienes pareja actualmente.')
 
     const parejas = JSON.parse(fs.readFileSync(parejasPath))
     const exparejas = fs.existsSync(exparejasPath) ? JSON.parse(fs.readFileSync(exparejasPath)) : {}
+    const casados = fs.existsSync(casadosPath) ? JSON.parse(fs.readFileSync(casadosPath)) : {}
 
     // Pareja actual
     const parejaData = parejas[yoJid] || parejas[yoRaw]
-    if (!parejaData || !parejaData.pareja) {
-      return m.reply('❌ No tienes pareja actualmente.')
-    }
+    if (!parejaData || !parejaData.pareja) return m.reply('❌ No tienes pareja actualmente.')
 
     const parejaJid = parejaData.pareja
     const parejaRaw = parejaJid.split('@')[0]
     const fechaInicio = new Date(parejaData.desde)
-    const casados = parejaData.casados || false
+
+    // Revisar si están casados en casados.json
+    let casado = false
+    if (casados[yoJid]) {
+      casado = casados[yoJid].some(c => c.jid === parejaJid)
+    } else if (casados[parejaJid]) {
+      casado = casados[parejaJid].some(c => c.jid === yoJid)
+    }
 
     // Calcular tiempo juntos
     const ahora = new Date()
@@ -42,7 +49,6 @@ const handler = async (m, { conn }) => {
         exSet.add(key) // tu ex también registrado al revés
       }
     }
-
     const exCount = exSet.size
 
     // Normalizar JIDs
@@ -63,7 +69,7 @@ const handler = async (m, { conn }) => {
 *⏳ Tiempo juntos:*
 ${dias} días, ${horas} horas, ${minutos} minutos
 
-*💍 Casados:* ${casados ? '✅ Sí' : '❌ No'}
+*💍 Casados:* ${casado ? '✅ Sí' : '❌ No'}
 
 *💔 Amores pasados:* ${exCount}`
 

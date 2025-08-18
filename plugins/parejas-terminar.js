@@ -5,9 +5,11 @@ const handler = async (m, { conn, plugins }) => {
   try {
     const parejasPath = path.join('./database', 'parejas.json')
     const exparejasPath = path.join('./database', 'exparejas.json')
+    const casadosPath = path.join('./database', 'casados.json') // agregado
 
     let parejas = fs.existsSync(parejasPath) ? JSON.parse(fs.readFileSync(parejasPath)) : {}
     let exparejas = fs.existsSync(exparejasPath) ? JSON.parse(fs.readFileSync(exparejasPath)) : {}
+    let casados = fs.existsSync(casadosPath) ? JSON.parse(fs.readFileSync(casadosPath)) : {}
 
     const yoJid = m.sender
     const yoRaw = yoJid.split('@')[0]
@@ -44,8 +46,19 @@ const handler = async (m, { conn, plugins }) => {
     delete parejas[parejaJid]
     delete parejas[parejaRaw]
 
+    // Eliminar de casados.json si existía
+    if (casados[yoJid]) {
+      casados[yoJid] = casados[yoJid].filter(c => c.jid !== parejaJid)
+      if (casados[yoJid].length === 0) delete casados[yoJid]
+    }
+    if (casados[parejaJid]) {
+      casados[parejaJid] = casados[parejaJid].filter(c => c.jid !== yoJid)
+      if (casados[parejaJid].length === 0) delete casados[parejaJid]
+    }
+
     fs.writeFileSync(parejasPath, JSON.stringify(parejas, null, 2))
     fs.writeFileSync(exparejasPath, JSON.stringify(exparejas, null, 2))
+    fs.writeFileSync(casadosPath, JSON.stringify(casados, null, 2))
 
     // Poemas de ruptura
     const poemas = [
