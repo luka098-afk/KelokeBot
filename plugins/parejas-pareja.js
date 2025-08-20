@@ -39,7 +39,48 @@ const handler = async (m, { conn, text }) => {
     const senderName = conn.getName(sender) || senderRaw
     const targetName = conn.getName(target) || targetRaw
 
+    // ==========================
+    // 🔎 Verificar parejas.json
+    // ==========================
+    const parejasPath = path.join('./database', 'parejas.json')
+    let parejas = {}
+    try {
+      if (fs.existsSync(parejasPath)) {
+        parejas = JSON.parse(fs.readFileSync(parejasPath))
+      }
+    } catch {
+      parejas = {}
+    }
+
+    // ✅ Verificar si el SENDER ya tiene pareja
+    let yaTienePareja = false
+    for (const [key, data] of Object.entries(parejas)) {
+      if (key === sender || key.split('@')[0] === senderRaw || data.pareja === sender) {
+        yaTienePareja = true
+        break
+      }
+    }
+
+    if (yaTienePareja) {
+      return m.reply('❌ No puedes declararte, ya tienes una pareja registrada. Termina tu relación primero.')
+    }
+
+    // ✅ Verificar si el TARGET ya tiene pareja
+    let targetConPareja = false
+    for (const [key, data] of Object.entries(parejas)) {
+      if (key === target || key.split('@')[0] === targetRaw || data.pareja === target) {
+        targetConPareja = true
+        break
+      }
+    }
+
+    if (targetConPareja) {
+      return m.reply(`❌ No puedes declararte, @${targetRaw} ya tiene una pareja registrada. 💔`, null, { mentions: [target] })
+    }
+
+    // ==========================
     // Leer solicitudes existentes
+    // ==========================
     const solicitudesPath = path.join('./database', 'solicitudes.json')
     let solicitudes = {}
     try {
@@ -86,7 +127,7 @@ const handler = async (m, { conn, text }) => {
 💕 ¡Qué momento tan especial! 💕
 
 @${targetRaw} para aceptar la declaración escribe:
-*.aceptar*@${senderRaw}
+*.aceptar* @${senderRaw}
 
 Para rechazar la declaración escribe:
 *.rechazar* @${senderRaw}

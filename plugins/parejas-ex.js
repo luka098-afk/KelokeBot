@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 
-const handler = async (m, { conn }) => {
+const handler = async (m, { conn, text }) => {
   try {
     const exparejasPath = path.join('./database', 'exparejas.json')
     const parejasPath = path.join('./database', 'parejas.json')
@@ -15,6 +15,7 @@ const handler = async (m, { conn }) => {
     // Determinar el JID objetivo: citado > mencionado > quien ejecuta
     let targetJID = m.quoted?.sender || (m.mentionedJid && m.mentionedJid[0]) || m.sender
     const targetNumber = targetJID.split('@')[0]
+    const targetName = conn.getName(targetJID) || targetNumber
 
     // Función para extraer solo el número
     const extractNumber = (jid) => jid.toString().split('@')[0].replace(/\D/g, '')
@@ -40,19 +41,21 @@ const handler = async (m, { conn }) => {
       // Buscar donde el usuario sea valor de "pareja"
       for (const [key, data] of Object.entries(parejas)) {
         if (data?.pareja && extractNumber(data.pareja) === extractNumber(targetJID)) {
-          parejaActualFound.push({ jid: data.pareja, number: extractNumber(data.pareja) })
+          parejaActualFound.push({ jid: key, number: extractNumber(key) })
           break
         }
       }
     }
 
     // === CONSTRUIR MENSAJE ===
-    const mentionsArray = []
-    let mensaje = ''
+    const mentionsArray = [targetJID]
+    let mensaje = `📜 *Exparejas de* @${targetNumber} 📜\n\n`
 
     if (exParejasFound.length > 0) {
       mensaje += `💔 *Ex parejas:* ${exParejasFound.map(ex => `@${ex.number}`).join(', ')}\n\n`
       exParejasFound.forEach(ex => mentionsArray.push(ex.jid))
+    } else {
+      mensaje += `💔 *Ex parejas:* Ninguna registrada\n\n`
     }
 
     if (parejaActualFound.length > 0) {
@@ -62,11 +65,6 @@ const handler = async (m, { conn }) => {
       mensaje += `💔 *Pareja actual:* No tiene 💔`
     }
 
-    // Casos especiales
-    if (!mensaje) return m.reply('💔 No hay información de ex parejas ni pareja actual para este usuario.')
-
-    mentionsArray.push(targetJID) // mencionar al objetivo también
-
     await conn.sendMessage(m.chat, { text: mensaje, mentions: mentionsArray })
 
   } catch (error) {
@@ -75,7 +73,7 @@ const handler = async (m, { conn }) => {
   }
 }
 
-handler.help = ['ex']
+handler.help = ['ex [@usuario]']
 handler.tags = ['fun']
 handler.command = /^ex$/i
 

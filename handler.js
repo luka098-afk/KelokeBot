@@ -37,12 +37,8 @@ if (typeof user !== 'object')
 
 global.db.data.users[m.sender] = {}
 if (user) {
-if (!('muto' in user))
-user.muto = false
 if (!('registered' in user))
 user.registered = false
-if (!('marry' in user))
-user.marry = ''
 if (!user.registered) {
 if (!('name' in user))
 user.name = m.name
@@ -59,9 +55,7 @@ if (!isNumber(user.warn))
 user.warn = 0
 } else
                 global.db.data.users[m.sender] = {
-muto: false,
 registered: false,
-marry: '',
 name: m.name,
 afk: -1,
 afkReason: '',

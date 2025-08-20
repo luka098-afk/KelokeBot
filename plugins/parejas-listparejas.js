@@ -50,7 +50,7 @@ const handler = async (m, { conn }) => {
     // Función para encontrar el JID real de una persona en el grupo
     const findRealJID = (number) => {
       const cleanNumber = extractNumber(number)
-      
+
       // Buscar primero en exparejas (que tiene los JIDs reales del grupo)
       for (const [key, data] of Object.entries(exparejas)) {
         const keyNumber = extractNumber(key)
@@ -59,7 +59,7 @@ const handler = async (m, { conn }) => {
           return key
         }
       }
-      
+
       // Si no se encuentra en exparejas, usar formato @lid por defecto
       const defaultJID = `${cleanNumber}@lid`
       console.log(`JID real no encontrado, usando default: ${number} -> ${defaultJID}`)
@@ -69,15 +69,15 @@ const handler = async (m, { conn }) => {
     // Función para calcular tiempo de relación
     const calcularTiempoRelacion = (fechaInicio) => {
       if (!fechaInicio) return 'Tiempo desconocido'
-      
+
       const inicio = new Date(fechaInicio)
       const ahora = new Date()
       const diferencia = ahora - inicio
-      
+
       const dias = Math.floor(diferencia / (1000 * 60 * 60 * 24))
       const horas = Math.floor((diferencia % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
       const minutos = Math.floor((diferencia % (1000 * 60 * 60)) / (1000 * 60))
-      
+
       if (dias > 0) {
         return `${dias} día${dias !== 1 ? 's' : ''}`
       } else if (horas > 0) {
@@ -87,19 +87,23 @@ const handler = async (m, { conn }) => {
       }
     }
 
-    // Función para verificar si están casados
+    // ✅ Función para verificar si están casados según la estructura real de casados.json
     const estanCasados = (numero1, numero2) => {
       const num1 = extractNumber(numero1)
       const num2 = extractNumber(numero2)
-      
-      for (const [key, data] of Object.entries(casados)) {
-        if (data && data.pareja) {
-          const keyNum = extractNumber(key)
-          const parejaNum = extractNumber(data.pareja)
-          
-          if ((keyNum === num1 && parejaNum === num2) || 
-              (keyNum === num2 && parejaNum === num1)) {
-            return true
+
+      for (const [_, registros] of Object.entries(casados)) {
+        if (Array.isArray(registros)) {
+          for (const reg of registros) {
+            const a = extractNumber(reg.jid)
+            const b = extractNumber(reg.targetJid)
+            const okEstado = (reg.estado || '').toLowerCase() === 'casados'
+            if (okEstado && (
+              (a === num1 && b === num2) ||
+              (a === num2 && b === num1)
+            )) {
+              return true
+            }
           }
         }
       }
@@ -109,32 +113,32 @@ const handler = async (m, { conn }) => {
     // Recopilar todas las parejas
     const parejasEncontradas = []
     const parejasYaProcesadas = new Set()
-    
+
     console.log('\n=== PROCESANDO PAREJAS ===')
-    
+
     for (const [key, data] of Object.entries(parejas)) {
       if (data && data.pareja) {
         const keyNumber = extractNumber(key)
         const parejaOriginalJID = data.pareja
         const parejaNumber = extractNumber(parejaOriginalJID)
-        
+
         console.log(`\nProcesando entrada: ${key} -> pareja: ${parejaOriginalJID}`)
         console.log(`Numbers: ${keyNumber} -> ${parejaNumber}`)
-        
+
         // Crear clave única para evitar duplicados
         const parejaKey = [keyNumber, parejaNumber].sort().join('-')
-        
+
         if (!parejasYaProcesadas.has(parejaKey)) {
           // Encontrar JIDs reales para ambas personas
           const persona1RealJID = findRealJID(keyNumber)
           const persona2RealJID = findRealJID(parejaNumber)
-          
+
           console.log(`JID real persona1: ${keyNumber} -> ${persona1RealJID}`)
           console.log(`JID real persona2: ${parejaNumber} -> ${persona2RealJID}`)
-          
-          const casados = estanCasados(keyNumber, parejaNumber)
+
+          const casadosFlag = estanCasados(keyNumber, parejaNumber)
           const tiempoJuntos = calcularTiempoRelacion(data.desde)
-          
+
           parejasEncontradas.push({
             persona1: {
               jid: persona1RealJID, // JID REAL del grupo
@@ -146,13 +150,13 @@ const handler = async (m, { conn }) => {
             },
             desde: data.desde,
             tiempoJuntos: tiempoJuntos,
-            casados: casados
+            casados: casadosFlag
           })
-          
+
           parejasYaProcesadas.add(parejaKey)
-          
+
           console.log(`✅ Pareja agregada: ${persona1RealJID} + ${persona2RealJID}`)
-          console.log(`   Casados: ${casados}, Tiempo: ${tiempoJuntos}`)
+          console.log(`   Casados: ${casadosFlag}, Tiempo: ${tiempoJuntos}`)
         } else {
           console.log(`❌ Pareja ya procesada: ${parejaKey}`)
         }
@@ -166,10 +170,10 @@ const handler = async (m, { conn }) => {
       return m.reply('💔 No hay parejas registradas en este momento.\n\n¡Anímense a declararse! 💕')
     }
 
-    // Construir mensaje
-    let mensaje = `💕 **LISTA DE PAREJAS ACTUALES** 💕\n\n`
+    // Construir mensaje (solo formateo: "Novios" y debajo "Casados? Sí/No")
+    let mensaje = `💕 **LISTA DE NOVIOS** 💕\n\n`
     const mentionsArray = [] // Array de JIDs REALES para menciones
-    
+
     // Ordenar parejas por tiempo de relación (más antiguas primero)
     const parejasOrdenadas = parejasEncontradas.sort((a, b) => {
       if (!a.desde && !b.desde) return 0
@@ -179,32 +183,30 @@ const handler = async (m, { conn }) => {
     })
 
     let contador = 1
-    
+
     for (const pareja of parejasOrdenadas) {
-      const estadoCivil = pareja.casados ? '💍 Casados' : '💕 Novios'
-      
-      // Agregar al mensaje usando números limpios
       mensaje += `${contador}. @${pareja.persona1.number} 💕 @${pareja.persona2.number}\n`
-      mensaje += `   ${estadoCivil} • ${pareja.tiempoJuntos}\n\n`
-      
+      mensaje += `   Novios • ${pareja.tiempoJuntos}\n`
+      mensaje += `   Casados? ${pareja.casados ? 'Sí ✅' : 'No ❌'}\n\n`
+
       // Agregar JIDs REALES para menciones
       mentionsArray.push(pareja.persona1.jid)
       mentionsArray.push(pareja.persona2.jid)
-      
+
       console.log(`Pareja ${contador}: ${pareja.persona1.jid} + ${pareja.persona2.jid}`)
-      
+
       contador++
     }
 
-    // Estadísticas al final
+    // Estadísticas al final (incluye cuántos casados)
     const totalParejas = parejasOrdenadas.length
-    const parejasNoviazgo = parejasOrdenadas.filter(p => !p.casados).length
     const parejasCasadas = parejasOrdenadas.filter(p => p.casados).length
-    
+    const parejasNoviazgo = totalParejas - parejasCasadas
+
     mensaje += `📊 **ESTADÍSTICAS**\n`
     mensaje += `Total parejas: ${totalParejas}\n`
-    mensaje += `💕 En noviazgo: ${parejasNoviazgo}\n`
-    mensaje += `💍 Casadas: ${parejasCasadas}\n\n`
+    mensaje += `💕 Novios: ${parejasNoviazgo}\n`
+    mensaje += `💍 Casados: ${parejasCasadas}\n\n`
     mensaje += `_¡El amor está en el aire! 💖_`
 
     console.log('\n=== MENSAJE FINAL ===')
