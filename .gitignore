@@ -38,3 +38,11 @@ Thumbs.db
 # Build output
 dist/
 build/
+
+# Bases de datos JSON del bot
+casados.json
+exparejas.json
+listanegra.json
+parejas.json
+solicitudes.json
+usuarios.json

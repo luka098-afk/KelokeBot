@@ -14,12 +14,12 @@ const handler = async (m, { conn, command }) => {
 
   if (cmd === 'config') {
     // Mostrar el estado de todas las opciones
-    let text = '╭━━🎛️ *GROUP CONFIGURATION* ━━╮\n';
+    let text = '╭━━*GROUP CONFIGURATION*━━╮\n';
     for (const key in options) {
       const state = chat[key] ? '✅ ON' : '❌ OFF';
       text += `┃ *${options[key]}:* ${state}\n`;
     }
-    text += '╰━━━━━━━━━━━━━━━━━━━━━━━━━━╯';
+    text += '╰━━━━━━━━━━￶━━━━━━━￶━━━━￶╯';
     return conn.reply(m.chat, text, m);
   }
 
