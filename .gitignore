@@ -6,7 +6,6 @@ logs
 *.log
 npm-debug.log*
 yarn-debug.log*
-yarn-error.log*
 
 # Runtime data
 pids
@@ -39,10 +38,5 @@ Thumbs.db
 dist/
 build/
 
-# Bases de datos JSON del bot
-casados.json
-exparejas.json
-listanegra.json
-parejas.json
-solicitudes.json
-usuarios.json
+# Bases de datos JSON del bot (mantener local, no subir a GitHub)
+database/*.json
