@@ -8,7 +8,7 @@ export async function before(m, { conn, isAdmin, isBotAdmin, isOwner, isROwner, 
     let chat = global.db.data.chats[m.chat];
 
     // 🔹 Activar antilink por defecto si no existe
-    if (chat.antiLink === undefined) chat.antiLink = true;
+    if (chat.antilink === undefined) chat.antilink = true;
 
     let delet = m.key.participant;
     let bang = m.key.id;
@@ -19,10 +19,10 @@ export async function before(m, { conn, isAdmin, isBotAdmin, isOwner, isROwner, 
     const isGroupLink = linkRegex.exec(m.text) || linkRegex1.exec(m.text);
     const grupo = `https://chat.whatsapp.com`;
 
-    if (isAdmin && chat.antiLink && m.text.includes(grupo)) 
+    if (isAdmin && chat.antilink && m.text.includes(grupo))
         return m.reply(` *El antilink está activo pero te salvaste por ser admin.*`);
 
-    if (chat.antiLink && isGroupLink && !isAdmin) {
+    if (chat.antilink && isGroupLink && !isAdmin) {
         if (isBotAdmin) {
             const linkThisGroup = `https://chat.whatsapp.com/${await this.groupInviteCode(m.chat)}`;
             if (m.text.includes(linkThisGroup)) return !0;
@@ -34,10 +34,10 @@ export async function before(m, { conn, isAdmin, isBotAdmin, isOwner, isROwner, 
             { quoted: m, ephemeralExpiration: 24*60*100, disappearingMessagesInChat: 24*60*100 }
         );
 
-        if (!isBotAdmin) 
+        if (!isBotAdmin)
             return conn.sendMessage(
-                m.chat, 
-                { text: ` *El antilink está activo pero no puedo eliminarte porque no soy admin.*`, mentions: [...groupAdmins.map(v => v.id)] }, 
+                m.chat,
+                { text: ` *El antilink está activo pero no puedo eliminarte porque no soy admin.*`, mentions: [...groupAdmins.map(v => v.id)] },
                 { quoted: m }
             );
 
