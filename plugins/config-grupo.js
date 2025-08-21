@@ -10,6 +10,12 @@ const options = {
 
 const handler = async (m, { conn, command }) => {
   const chat = global.db.data.chats[m.chat] || {};
+
+  // 🔹 Inicializar todas las opciones si no existen
+  for (const key in options) {
+    if (chat[key] === undefined) chat[key] = key === 'antilink' ? true : false;
+  }
+
   const cmd = command.toLowerCase();
 
   if (cmd === 'config') {
@@ -19,7 +25,7 @@ const handler = async (m, { conn, command }) => {
       const state = chat[key] ? '✅ ON' : '❌ OFF';
       text += `┃ *${options[key]}:* ${state}\n`;
     }
-    text += '╰━━━━━━━━━━￶━━━━━━━￶━━━━￶╯';
+    text += '╰━━━━━━━━━━━━━━━━━━━━━━╯';
     return conn.reply(m.chat, text, m);
   }
 
