@@ -7,7 +7,6 @@ import chalk from 'chalk'
 import fetch from 'node-fetch'
 import getMensajeSistema from './lib/msmwarning.js'
 
-
 const { proto } = (await import('@whiskeysockets/baileys')).default
 const isNumber = x => typeof x === 'number' && !isNaN(x)
 const delay = ms => isNumber(ms) && new Promise(resolve => setTimeout(function () {
@@ -30,11 +29,9 @@ try {
 m = smsg(this, m) || m
 if (!m)
 return
-m.exp = 0
 try {
 let user = global.db.data.users[m.sender]
 if (typeof user !== 'object')
-
 global.db.data.users[m.sender] = {}
 if (user) {
 if (!('registered' in user))
@@ -100,13 +97,11 @@ if (typeof settings !== 'object') global.db.data.settings[this.user.jid] = {}
 if (settings) {
 if (!('self' in settings)) settings.self = false
 if (!('restrict' in settings)) settings.restrict = true
-if (!('jadibotmd' in settings)) settings.jadibotmd = true
 if (!('antiPrivate' in settings)) settings.antiPrivate = false
 if (!('autoread' in settings)) settings.autoread = false
 } else global.db.data.settings[this.user.jid] = {
 self: false,
 restrict: true,
-jadibotmd: true,
 antiPrivate: false,
 autoread: false,
 status: 0
@@ -127,7 +122,6 @@ const detectwhat = m.sender.includes('@lid') ? '@lid' : '@s.whatsapp.net';
 const isROwner = [...global.owner.map(([number]) => number)].map(v => v.replace(/[^0-9]/g, '') + detectwhat).includes(m.sender)
 const isOwner = isROwner || m.fromMe
 const isMods = isOwner || global.mods.map(v => v.replace(/[^0-9]/g, '') + detectwhat).includes(m.sender)
-//const isPrems = isROwner || global.prems.map(v => v.replace(/[^0-9]/g, '') + detectwhat).includes(m.sender)
 const isPrems = isROwner || global.db.data.users[m.sender].premiumTime > 0
 
 if (m.isBaileys) return
@@ -146,8 +140,6 @@ if (queque.indexOf(previousID) === -1) clearInterval(this)
 await delay(time)
 }, time)
 }
-
-m.exp += Math.ceil(Math.random() * 10)
 
 let usedPrefix
 
@@ -315,11 +307,6 @@ fail('private', m, this)
 continue
 }
 m.isCommand = true
-let xp = 'exp' in plugin ? parseInt(plugin.exp) : 17
-if (xp > 200)
-m.reply('chirrido -_-')
-else
-m.exp += xp
 let extra = {
 match,
 usedPrefix,
@@ -345,8 +332,6 @@ __filename
 }
 try {
 await plugin.call(this, m, extra)
-if (!isPrems)
-m.coin = m.coin || plugin.coin || false
 } catch (e) {
 m.error = e
 console.error(e)
@@ -363,8 +348,6 @@ await plugin.after.call(this, m, extra)
 } catch (e) {
 console.error(e)
 }}
-if (m.coin)
-conn.reply(m.chat, `❮✦❯ Utilizaste ${+m.coin} ${moneda}`, m)
 }
 break
 }}
@@ -384,8 +367,7 @@ let cancellazzione = m.key.participant
 await conn.sendMessage(m.chat, { delete: { remoteJid: m.chat, fromMe: false, id: bang, participant: cancellazzione }})
 }
 if (m.sender && (user = global.db.data.users[m.sender])) {
-user.exp += m.exp
-user.coin -= m.coin * 1
+// Usuario procesado
 }
 
 let stat
