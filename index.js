@@ -8,12 +8,12 @@ import {fileURLToPath, pathToFileURL} from 'url'
 import {platform} from 'process'
 import * as ws from 'ws'
 import fs, {readdirSync, statSync, unlinkSync, existsSync, mkdirSync, readFileSync, rmSync, watch} from 'fs'
-import yargs from 'yargs';
+import yargs from 'yargs'
 import {spawn} from 'child_process'
 import lodash from 'lodash'
 import chalk from 'chalk'
 import syntaxerror from 'syntax-error'
-import {tmpdir} from 'os'
+import os, {tmpdir} from 'os'
 import {format} from 'util'
 import boxen from 'boxen'
 import P from 'pino'
@@ -38,6 +38,9 @@ const PORT = process.env.PORT || process.env.SERVER_PORT || 3000
 
 let { say } = cfonts
 
+// Definir variables globales necesarias
+global.sessions = global.sessions || 'sessions'
+
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 async function showBanner() {
@@ -50,7 +53,7 @@ async function showBanner() {
     const aiMsg = chalk.hex('#ffb300').bold('🤖 KelokeBot - Tu compañero virtual')
     const tips = [
         chalk.hex('#ffb300')('💡 Tip: Usa /help para ver los comandos disponibles.'),
-        chalk.hex('#00eaff')('� Síguenos en GitHub para actualizaciones.'),
+        chalk.hex('#00eaff')('📋 Síguenos en GitHub para actualizaciones.'),
         chalk.hex('#ff00cc')('✨ Disfruta de la experiencia premium de Keloke.')
     ]
     const loadingFrames = [
@@ -138,8 +141,6 @@ async function showBanner() {
 
 // Ejecutar el banner
 await showBanner()
-
-
 protoType()
 serialize()
 
@@ -160,7 +161,20 @@ const __dirname = global.__dirname(import.meta.url)
 global.opts = new Object(yargs(process.argv.slice(2)).exitProcess(false).parse())
 global.prefix = new RegExp('^[#/!.]')
 
-global.db = new Low(/https?:\/\//.test(opts['db'] || '') ? new cloudDBAdapter(opts['db']) : new JSONFile('./database.json'))
+// Crear adaptador de base de datos según el tipo
+const createDBAdapter = (dbUrl) => {
+  if (/https?:\/\//.test(dbUrl)) {
+    try {
+      return new mongoDB(dbUrl)
+    } catch (e) {
+      console.log(chalk.yellow('⚠️ MongoDB no disponible, usando JSON local'))
+      return new JSONFile('./database.json')
+    }
+  }
+  return new JSONFile('./database.json')
+}
+
+global.db = new Low(createDBAdapter(opts['db'] || ''))
 
 global.DATABASE = global.db 
 global.loadDatabase = async function loadDatabase() {
@@ -207,7 +221,7 @@ let opcion
 if (methodCodeQR) {
 opcion = '1'
 }
-if (!methodCodeQR && !methodCode && !fs.existsSync(`./${sessions}/creds.json`)) {
+if (!methodCodeQR && !methodCode && !fs.existsSync(`./${global.sessions}/creds.json`)) {
 do {
 opcion = await question(`
 ╭─────────────────────────────◉
@@ -228,12 +242,11 @@ ${chalk.magenta('--->')} ${chalk.bold('Elige (1 o 2): ')}`.trim());
 
 if (!/^[1-2]$/.test(opcion)) {
     console.log(chalk.redBright('✖ Opción inválida. Solo se permite 1 o 2.'));
-}} while (opcion !== '1' && opcion !== '2' || fs.existsSync(`./${sessions}/creds.json`))
-} 
+}} while (opcion !== '1' && opcion !== '2' || fs.existsSync(`./${global.sessions}/creds.json`))
+}
 
 console.info = () => {} 
-console.debug = () => {} 
-
+console.debug = () => {}
 const connectionOptions = {
   logger: pino({ level: 'silent' }),
   printQRInTerminal: opcion == '1' ? true : methodCodeQR ? true : false,
@@ -263,7 +276,7 @@ const connectionOptions = {
 
 global.conn = makeWASocket(connectionOptions);
 
-if (!fs.existsSync(`./${sessions}/creds.json`)) {
+if (!fs.existsSync(`./${global.sessions}/creds.json`)) {
 if (opcion === '2' || methodCode) {
 opcion = '2'
 if (!conn.authState.creds.registered) {
@@ -315,7 +328,16 @@ conn.well = false;
 if (!opts['test']) {
 if (global.db) setInterval(async () => {
 if (global.db.data) await global.db.write()
-if (opts['autocleartmp'] && (global.support || {}).find) (tmp = [os.tmpdir(), 'tmp', `${jadi}`], tmp.forEach((filename) => cp.spawn('find', [filename, '-amin', '3', '-type', 'f', '-delete'])));
+if (opts['autocleartmp'] && (global.support || {}).find) {
+  const tmp = [os.tmpdir(), 'tmp'];
+  tmp.forEach((filename) => {
+    try {
+      spawn('find', [filename, '-amin', '3', '-type', 'f', '-delete']);
+    } catch (e) {
+      console.log('Error al limpiar archivos temporales:', e.message);
+    }
+  });
+}
 }, 30 * 1000);
 }
 
@@ -360,13 +382,12 @@ console.log(chalk.bold.cyanBright(`\n╭┄┄┄┄┄┄┄┄┄┄┄┄┄�
 await global.reloadHandler(true).catch(console.error)
 } else if (reason === DisconnectReason.timedOut) {
 console.log(chalk.bold.yellowBright(`\n╭┄┄┄┄┄┄┄┄┄┄┄┄┄┄ • • • ┄┄┄┄┄┄┄┄┄┄┄┄┄┄ ▸\n┆ ⧖ TIEMPO DE CONEXIÓN AGOTADO, RECONECTANDO....\n╰┄┄┄┄┄┄┄┄┄┄┄┄┄┄ • • • ┄┄┄┄┄┄┄┄┄┄┄┄┄┄ ▸`))
-await global.reloadHandler(true).catch(console.error) //process.send('reset')
+await global.reloadHandler(true).catch(console.error)
 } else {
 console.log(chalk.bold.redBright(`\n⚠︎！ RAZON DE DESCONEXIÓN DESCONOCIDA: ${reason || 'No encontrado'} >> ${connection || 'No encontrado'}`))
 }}
 }
 process.on('uncaughtException', console.error)
-
 let isInit = true;
 let handler = await import('./handler.js')
 global.reloadHandler = async function(restatConn) {
@@ -384,8 +405,8 @@ global.conn.ws.close()
 conn.ev.removeAllListeners()
 global.conn = makeWASocket(connectionOptions, {
   chats: oldChats,
-  retryRequestDelayMs: 10000, // Increase delay between retries
-  maxRetries: 3 // Limit number of retries
+  retryRequestDelayMs: 10000,
+  maxRetries: 3
 })
 isInit = true
 }
@@ -396,7 +417,6 @@ conn.ev.off('creds.update', conn.credsUpdate)
 }
 
 conn.handler = handler.handler ? handler.handler.bind(conn) : conn.handler
-
 conn.connectionUpdate = connectionUpdate.bind(global.conn)
 conn.credsUpdate = saveCreds.bind(global.conn, true)
 
@@ -404,7 +424,6 @@ const currentDateTime = new Date()
 const messageDateTime = new Date(conn.ev)
 if (currentDateTime >= messageDateTime) {
 const chats = Object.entries(conn.chats).filter(([jid, chat]) => !jid.endsWith('@g.us') && chat.isChats).map((v) => v[0])
-
 } else {
 const chats = Object.entries(conn.chats).filter(([jid, chat]) => !jid.endsWith('@g.us') && chat.isChats).map((v) => v[0])
 }
@@ -425,31 +444,6 @@ conn.ev.on('creds.update', conn.credsUpdate)
 isInit = false
 return true
 };
-
-//Arranque nativo para subbots by - ReyEndymion >> https://github.com/ReyEndymion
-
-global.rutaJadiBot = join(__dirname, './JadiBots')
-
-if (global.yukiJadibts) {
-if (!existsSync(global.rutaJadiBot)) {
-mkdirSync(global.rutaJadiBot, { recursive: true }) 
-console.log(chalk.bold.cyan(`La carpeta: ${jadi} se creó correctamente.`))
-} else {
-console.log(chalk.bold.cyan(`La carpeta: ${jadi} ya está creada.`)) 
-}
-
-const readRutaJadiBot = readdirSync(rutaJadiBot)
-if (readRutaJadiBot.length > 0) {
-const creds = 'creds.json'
-for (const gjbts of readRutaJadiBot) {
-const botPath = join(rutaJadiBot, gjbts)
-const readBotPath = readdirSync(botPath)
-if (readBotPath.includes(creds)) {
-yukiJadiBot({pathYukiJadiBot: botPath, m: null, conn, args: '', usedPrefix: '/', command: 'serbot'})
-}
-}
-}
-}
 
 const pluginFolder = global.__dirname(join(__dirname, './plugins/index'))
 const pluginFilter = (filename) => /\.js$/.test(filename)
@@ -493,6 +487,7 @@ global.plugins = Object.fromEntries(Object.entries(global.plugins).sort(([a], [b
 Object.freeze(global.reload)
 watch(pluginFolder, global.reload)
 await global.reloadHandler()
+
 async function _quickTest() {
 const test = await Promise.all([
 spawn('ffmpeg'),
@@ -520,62 +515,57 @@ Object.freeze(global.support);
 
 function clearTmp() {
 const tmpDir = join(__dirname, 'tmp')
+if (existsSync(tmpDir)) {
 const filenames = readdirSync(tmpDir)
 filenames.forEach(file => {
+try {
 const filePath = join(tmpDir, file)
-unlinkSync(filePath)})
+if (existsSync(filePath)) unlinkSync(filePath)
+} catch (e) {
+console.log('Error al limpiar archivo temporal:', e.message)
 }
+})
+}}
 
 function purgeSession() {
 let prekey = []
-let directorio = readdirSync(`./${sessions}`)
+const sessionDir = `./${global.sessions}`
+if (existsSync(sessionDir)) {
+let directorio = readdirSync(sessionDir)
 let filesFolderPreKeys = directorio.filter(file => {
 return file.startsWith('pre-key-')
 })
 prekey = [...prekey, ...filesFolderPreKeys]
 filesFolderPreKeys.forEach(files => {
-unlinkSync(`./${sessions}/${files}`)
-})
-} 
-
-function purgeSessionSB() {
 try {
-const listaDirectorios = readdirSync(`./${jadi}/`);
-let SBprekey = [];
-listaDirectorios.forEach(directorio => {
-if (statSync(`./${jadi}/${directorio}`).isDirectory()) {
-const DSBPreKeys = readdirSync(`./${jadi}/${directorio}`).filter(fileInDir => {
-return fileInDir.startsWith('pre-key-')
+unlinkSync(`${sessionDir}/${files}`)
+} catch (e) {
+console.log('Error al eliminar archivo de sesión:', e.message)
+}
 })
-SBprekey = [...SBprekey, ...DSBPreKeys];
-DSBPreKeys.forEach(fileInDir => {
-if (fileInDir !== 'creds.json') {
-unlinkSync(`./${jadi}/${directorio}/${fileInDir}`)
-}})
-}})
-if (SBprekey.length === 0) {
-console.log(chalk.bold.green(`\n╭» ❍ ${jadi} ❍\n│→ NADA POR ELIMINAR \n╰― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ⌫ ♻︎`))
-} else {
-console.log(chalk.bold.cyanBright(`\n╭» ❍ ${jadi} ❍\n│→ ARCHIVOS NO ESENCIALES ELIMINADOS\n╰― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ⌫ ♻︎︎`))
-}} catch (err) {
-console.log(chalk.bold.red(`\n╭» ❍ ${jadi} ❍\n│→ OCURRIÓ UN ERROR\n╰― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ⌫ ♻\n` + err))
 }}
-
 function purgeOldFiles() {
-const directories = [`./${sessions}/`, `./${jadi}/`]
+const directories = [`./${global.sessions}/`]
 directories.forEach(dir => {
-readdirSync(dir, (err, files) => {
-if (err) throw err
+if (existsSync(dir)) {
+try {
+const files = readdirSync(dir)
 files.forEach(file => {
 if (file !== 'creds.json') {
 const filePath = path.join(dir, file);
-unlinkSync(filePath, err => {
-if (err) {
-console.log(chalk.bold.red(`\n╭» ❍ ARCHIVO ❍\n│→ ${file} NO SE LOGRÓ BORRAR\n╰― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ⌫ ✘\n` + err))
-} else {
+try {
+unlinkSync(filePath)
 console.log(chalk.bold.green(`\n╭» ❍ ARCHIVO ❍\n│→ ${file} BORRADO CON ÉXITO\n╰― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ⌫ ♻`))
-} }) }
-}) }) }) }
+} catch (err) {
+console.log(chalk.bold.red(`\n╭» ❍ ARCHIVO ❍\n│→ ${file} NO SE LOGRÓ BORRAR\n╰― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ⌫ ✘`))
+}
+}
+})
+} catch (e) {
+console.log('Error al acceder al directorio:', e.message)
+}
+}})
+}
 
 function redefineConsoleMethod(methodName, filterStrings) {
 const originalConsoleMethod = console[methodName]
@@ -588,36 +578,83 @@ originalConsoleMethod.apply(console, arguments)
 }}
 
 setInterval(async () => {
-if (stopped === 'close' || !conn || !conn.user) return
+if (global.stopped === 'close' || !conn || !conn.user) return
 await clearTmp()
-console.log(chalk.bold.cyanBright(`\n╭» ❍ MULTIMEDIA ❍\n│→ ARCHIVOS DE LA CARPETA TMP ELIMINADAS\n╰― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ⌫ ♻`))}, 1000 * 60 * 4) // 4 min 
+console.log(chalk.bold.cyanBright(`\n╭» ❍ MULTIMEDIA ❍\n│→ ARCHIVOS DE LA CARPETA TMP ELIMINADAS\n╰― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ⌫ ♻`))
+}, 1000 * 60 * 4) // 4 minutos
 
 setInterval(async () => {
-if (stopped === 'close' || !conn || !conn.user) return
+if (global.stopped === 'close' || !conn || !conn.user) return
 await purgeSession()
-console.log(chalk.bold.cyanBright(`\n╭» ❍ ${global.sessions} ❍\n│→ SESIONES NO ESENCIALES ELIMINADAS\n╰― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ⌫ ♻`))}, 1000 * 60 * 10) // 10 min
+console.log(chalk.bold.cyanBright(`\n╭» ❍ ${global.sessions} ❍\n│→ SESIONES NO ESENCIALES ELIMINADAS\n╰― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ⌫ ♻`))
+}, 1000 * 60 * 10) // 10 minutos
 
 setInterval(async () => {
-if (stopped === 'close' || !conn || !conn.user) return
-await purgeSessionSB()}, 1000 * 60 * 10) 
-
-setInterval(async () => {
-if (stopped === 'close' || !conn || !conn.user) return
+if (global.stopped === 'close' || !conn || !conn.user) return
 await purgeOldFiles()
-console.log(chalk.bold.cyanBright(`\n╭» ❍ ARCHIVOS ❍\n│→ ARCHIVOS RESIDUALES ELIMINADAS\n╰― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ⌫ ♻`))}, 1000 * 60 * 10)
+console.log(chalk.bold.cyanBright(`\n╭» ❍ ARCHIVOS ❍\n│→ ARCHIVOS RESIDUALES ELIMINADAS\n╰― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ⌫ ♻`))
+}, 1000 * 60 * 10) // 10 minutos
 
-_quickTest().then(() => conn.logger.info(chalk.bold(`✦  H E C H O\n`.trim()))).catch(console.error)
+// Ejecutar test inicial y mostrar mensaje final
+_quickTest()
+  .then(() => {
+    conn.logger.info(chalk.bold(`✦  H E C H O\n`.trim()))
+    console.log(chalk.bold.greenBright('\n🚀 Bot iniciado correctamente. Listo para recibir mensajes.'))
+  })
+  .catch(console.error)
 
+// Función para validar números de teléfono
 async function isValidPhoneNumber(number) {
-try {
-number = number.replace(/\s+/g, '')
-if (number.startsWith('+521')) {
-number = number.replace('+521', '+52');
-} else if (number.startsWith('+52') && number[4] === '1') {
-number = number.replace('+52 1', '+52');
+  try {
+    number = number.replace(/\s+/g, '')
+    if (number.startsWith('+521')) {
+      number = number.replace('+521', '+52');
+    } else if (number.startsWith('+52') && number[4] === '1') {
+      number = number.replace('+52 1', '+52');
+    }
+    const parsedNumber = phoneUtil.parseAndKeepRawInput(number)
+    return phoneUtil.isValidNumber(parsedNumber)
+  } catch (error) {
+    return false
+  }
 }
-const parsedNumber = phoneUtil.parseAndKeepRawInput(number)
-return phoneUtil.isValidNumber(parsedNumber)
-} catch (error) {
-return false
-}}
+
+// Manejo de cierre del proceso
+process.on('SIGINT', async () => {
+  console.log(chalk.yellow('\n⚠️  Cerrando bot...'))
+  
+  if (global.conn) {
+    try {
+      await global.conn.ws.close()
+    } catch (e) {
+      console.error('Error al cerrar conexión:', e)
+    }
+  }
+  
+  if (global.db && global.db.data) {
+    try {
+      await global.db.write()
+      console.log(chalk.green('✅ Base de datos guardada'))
+    } catch (e) {
+      console.error('Error al guardar base de datos:', e)
+    }
+  }
+  
+  console.log(chalk.red('❌ Bot desconectado'))
+  process.exit(0)
+})
+
+// Manejo de errores no capturados
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason)
+})
+
+// Mensaje final de inicio
+console.log(chalk.bold.magentaBright(`
+╭─────────────────────────────────────╮
+│  🤖 KelokeBot iniciado correctamente │
+│  ✨ Listo para recibir mensajes      │
+│  📱 Versión limpia sin jadibots      │
+╰─────────────────────────────────────╯
+`))
+
