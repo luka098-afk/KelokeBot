@@ -7,16 +7,27 @@ const handler = async (m, { conn, isAdmin, isBotAdmin }) => {
     // Obtener información actual del grupo
     const groupInfo = await conn.groupMetadata(m.chat)
     const isAnnouncement = groupInfo.announce
+    let text = ''
     
     if (isAnnouncement) {
       // El grupo está cerrado, abrirlo
       await conn.groupSettingUpdate(m.chat, 'not_announcement')
-      return m.reply('🔓 *El grupo ha sido abierto.*\nAhora todos pueden enviar mensajes.')
+      text = '🔓 *El grupo ha sido abierto.*\nAhora todos pueden enviar mensajes.'
     } else {
       // El grupo está abierto, cerrarlo
       await conn.groupSettingUpdate(m.chat, 'announcement')
-      return m.reply('🔒 *El grupo ha sido cerrado.*\nSolo los administradores pueden enviar mensajes.')
+      text = '🔒 *El grupo ha sido cerrado.*\nSolo los administradores pueden enviar mensajes.'
     }
+
+    // Respuesta con botón de canal
+    await conn.sendMessage(m.chat, {
+      text,
+      footer: '📢 Síguenos en nuestro canal oficial',
+      templateButtons: [
+        { index: 1, urlButton: { displayText: '🌐 Canal', url: 'https://whatsapp.com/channel/0029VaI2USk3tKaKkqNv0T3F' } }
+      ]
+    }, { quoted: m })
+
   } catch (error) {
     console.error('Error al obtener info del grupo:', error)
     return m.reply('❌ Error al cambiar la configuración del grupo.')

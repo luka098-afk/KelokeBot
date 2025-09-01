@@ -1,13 +1,73 @@
 const handler = async (m, { conn, text, usedPrefix, command, participants, groupMetadata, isAdmin, isBotAdmin }) => {
-  if (!m.isGroup) return m.reply('✦ Este comando solo se puede usar en grupos.')
-  if (!isAdmin) return m.reply('✦ Solo los administradores pueden usar este comando.')
-  if (!isBotAdmin) return m.reply('✦ Necesito ser administrador para poder eliminar usuarios.')
+  const channelRD = global.channelRD || { id: '120363386229166956@newsletter', name: 'Canal Oficial' }
+
+  if (!m.isGroup) return conn.sendMessage(m.chat, {
+    text: '✦ Este comando solo se puede usar en grupos.',
+    contextInfo: {
+      mentionedJid: [m.sender],
+      isForwarded: true,
+      forwardedNewsletterMessageInfo: {
+        newsletterJid: channelRD.id,
+        serverMessageId: 100,
+        newsletterName: channelRD.name
+      }
+    }
+  }, { quoted: m })
+
+  if (!isAdmin) return conn.sendMessage(m.chat, {
+    text: '✦ Solo los administradores pueden usar este comando.',
+    contextInfo: {
+      mentionedJid: [m.sender],
+      isForwarded: true,
+      forwardedNewsletterMessageInfo: {
+        newsletterJid: channelRD.id,
+        serverMessageId: 100,
+        newsletterName: channelRD.name
+      }
+    }
+  }, { quoted: m })
+
+  if (!isBotAdmin) return conn.sendMessage(m.chat, {
+    text: '✦ Necesito ser administrador para poder eliminar usuarios.',
+    contextInfo: {
+      mentionedJid: [m.sender],
+      isForwarded: true,
+      forwardedNewsletterMessageInfo: {
+        newsletterJid: channelRD.id,
+        serverMessageId: 100,
+        newsletterName: channelRD.name
+      }
+    }
+  }, { quoted: m })
 
   const user = m.mentionedJid?.[0]
   const mensaje = text.split(" ").slice(1).join(" ")
 
-  if (!user) return m.reply(`✦ Debes mencionar a alguien.\nEjemplo: *${usedPrefix}${command} @usuario razón*`)
-  if (!mensaje) return m.reply('✦ Debes escribir el motivo de la advertencia.')
+  if (!user) return conn.sendMessage(m.chat, {
+    text: `✦ Debes mencionar a alguien.\nEjemplo: *${usedPrefix}${command} @usuario razón*`,
+    contextInfo: {
+      mentionedJid: [m.sender],
+      isForwarded: true,
+      forwardedNewsletterMessageInfo: {
+        newsletterJid: channelRD.id,
+        serverMessageId: 100,
+        newsletterName: channelRD.name
+      }
+    }
+  }, { quoted: m })
+
+  if (!mensaje) return conn.sendMessage(m.chat, {
+    text: '✦ Debes escribir el motivo de la advertencia.',
+    contextInfo: {
+      mentionedJid: [m.sender],
+      isForwarded: true,
+      forwardedNewsletterMessageInfo: {
+        newsletterJid: channelRD.id,
+        serverMessageId: 100,
+        newsletterName: channelRD.name
+      }
+    }
+  }, { quoted: m })
 
   const date = new Date().toLocaleDateString('es-ES')
 
@@ -26,6 +86,7 @@ const handler = async (m, { conn, text, usedPrefix, command, participants, group
     date: date,
     jid: user
   }
+
   const groupName = groupMetadata.subject
   const senderName = await conn.getName(m.sender)
   const userName = await conn.getName(user)
@@ -45,24 +106,40 @@ ${mensaje}
 ❌ *El usuario ha sido eliminado del grupo por acumular 3 advertencias.*`
 
     try {
-      // Enviar mensaje de eliminación al grupo
-      await conn.sendMessage(m.chat, { 
+      await conn.sendMessage(m.chat, {
         text: eliminarTexto,
-        mentions: [user]
+        mentions: [user],
+        contextInfo: {
+          mentionedJid: [user, m.sender],
+          isForwarded: true,
+          forwardedNewsletterMessageInfo: {
+            newsletterJid: channelRD.id,
+            serverMessageId: 100,
+            newsletterName: channelRD.name
+          }
+        }
       }, { quoted: m })
 
-      // Eliminar usuario del grupo
       await conn.groupParticipantsUpdate(m.chat, [user], 'remove')
-      
-      // Resetear las advertencias del usuario
       delete global.db.data.chats[m.chat].warns[user]
 
     } catch (e) {
       console.error(e)
-      await m.reply('❌ No se pudo eliminar al usuario. Verifica que el bot tenga permisos de administrador.')
+      await conn.sendMessage(m.chat, {
+        text: '❌ No se pudo eliminar al usuario. Verifica que el bot tenga permisos de administrador.',
+        contextInfo: {
+          mentionedJid: [m.sender],
+          isForwarded: true,
+          forwardedNewsletterMessageInfo: {
+            newsletterJid: channelRD.id,
+            serverMessageId: 100,
+            newsletterName: channelRD.name
+          }
+        }
+      }, { quoted: m })
     }
+
   } else {
-    // Advertencia normal (1ra o 2da)
     const advertenciaTexto = `⚠️ *ADVERTENCIA ${newWarnCount}/3* ⚠️
 
 👤 *Usuario:* @${user.split('@')[0]}
@@ -72,20 +149,39 @@ ${mensaje}
 📝 *Motivo:*
 ${mensaje}
 
-${newWarnCount === 2 ? 
-  '🔥 *¡ÚLTIMA ADVERTENCIA!* La próxima advertencia resultará en eliminación del grupo.' : 
+${newWarnCount === 2 ?
+  '🔥 *¡ÚLTIMA ADVERTENCIA!* La próxima advertencia resultará en eliminación del grupo.' :
   '❗ Por favor, evita futuras faltas. Te quedan ' + (3 - newWarnCount) + ' advertencias.'}`
 
     try {
-      // Enviar advertencia al grupo mencionando al usuario
-      await conn.sendMessage(m.chat, { 
+      await conn.sendMessage(m.chat, {
         text: advertenciaTexto,
-        mentions: [user]
+        mentions: [user],
+        contextInfo: {
+          mentionedJid: [user, m.sender],
+          isForwarded: true,
+          forwardedNewsletterMessageInfo: {
+            newsletterJid: channelRD.id,
+            serverMessageId: 100,
+            newsletterName: channelRD.name
+          }
+        }
       }, { quoted: m })
 
     } catch (e) {
       console.error(e)
-      await m.reply('❌ No se pudo enviar la advertencia.')
+      await conn.sendMessage(m.chat, {
+        text: '❌ No se pudo enviar la advertencia.',
+        contextInfo: {
+          mentionedJid: [m.sender],
+          isForwarded: true,
+          forwardedNewsletterMessageInfo: {
+            newsletterJid: channelRD.id,
+            serverMessageId: 100,
+            newsletterName: channelRD.name
+          }
+        }
+      }, { quoted: m })
     }
   }
 }
