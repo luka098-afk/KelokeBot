@@ -432,10 +432,8 @@ const chats = Object.entries(conn.chats).filter(([jid, chat]) => !jid.endsWith('
 conn.ev.on('messages.upsert', async (m) => {
     if (m.messages && m.messages[0] && m.messages[0].key && m.messages[0].key.remoteJid) {
         const jid = m.messages[0].key.remoteJid;
-        await conn.sendPresenceUpdate('composing', jid);
         await conn.handler(m);
         await conn.readMessages([m.messages[0].key]);
-        await conn.sendPresenceUpdate('paused', jid);
     }
 });
 
